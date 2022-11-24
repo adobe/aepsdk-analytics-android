@@ -143,7 +143,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
     }
 
     private fun handleResetIdentitiesEvent(event: Event) {
-        if (event.type != EventType.IDENTITY || event.source != EventSource.REQUEST_RESET) {
+        if (event.type != EventType.GENERIC_IDENTITY || event.source != EventSource.REQUEST_RESET) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
@@ -359,6 +359,24 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                 )
                 track(eventData, event.timestampInSeconds, false, event.uniqueIdentifier)
             }
+            eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.GET_QUEUE_SIZE) -> {
+                val queueSize = analyticsDatabase.getQueueSize()
+                val data: Map<String, Any> = mapOf(
+                    AnalyticsConstants.EventDataKeys.Analytics.QUEUE_SIZE to queueSize
+                )
+                Log.debug(
+                    AnalyticsConstants.LOG_TAG,
+                    CLASS_NAME,
+                    "Dispatching Analytics hit queue size response event with eventdata $data"
+                )
+                api.dispatch(
+                    Event.Builder(
+                        "QueueSizeValue",
+                        EventType.ANALYTICS,
+                        EventSource.RESPONSE_CONTENT
+                    ).inResponseToEvent(event).setEventData(data).build()
+                )
+            }
             eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.FORCE_KICK_HITS) -> {
                 analyticsDatabase.kick(true)
             }
@@ -436,13 +454,13 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         // copy the event's data so we don't accidentally overwrite it for someone else consuming this event
 
         // copy the event's data so we don't accidentally overwrite it for someone else consuming this event
-        val tempLifecycleContextData: MutableMap<String, String?> =
+        val tempLifecycleContextData: MutableMap<String, String> =
             HashMap(eventLifecycleContextData)
 
         // convert lifecycle event data keys into context data keys for AnalyticsExtension
 
         // convert lifecycle event data keys into context data keys for AnalyticsExtension
-        val lifecycleContextData: MutableMap<String, String?> = HashMap()
+        val lifecycleContextData: MutableMap<String, String> = HashMap()
 
         //Removing them because they override current os and app id in the loop below.
 
@@ -455,8 +473,8 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
 
         AnalyticsConstants.MAP_TO_CONTEXT_DATA_KEYS.forEach { entry ->
-            val value = tempLifecycleContextData.get(entry.key)
-            if (!StringUtils.isNullOrEmpty(value)) {
+            val value = tempLifecycleContextData[entry.key]
+            if (value != null && value.isNotEmpty()) {
                 lifecycleContextData[entry.value] = value
                 tempLifecycleContextData.remove(entry.key)
             }
@@ -717,7 +735,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
         analyticsProperties.mostRecentHitTimeStampInSeconds = timeStampInSeconds
 
-        val analyticsData = processAnalyticsContextData(eventData)
+        val analyticsData = processAnalyticsContextData(timeStampInSeconds, eventData)
         val analyticsVars = processAnalyticsVars(eventData, timeStampInSeconds)
         val builtRequest =
             AnalyticsRequestSerializer.buildRequest(analyticsState, analyticsData, analyticsVars)
@@ -738,6 +756,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
      * @return `Map<String, String>` contains the context data
      */
     private fun processAnalyticsContextData(
+        timeStampInSeconds: Long,
         trackEventData: Map<String, Any?>
     ): MutableMap<String, String> {
 
@@ -771,7 +790,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         if (lifecycleSessionStartTimestamp > 0) {
             val maxSessionLengthInSeconds = analyticsState.lifecycleMaxSessionLength
             val timeSinceLaunchInSeconds: Long =
-                TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) - lifecycleSessionStartTimestamp
+                timeStampInSeconds - TimeUnit.MILLISECONDS.toSeconds(lifecycleSessionStartTimestamp)
             if (timeSinceLaunchInSeconds in 0..maxSessionLengthInSeconds) {
                 analyticsData[AnalyticsConstants.ContextDataKeys.TIME_SINCE_LAUNCH_KEY] =
                     timeSinceLaunchInSeconds.toString()
@@ -860,10 +879,15 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             AnalyticsProperties.CHARSET
         analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_FORMATTED_TIMESTAMP_KEY] =
             TimeZone.TIMESTAMP_TIMEZONE_OFFSET
-        if (analyticsState.isOptIn) {
+//        if (analyticsState.isOptIn) {
+//            analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_STRING_TIMESTAMP_KEY] =
+//                timestamp.toString()
+//        }
+        if (analyticsState.isOfflineTrackingEnabled) {
             analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_STRING_TIMESTAMP_KEY] =
                 timestamp.toString()
         }
+
         if (analyticsState.isVisitorIDServiceEnabled) {
             analyticsVars.putAll(analyticsState.analyticsIdVisitorParameters)
         }

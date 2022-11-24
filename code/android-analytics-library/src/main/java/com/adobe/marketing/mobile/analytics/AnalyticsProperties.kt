@@ -27,7 +27,7 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
     }
 
     fun setVisitorIdentifier(vid: String) {
-
+        this.vid = vid
     }
 
     companion object {
@@ -36,26 +36,24 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
 
 
     internal var aid: String? = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
-        get() = field
-        set(aid) {
+        private set(aid) {
             if (aid == null || aid.isEmpty()) {
                 dataStore.remove(AnalyticsConstants.DataStoreKeys.AID_KEY)
             } else {
                 dataStore.setString(AnalyticsConstants.DataStoreKeys.AID_KEY, aid)
             }
-            this.aid = aid
+            field = aid
         }
 
     internal var vid: String? =
         dataStore.getString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, null)
-        get() = field
-        set(vid) {
+        private set(vid) {
             if (vid == null || vid.isEmpty()) {
                 dataStore.remove(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY)
             } else {
                 dataStore.setString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, vid)
             }
-            this.vid = vid
+            field = vid
         }
 
     internal var mostRecentHitTimeStampInSeconds: Long =

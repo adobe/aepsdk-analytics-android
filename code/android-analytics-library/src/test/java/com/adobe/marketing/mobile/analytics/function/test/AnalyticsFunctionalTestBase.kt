@@ -1,12 +1,6 @@
 package com.adobe.marketing.mobile.analytics.function.test
 
-
-import com.adobe.marketing.mobile.Event
-import com.adobe.marketing.mobile.EventSource
-import com.adobe.marketing.mobile.EventType
-import com.adobe.marketing.mobile.ExtensionApi
-import com.adobe.marketing.mobile.SharedStateResult
-import com.adobe.marketing.mobile.SharedStateStatus
+import com.adobe.marketing.mobile.*
 import com.adobe.marketing.mobile.analytics.AnalyticsExtension
 import com.adobe.marketing.mobile.services.*
 import org.junit.Before
@@ -41,9 +35,6 @@ internal open class AnalyticsFunctionalTestBase {
     @Mock
     protected lateinit var mockedExtensionApi: ExtensionApi
 
-    @Mock
-    protected lateinit var mockedDataStore: NamedCollection
-
     protected var mockedMainDataQueue: DataQueue = MockedDataQueue()
 
     protected var mockedReorderDataQueue: DataQueue = MockedDataQueue()
@@ -56,7 +47,6 @@ internal open class AnalyticsFunctionalTestBase {
     @Before
     fun setup() {
         Mockito.reset(mockedExtensionApi)
-        Mockito.reset(mockedDataStore)
         mockedMainDataQueue = MockedDataQueue()
         mockedReorderDataQueue = MockedDataQueue()
         Mockito.reset(mockedNameCollection)
@@ -102,6 +92,20 @@ internal open class AnalyticsFunctionalTestBase {
         mockedSharedState[extensionNam] = data
     }
 
+    protected fun dispatchGetQueueSizeEvent(analyticsExtension: AnalyticsExtension) {
+        analyticsExtension.handleIncomingEvent(
+            Event.Builder(
+                "GetQueueSize",
+                EventType.ANALYTICS,
+                EventSource.REQUEST_CONTENT
+            ).setEventData(
+                mapOf(
+                    "getqueuesize" to true
+                )
+            ).build()
+        )
+    }
+
     protected fun initializeAnalyticsExtensionWithPreset(
         configuration: Map<String, Any>?,
         identity: Map<String, Any>?
@@ -141,6 +145,7 @@ private class MockedDataQueue : DataQueue {
     }
 
     override fun remove(): Boolean {
+        cache.remove()
         return true
     }
 
@@ -149,6 +154,7 @@ private class MockedDataQueue : DataQueue {
     }
 
     override fun clear(): Boolean {
+        cache.clear()
         return true
     }
 
@@ -175,7 +181,7 @@ private class MockedHttpConnecting() : HttpConnecting {
     }
 
     override fun getResponseCode(): Int {
-        return 200
+        return 300
     }
 
     override fun getResponseMessage(): String {

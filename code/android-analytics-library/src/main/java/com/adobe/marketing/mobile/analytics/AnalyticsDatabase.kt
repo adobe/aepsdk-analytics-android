@@ -177,7 +177,7 @@ internal class AnalyticsDatabase(
         return reorderQueue.count() > 0
     }
 
-    fun kickWithAdditionalData(dataType: DataType, data: Map<String, Any?>?) {
+    fun kickWithAdditionalData(dataType: DataType, data: Map<String, Any>?) {
         if (!waitingForAdditionalData()) {
             return
         }
@@ -190,9 +190,7 @@ internal class AnalyticsDatabase(
             DataType.REFERRER -> this.waitingForReferrer = false
             DataType.LIFECYCLE -> this.waitingForLifecycle = false
         }
-        data?.let {
-            additionalData.plus(data)
-        }
+        data?.let { additionalData = additionalData.plus(it) }
         if (!waitingForAdditionalData()) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
@@ -231,6 +229,10 @@ internal class AnalyticsDatabase(
 
     private fun waitingForAdditionalData(): Boolean {
         return waitingForReferrer || waitingForLifecycle
+    }
+
+    internal fun getQueueSize(): Int {
+        return mainQueue.count() + reorderQueue.count()
     }
 
 }
