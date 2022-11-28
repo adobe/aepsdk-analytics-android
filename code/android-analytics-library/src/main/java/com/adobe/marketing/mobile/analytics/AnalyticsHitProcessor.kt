@@ -1,3 +1,13 @@
+/*
+  Copyright 2022 Adobe. All rights reserved.
+  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License. You may obtain a copy
+  of the License at http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+  OF ANY KIND, either express or implied. See the License for the specific language
+  governing permissions and limitations under the License.
+ */
 package com.adobe.marketing.mobile.analytics
 
 import com.adobe.marketing.mobile.Event
@@ -188,25 +198,6 @@ internal class AnalyticsHitProcessor(
         }
         return baseUrl
     }
-
-//    /**
-//     * Generates and returns the base URL for an Analytics request.
-//     *
-//     * @param sdkVersion [String] containing the version of the SDK, as provided by the [DeviceInforming] service
-//     * @return `String` containing the base URL for an Analytics request
-//     */
-//    fun getBaseURL(sdkVersion: String?): String {
-//        val urlBuilder = URLBuilder()
-//        urlBuilder.enableSSL(true)
-//            .setServer(server)
-//            .addPath("b")
-//            .addPath("ss")
-//            .addPath(rsids)
-//            .addPath(analyticsResponseType)
-//            .addPath(sdkVersion)
-//            .addPath("s")
-//        return urlBuilder.build() ?: return ""
-//    }
 
     private fun getAnalyticsResponseType(state: AnalyticsState): String {
         return if (state.isAnalyticsForwardingEnabled) "10" else "0"

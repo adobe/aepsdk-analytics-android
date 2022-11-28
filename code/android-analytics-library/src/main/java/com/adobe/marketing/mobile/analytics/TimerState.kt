@@ -1,3 +1,13 @@
+/*
+  Copyright 2022 Adobe. All rights reserved.
+  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License. You may obtain a copy
+  of the License at http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+  OF ANY KIND, either express or implied. See the License for the specific language
+  governing permissions and limitations under the License.
+ */
 package com.adobe.marketing.mobile.analytics
 
 import com.adobe.marketing.mobile.AdobeCallback
@@ -8,12 +18,14 @@ import java.util.*
  * Encapsulates a [Timer] object and provides API to start/cancel the timer or check whether the timer is running.
  */
 internal class TimerState(private val debugName: String) {
+
+    companion object {
+        private const val CLASS_NAME = "TimerState"
+    }
+
     private var isTimerRunning = false
-    private var timeout: Long = 0
-    private var timerTask: TimerTask? = null
     private var timer: Timer? = null
-    private var callback: AdobeCallback<Boolean>? = null
-    private val timerMutex: Any = Any()
+    private val timerMutex = Any()
 
     /**
      * Checks if the timer is still running.
@@ -21,7 +33,7 @@ internal class TimerState(private val debugName: String) {
      * @return a `boolean` indicates whether there is a timer and it is still running
      */
     fun isTimerRunning(): Boolean {
-        synchronized(timerMutex) { return timerTask != null && isTimerRunning }
+        synchronized(timerMutex) { return isTimerRunning }
     }
 
     /**
@@ -31,9 +43,9 @@ internal class TimerState(private val debugName: String) {
      * @param timeout  `long` timeout value for the timer
      * @param callback the `AdobeCallback<Boolean>` to be invoked once times out
      */
-    fun startTimer(timeout: Long, callback: AdobeCallback<Boolean>?) {
+    fun startTimer(timeout: Long = 0, callback: AdobeCallback<Boolean>) {
         synchronized(timerMutex) {
-            if (timerTask != null) {
+            if (isTimerRunning) {
                 Log.debug(
                     AnalyticsConstants.LOG_TAG,
                     CLASS_NAME,
@@ -41,26 +53,21 @@ internal class TimerState(private val debugName: String) {
                 )
                 return
             }
-            this.timeout = timeout
             isTimerRunning = true
-            this.callback = callback
             try {
-                timerTask = object : TimerTask() {
+                timer = Timer(debugName)
+                timer?.schedule(object : TimerTask() {
                     override fun run() {
                         isTimerRunning = false
-                        if (this@TimerState.callback != null) {
-                            this@TimerState.callback!!.call(true)
-                        }
+                        callback.call(true)
                     }
-                }
-                timer = Timer(debugName)
-                timer!!.schedule(timerTask, timeout)
+                }, timeout)
                 Log.trace(
                     AnalyticsConstants.LOG_TAG,
                     CLASS_NAME,
                     "%s timer scheduled having timeout %s ms",
                     debugName,
-                    this.timeout
+                    timeout
                 )
             } catch (e: Exception) {
                 Log.warning(
@@ -79,25 +86,22 @@ internal class TimerState(private val debugName: String) {
      */
     fun cancel() {
         synchronized(timerMutex) {
-            if (timer != null) {
-                try {
-                    timer!!.cancel()
-                    Log.trace(
-                        AnalyticsConstants.LOG_TAG,
-                        CLASS_NAME,
-                        "%s timer was canceled",
-                        debugName
-                    )
-                } catch (e: Exception) {
-                    Log.warning(
-                        AnalyticsConstants.LOG_TAG,
-                        CLASS_NAME,
-                        "Error cancelling %s timer, failed with error: (%s)",
-                        debugName,
-                        e
-                    )
-                }
-                timerTask = null
+            try {
+                timer?.cancel()
+                Log.trace(
+                    AnalyticsConstants.LOG_TAG,
+                    CLASS_NAME,
+                    "%s timer was canceled",
+                    debugName
+                )
+            } catch (e: Exception) {
+                Log.warning(
+                    AnalyticsConstants.LOG_TAG,
+                    CLASS_NAME,
+                    "Error cancelling %s timer, failed with error: (%s)",
+                    debugName,
+                    e
+                )
             }
 
             // set is running to false regardless of whether the timer is null or not
@@ -105,7 +109,4 @@ internal class TimerState(private val debugName: String) {
         }
     }
 
-    companion object {
-        private const val CLASS_NAME = "TimerState"
-    }
 }

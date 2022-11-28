@@ -21,7 +21,6 @@ internal class AnalyticsTimer {
         private const val CLASS_NAME = "TimerState"
     }
 
-
     internal var isTimerRunning = false
     private val referrerTimerState = TimerState("ADBReferrerTimer");
     private val lifecycleTimerState = TimerState("ADBLifecycleTimer");

@@ -24,7 +24,6 @@ internal class AnalyticsState {
     internal var host: String = ""
         private set
 
-    //TODO: ??
     internal var lastResetIdentitiesTimestamp: Long = TimeUtils.getUnixTimeInSeconds()
 
     // ----------- Configuration properties -----------
@@ -370,12 +369,6 @@ internal class AnalyticsState {
 
     val isVisitorIDServiceEnabled: Boolean
         get() = !StringUtils.isNullOrEmpty(marketingCloudOrganizationID)
-    private val analyticsResponseType: String
-        get() = if (isAnalyticsForwardingEnabled) "10" else "0"
-
-    fun setOfflineEnabled(offlineEnabled: Boolean) {
-        isOfflineTrackingEnabled = offlineEnabled
-    }
 
     fun resetIdentities() {
         clearPlacesData()

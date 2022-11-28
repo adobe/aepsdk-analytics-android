@@ -1,3 +1,13 @@
+/*
+  Copyright 2022 Adobe. All rights reserved.
+  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License. You may obtain a copy
+  of the License at http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+  OF ANY KIND, either express or implied. See the License for the specific language
+  governing permissions and limitations under the License.
+ */
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.Event
@@ -140,7 +150,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
 
     }
 
-    @Test
+    @Test(timeout = 10000)
     fun `unknown to optedin - send out hits`() {
 
         val countDownLatch = CountDownLatch(1)
@@ -232,7 +242,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
         Assert.assertEquals(expectedVars, varMap)
     }
 
-    @Test
+    @Test(timeout = 10000)
     fun `tack hits only sent on valid configuration`() {
 
         val countDownLatch = CountDownLatch(1)
@@ -337,7 +347,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
         Assert.assertEquals(expectedVars, varMap)
     }
 
-    @Test
+    @Test(timeout = 10000)
     fun `offline hits should not contain timestamp`() {
 
         val countDownLatch = CountDownLatch(1)
@@ -407,7 +417,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
         Assert.assertEquals(expectedVars, varMap)
     }
 
-    @Test
+    @Test(timeout = 10000)
     fun `offline hits should be dropped after 60s`() {
 
         val countDownLatch = CountDownLatch(1)

@@ -1,3 +1,13 @@
+/*
+  Copyright 2022 Adobe. All rights reserved.
+  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License. You may obtain a copy
+  of the License at http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+  OF ANY KIND, either express or implied. See the License for the specific language
+  governing permissions and limitations under the License.
+ */
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.*
@@ -5,6 +15,7 @@ import com.adobe.marketing.mobile.analytics.AnalyticsExtension
 import com.adobe.marketing.mobile.services.*
 import org.junit.Before
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
@@ -17,6 +28,7 @@ import java.util.Queue
 
 internal typealias NetworkMonitor = (request: NetworkRequest) -> Unit
 
+@Ignore
 @RunWith(MockitoJUnitRunner.Silent::class)
 internal open class AnalyticsFunctionalTestBase {
     companion object {
@@ -168,8 +180,7 @@ private class MockedDataQueue : DataQueue {
 
 }
 
-
-private class MockedHttpConnecting() : HttpConnecting {
+private class MockedHttpConnecting : HttpConnecting {
     var rulesStream: InputStream? = null
 
     override fun getInputStream(): InputStream? {

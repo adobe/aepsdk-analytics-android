@@ -20,7 +20,6 @@ import java.util.Map;
 
 public class Analytics {
     private final static String LOG_TAG = "Analytics";
-    private final static String OPERATING_SYSTEM = "AND";
     private final static String EXTENSION_VERSION = "2.0.0";
     private final static String ANALYTICS_ID = "aid";
     private final static String GET_QUEUE_SIZE = "getqueuesize";
@@ -189,38 +188,5 @@ public class Analytics {
         Log.debug(LOG_TAG, LOG_TAG, "setVisitorIdentifier - vid is (%s)", visitorID);
     }
 
-    static String getVersionString(String mobileCoreVersion, String analyticsVersion) {
-        String coreVersion = mobileCoreVersion;
-        String wrapperType = "N";
-
-        final String[] mobileCoreVersionInfo = coreVersion.split("-");
-
-        if (mobileCoreVersionInfo.length == 2) {
-            coreVersion = mobileCoreVersionInfo[0];
-            wrapperType = mobileCoreVersionInfo[1];
-        }
-
-        final String mobileCoreFormattedVersion = getFormattedVersion(coreVersion);
-        final String analyticsFormattedVersion = getFormattedVersion(analyticsVersion);
-
-        // version format <operatingsystem><wrappertype><analyticsversion><coreversion>
-        return OPERATING_SYSTEM + wrapperType + analyticsFormattedVersion + mobileCoreFormattedVersion;
-    }
-
-    static String getFormattedVersion(String versionString) {
-        String formattedVersionString = "000000";
-
-        final String[] versionInfo = versionString.split("\\.");
-
-        if (versionInfo.length == 3) {
-            final String major = versionInfo[0].length() == 1 ? ("0" + versionInfo[0]) : versionInfo[0];
-            final String minor = versionInfo[1].length() == 1 ? ("0" + versionInfo[1]) : versionInfo[1];
-            final String build = versionInfo[2].length() == 1 ? ("0" + versionInfo[2]) : versionInfo[2];
-
-            formattedVersionString = major + minor + build;
-        }
-
-        return formattedVersionString;
-    }
 }
 

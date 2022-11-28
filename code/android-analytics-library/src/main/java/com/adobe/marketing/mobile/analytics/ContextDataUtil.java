@@ -398,7 +398,7 @@ class ContextDataUtil {
 
                 try {
                     contextData.put(contextDataKey, java.net.URLDecoder.decode(kvpair[1], String.valueOf(StandardCharsets.UTF_8)));
-                } catch (UnsupportedEncodingException e) {
+                } catch (Exception e) {
                     Log.warning(AnalyticsConstants.LOG_TAG, LOG_TAG, "Appending the context data information failed with %s", e);
                 }
             }

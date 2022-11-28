@@ -1,3 +1,14 @@
+/*
+  Copyright 2022 Adobe. All rights reserved.
+  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License. You may obtain a copy
+  of the License at http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+  OF ANY KIND, either express or implied. See the License for the specific language
+  governing permissions and limitations under the License.
+ */
+
 package com.adobe.marketing.mobile.analytics
 
 import com.adobe.marketing.mobile.MobilePrivacyStatus
@@ -135,7 +146,7 @@ internal object AnalyticsConstants {
 
         internal object Configuration {
             const val EXTENSION_NAME = "com.adobe.module.configuration"
-
+            const val SHARED_STATE_NAME = "com.adobe.module.configuration"
             // config response keys
             const val GLOBAL_CONFIG_PRIVACY = "global.privacy"
             const val CONFIG_EXPERIENCE_CLOUD_ORGID_KEY = "experienceCloud.org"
@@ -151,6 +162,7 @@ internal object AnalyticsConstants {
         }
 
         internal object Identity {
+            const val SHARED_STATE_NAME = "com.adobe.module.identity"
             const val EXTENSION_NAME = "com.adobe.module.identity"
             const val VISITOR_ID_MID = "mid"
             const val VISITOR_ID_BLOB = "blob"
@@ -161,6 +173,7 @@ internal object AnalyticsConstants {
         }
 
         internal object Lifecycle {
+            const val SHARED_STATE_NAME = "com.adobe.module.lifecycle"
             const val EXTENSION_NAME = "com.adobe.module.lifecycle"
             const val APP_ID = "appid"
             const val CARRIER_NAME = "carriername"
@@ -199,6 +212,7 @@ internal object AnalyticsConstants {
         }
 
         internal object Places {
+            const val SHARED_STATE_NAME = "com.adobe.module.places"
             const val EXTENSION_NAME = "com.adobe.module.places"
             const val CURRENT_POI = "currentpoi"
             const val REGION_ID = "regionid"
@@ -214,104 +228,8 @@ internal object AnalyticsConstants {
 
         internal object Assurance {
             const val EXTENSION_NAME = "com.adobe.assurance"
-            const val SESSION_ID = "sessionid"
-        }
-    }
-
-    internal object Identity {
-        internal object EventDataKeys {
-            const val SHARED_STATE_NAME = "com.adobe.module.identity"
-            const val VISITOR_ID_MID = "mid"
-            const val VISITOR_ID_BLOB = "blob"
-            const val VISITOR_ID_LOCATION_HINT = "locationhint"
-            const val VISITOR_IDS_LIST = "visitoridslist"
-            const val ADVERTISING_IDENTIFIER = "a.adid"
-            const val USER_IDENTIFIER = "vid"
-            const val VISITOR_ID_TYPE = "id_type"
-            const val VISITOR_ID_ORIGIN = "id_origin"
-            const val VISITOR_ID = "id"
-            const val VISITOR_ID_AUTHENTICATION_STATE = "authentication_state"
-        }
-    }
-
-    internal object Configuration {
-        internal object EventDataKeys {
-            const val SHARED_STATE_NAME = "com.adobe.module.configuration"
-            const val GLOBAL_PRIVACY = "global.privacy"
-            const val MARKETING_CLOUD_ORGID_KEY = "experienceCloud.org"
-            const val ANALYTICS_AAMFORWARDING = "analytics.aamForwardingEnabled"
-            const val ANALYTICS_BATCH_LIMIT = "analytics.batchLimit"
-            const val ANALYTICS_OFFLINE_TRACKING = "analytics.offlineEnabled"
-            const val ANALYTICS_REPORT_SUITES = "analytics.rsids"
-            const val ANALYTICS_SERVER = "analytics.server"
-            const val ANALYTICS_LAUNCH_HIT_DELAY = "analytics.launchHitDelay"
-            const val ANALYTICS_BACKDATE_PREVIOUS_SESSION = "analytics.backdatePreviousSessionInfo"
-        }
-
-    }
-
-    internal object Lifecycle {
-        internal object EventDataKeys {
-            const val SHARED_STATE_NAME = "com.adobe.module.lifecycle"
-            const val ADDITIONAL_CONTEXT_DATA = "additionalcontextdata"
-            const val APP_ID = "appid"
-            const val CARRIER_NAME = "carriername"
-            const val CRASH_EVENT = "crashevent"
-            const val DAILY_ENGAGED_EVENT = "dailyenguserevent"
-            const val DAY_OF_WEEK = "dayofweek"
-            const val DAYS_SINCE_FIRST_LAUNCH = "dayssincefirstuse"
-            const val DAYS_SINCE_LAST_LAUNCH = "dayssincelastuse"
-            const val DAYS_SINCE_LAST_UPGRADE = "dayssincelastupgrade"
-            const val DEVICE_NAME = "devicename"
-            const val DEVICE_RESOLUTION = "resolution"
-            const val HOUR_OF_DAY = "hourofday"
-            const val IGNORED_SESSION_LENGTH = "ignoredsessionlength"
-            const val INSTALL_DATE = "installdate"
-            const val INSTALL_EVENT = "installevent"
-            const val LAUNCH_EVENT = "launchevent"
-            const val LAUNCHES = "launches"
-            const val LAUNCHES_SINCE_UPGRADE = "launchessinceupgrade"
-            const val LIFECYCLE_ACTION_KEY = "action"
-            const val LIFECYCLE_CONTEXT_DATA = "lifecyclecontextdata"
-            const val LIFECYCLE_PAUSE = "pause"
-            const val LIFECYCLE_START = "start"
-            const val LOCALE = "locale"
-            const val MAX_SESSION_LENGTH = "maxsessionlength"
-            const val MONTHLY_ENGAGED_EVENT = "monthlyenguserevent"
-            const val OPERATING_SYSTEM = "osversion"
-            const val PREVIOUS_SESSION_LENGTH = "prevsessionlength"
-            const val PREVIOUS_SESSION_PAUSE_TIMESTAMP = "previoussessionpausetimestampmillis"
-            const val PREVIOUS_SESSION_START_TIMESTAMP = "previoussessionstarttimestampmillis"
-            const val RUN_MODE = "runmode"
-            const val SESSION_EVENT = "sessionevent"
-            const val SESSION_START_TIMESTAMP = "starttimestampmillis"
-            const val UPGRADE_EVENT = "upgradeevent"
-            const val PREVIOUS_OS_VERSION = "previousosversion"
-            const val PREVIOUS_APP_ID = "previousappid"
-        }
-    }
-
-    internal object Places {
-        internal object EventDataKeys {
-            const val SHARED_STATE_NAME = "com.adobe.module.places"
-            const val CURRENT_POI = "currentpoi"
-            const val REGION_ID = "regionid"
-            const val REGION_NAME = "regionname"
-        }
-    }
-
-    internal object Assurance {
-        internal object EventDataKeys {
             const val SHARED_STATE_NAME = "com.adobe.assurance"
             const val SESSION_ID = "sessionid"
-            const val CONTENT_TYPE_HEADER = "Content-Type"
-            const val ETAG_HEADER = "Etag"
-            const val SERVER_HEADER = "Server"
-            const val ENABLE_DEBUG_REQUEST = "&p.&debug=true&.p"
-        }
-
-        internal object DEFAULT {
-            const val SESSION_ENABLED = false
         }
     }
 
