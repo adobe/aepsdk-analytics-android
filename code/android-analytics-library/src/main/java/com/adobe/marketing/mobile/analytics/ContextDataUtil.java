@@ -12,6 +12,7 @@ package com.adobe.marketing.mobile.analytics;
 
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.StringUtils;
+import com.adobe.marketing.mobile.util.UrlUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -197,7 +198,7 @@ class ContextDataUtil {
         }
 
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-            String key = UrlEncoder.urlEncode(entry.getKey());
+            String key = UrlUtils.urlEncode(entry.getKey());
 
             if (key == null) {
                 continue;
@@ -362,9 +363,9 @@ class ContextDataUtil {
         builder.append("=");
 
         if (value instanceof List) {
-            builder.append(UrlEncoder.urlEncode(join((List) value, ",")));
+            builder.append(UrlUtils.urlEncode(join((List) value, ",")));
         } else {
-            builder.append(UrlEncoder.urlEncode(value.toString()));
+            builder.append(UrlUtils.urlEncode(value.toString()));
         }
     }
 
