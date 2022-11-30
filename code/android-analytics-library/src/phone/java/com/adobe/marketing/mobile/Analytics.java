@@ -10,7 +10,6 @@
  */
 
 package com.adobe.marketing.mobile;
-
 import com.adobe.marketing.mobile.analytics.AnalyticsExtension;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
