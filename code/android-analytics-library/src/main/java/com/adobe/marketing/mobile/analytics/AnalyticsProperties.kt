@@ -17,6 +17,11 @@ import java.nio.charset.StandardCharsets
  * [AnalyticsProperties] class hosts the properties needed by [AnalyticsExtension] when processing events.
  */
 internal class AnalyticsProperties(private val dataStore: NamedCollection) {
+
+    companion object {
+        val CHARSET: String = StandardCharsets.UTF_8.name()
+    }
+
     fun reset() {
         mostRecentHitTimeStampInSeconds = 0L
         vid = null
@@ -29,11 +34,6 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
     fun setVisitorIdentifier(vid: String) {
         this.vid = vid
     }
-
-    companion object {
-        val CHARSET: String = StandardCharsets.UTF_8.name()
-    }
-
 
     internal var aid: String? = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
         private set(aid) {
@@ -61,7 +61,6 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
             AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
             0L
         )
-        get() = field
         set(timestampInSeconds) {
             if (field < timestampInSeconds) {
                 dataStore.setLong(

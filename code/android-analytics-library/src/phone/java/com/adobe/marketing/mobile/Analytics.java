@@ -11,6 +11,8 @@
 
 package com.adobe.marketing.mobile;
 
+import androidx.annotation.NonNull;
+
 import com.adobe.marketing.mobile.analytics.AnalyticsExtension;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
@@ -28,6 +30,8 @@ public class Analytics {
     private final static String FORCE_KICK_HITS = "forcekick";
     private final static String VISITOR_IDENTIFIER = "vid";
     private final static long EVENT_PROCESSING_TIMEOUT_MS = 5000L;
+
+    public static final Class<? extends Extension> EXTENSION = AnalyticsExtension.class;
 
     private Analytics() {
 
@@ -48,6 +52,7 @@ public class Analytics {
      *
      * @return The version string
      */
+    @NonNull
     public static String extensionVersion() {
         return EXTENSION_VERSION;
     }
@@ -60,7 +65,7 @@ public class Analytics {
      *                 eventuality of an unexpected error or if the default timeout (5000ms) is met before the callback is returned with analytics tracking identifier.
      */
     @SuppressWarnings("rawtypes")
-    public static void getTrackingIdentifier(final AdobeCallback<String> callback) {
+    public static void getTrackingIdentifier(@NonNull final AdobeCallback<String> callback) {
         if (callback == null) {
             return;
         }
@@ -94,7 +99,7 @@ public class Analytics {
      *                 eventuality of an unexpected error or if the default timeout (5000ms) is met before the callback is returned with queue size.
      */
     @SuppressWarnings("rawtypes")
-    public static void getQueueSize(final AdobeCallback<Long> callback) {
+    public static void getQueueSize(@NonNull final AdobeCallback<Long> callback) {
         if (callback == null) {
             return;
         }
@@ -151,7 +156,7 @@ public class Analytics {
      *                 eventuality of an unexpected error or if the default timeout (5000ms) is met before the callback is returned with visitor identifier.
      */
     @SuppressWarnings("rawtypes")
-    public static void getVisitorIdentifier(final AdobeCallback<String> callback) {
+    public static void getVisitorIdentifier(@NonNull final AdobeCallback<String> callback) {
         if (callback == null) {
             return;
         }
@@ -181,7 +186,7 @@ public class Analytics {
      *
      * @param visitorID {@code String} new value for visitor identifier
      */
-    public static void setVisitorIdentifier(final String visitorID) {
+    public static void setVisitorIdentifier(@NonNull final String visitorID) {
         Map<String, Object> eventDataMap = new HashMap<>();
         eventDataMap.put(VISITOR_IDENTIFIER, visitorID);
         MobileCore.dispatchEvent(new Event.Builder("UpdateVisitorIdentifier", EventType.ANALYTICS, EventSource.REQUEST_CONTENT).setEventData(eventDataMap).build());
