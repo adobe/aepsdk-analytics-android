@@ -40,7 +40,7 @@ final class ContextData {
         return (ContextData) data.get(key);
     }
 
-    private int size() {
+    int size() {
         return data.size();
     }
 }

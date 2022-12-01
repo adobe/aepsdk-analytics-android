@@ -10,6 +10,7 @@
  */
 package com.adobe.marketing.mobile.analytics
 
+import androidx.annotation.VisibleForTesting
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
@@ -17,6 +18,7 @@ import com.adobe.marketing.mobile.ExtensionApi
 import com.adobe.marketing.mobile.services.*
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
+import java.sql.Timestamp
 
 internal class AnalyticsHitProcessor(
     private val analyticsState: AnalyticsState,
@@ -32,6 +34,7 @@ internal class AnalyticsHitProcessor(
 
     private val networkService: Networking = ServiceProvider.getInstance().networkService
     private var lastHitTimestamp: Long = 0L
+
     private val version =
         AnalyticsVersionProvider.getVersion()
 
@@ -42,10 +45,20 @@ internal class AnalyticsHitProcessor(
 
     override fun processHit(entity: DataEntity, processingResult: HitProcessingResult) {
         val analyticsHit = AnalyticsHit.from(entity)
-
         val eventIdentifier = analyticsHit.eventIdentifier
         var payload = analyticsHit.payload
         var timestamp = analyticsHit.timestamp
+
+        if (payload.isEmpty()) {
+            Log.debug(
+                AnalyticsConstants.LOG_TAG,
+                CLASS_NAME,
+                "processHit - Dropping Analytics hit, payload is empty."
+            )
+            processingResult.complete(true)
+            return
+        }
+
         if (timestamp < analyticsState.lastResetIdentitiesTimestamp) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
@@ -201,6 +214,16 @@ internal class AnalyticsHitProcessor(
 
     private fun getAnalyticsResponseType(state: AnalyticsState): String {
         return if (state.isAnalyticsForwardingEnabled) "10" else "0"
+    }
+
+    @VisibleForTesting
+    internal fun getLastHitTimestamp(): Long {
+        return this.lastHitTimestamp
+    }
+
+    @VisibleForTesting
+    internal fun setLastHitTimestamp(timestamp: Long) {
+        this.lastHitTimestamp = timestamp
     }
 
 

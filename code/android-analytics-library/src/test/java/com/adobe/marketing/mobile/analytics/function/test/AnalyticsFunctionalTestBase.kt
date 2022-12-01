@@ -12,6 +12,9 @@ package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.*
 import com.adobe.marketing.mobile.analytics.AnalyticsExtension
+import com.adobe.marketing.mobile.analytics.MemoryDataQueue
+import com.adobe.marketing.mobile.analytics.MockedHttpConnecting
+import com.adobe.marketing.mobile.analytics.NetworkMonitor
 import com.adobe.marketing.mobile.services.*
 import org.junit.Before
 import org.junit.BeforeClass
@@ -25,8 +28,6 @@ import org.mockito.kotlin.anyOrNull
 import java.io.InputStream
 import java.util.LinkedList
 import java.util.Queue
-
-internal typealias NetworkMonitor = (request: NetworkRequest) -> Unit
 
 @Ignore
 @RunWith(MockitoJUnitRunner.Silent::class)
@@ -47,9 +48,9 @@ internal open class AnalyticsFunctionalTestBase {
     @Mock
     protected lateinit var mockedExtensionApi: ExtensionApi
 
-    protected var mockedMainDataQueue: DataQueue = MockedDataQueue()
+    protected var mockedMainDataQueue: DataQueue = MemoryDataQueue()
 
-    protected var mockedReorderDataQueue: DataQueue = MockedDataQueue()
+    protected var mockedReorderDataQueue: DataQueue = MemoryDataQueue()
 
     @Mock
     protected lateinit var mockedNameCollection: NamedCollection
@@ -59,8 +60,8 @@ internal open class AnalyticsFunctionalTestBase {
     @Before
     fun setup() {
         Mockito.reset(mockedExtensionApi)
-        mockedMainDataQueue = MockedDataQueue()
-        mockedReorderDataQueue = MockedDataQueue()
+        mockedMainDataQueue = MemoryDataQueue()
+        mockedReorderDataQueue = MemoryDataQueue()
         Mockito.reset(mockedNameCollection)
         mockedSharedState.clear()
 
@@ -142,69 +143,3 @@ internal open class AnalyticsFunctionalTestBase {
 
 }
 
-private class MockedDataQueue : DataQueue {
-    private val cache: Queue<DataEntity> = LinkedList()
-    override fun add(dataEntity: DataEntity?): Boolean {
-        return if (dataEntity == null) false else cache.add(dataEntity)
-    }
-
-    override fun peek(): DataEntity? {
-        return cache.peek()
-    }
-
-    override fun peek(size: Int): List<DataEntity>? {
-        return null
-    }
-
-    override fun remove(): Boolean {
-        cache.remove()
-        return true
-    }
-
-    override fun remove(p0: Int): Boolean {
-        return true
-    }
-
-    override fun clear(): Boolean {
-        cache.clear()
-        return true
-    }
-
-    override fun count(): Int {
-        return cache.size
-    }
-
-    override fun close() {
-        TODO("Not yet implemented")
-    }
-
-}
-
-private class MockedHttpConnecting : HttpConnecting {
-    var rulesStream: InputStream? = null
-
-    override fun getInputStream(): InputStream? {
-        return null
-    }
-
-    override fun getErrorStream(): InputStream? {
-        return null
-    }
-
-    override fun getResponseCode(): Int {
-        return 300
-    }
-
-    override fun getResponseMessage(): String {
-        return ""
-    }
-
-    override fun getResponsePropertyValue(responsePropertyKey: String?): String {
-        return ""
-    }
-
-    override fun close() {
-        rulesStream?.close()
-    }
-
-}
