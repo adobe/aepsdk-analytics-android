@@ -21,7 +21,7 @@ import java.util.HashMap
  * which are retrieved from SharedState.
  */
 internal class AnalyticsState {
-    internal var host: String = ""
+    internal var host: String? = null
         private set
 
     internal var lastResetIdentitiesTimestamp: Long = TimeUtils.getUnixTimeInSeconds()
@@ -45,15 +45,20 @@ internal class AnalyticsState {
         private set
     internal var isBackdateSessionInfoEnabled: Boolean =
         AnalyticsConstants.Default.DEFAULT_BACKDATE_SESSION_INFO_ENABLED
-    private var marketingCloudOrganizationID: String? = null
+    internal var marketingCloudOrganizationID: String? = null
+        private set
     internal var rsids: String? = null
         private set
 
     // ----------- Identity properties -----------
-    private var marketingCloudId: String? = null
-    private var locationHint: String? = null
-    private var advertisingIdentifier: String? = null
-    private var blob: String? = null
+    internal var marketingCloudId: String? = null
+        private set
+    internal var locationHint: String? = null
+        private set
+    internal var advertisingIdentifier: String? = null
+        private set
+    internal var blob: String? = null
+        private set
     internal var serializedVisitorIDsList: String? = null
         private set
 

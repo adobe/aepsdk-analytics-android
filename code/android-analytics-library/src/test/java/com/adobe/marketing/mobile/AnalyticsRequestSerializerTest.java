@@ -27,7 +27,7 @@
 //
 //import static org.junit.Assert.*;
 //
-//public class AnalyticsRequestSerializerTest {
+//public class AnalyticsRequestSerializerTests {
 //	private static final String IDENTITY_SHARED_STATE = "com.adobe.module.identity";
 //	private static final String CONFIG_SHARED_STATE = "com.adobe.module.configuration";
 //	private AnalyticsRequestSerializer requestSerializer = new AnalyticsRequestSerializer();

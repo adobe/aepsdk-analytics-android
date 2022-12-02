@@ -25,7 +25,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     companion object {
         private const val CLASS_NAME = "AnalyticsExtension"
-        private const val OPERATING_SYSTEM = "AND";
         private val ANALYTICS_HARD_DEPENDENCIES = listOf(
             AnalyticsConstants.EventDataKeys.Configuration.SHARED_STATE_NAME,
             AnalyticsConstants.EventDataKeys.Identity.SHARED_STATE_NAME
@@ -91,9 +90,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         api.registerEventListener(
             EventType.GENERIC_IDENTITY, EventSource.REQUEST_RESET, eventHandler
         )
-        val analyticsVersion =
-            getVersionString(MobileCore.extensionVersion(), Analytics.extensionVersion())
-        AnalyticsVersionProvider.setVersion(analyticsVersion)
     }
 
     override fun readyForEvent(event: Event): Boolean {
@@ -741,7 +737,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
 //        setMostRecentHitTimestampInSeconds(timestampInSeconds) // set hit timestamp before OPT_OUT check
 
-        analyticsProperties.mostRecentHitTimeStampInSeconds = timeStampInSeconds
+        analyticsProperties.setMostRecentHitTimeStamp(timeStampInSeconds)
 
         val analyticsData = processAnalyticsContextData(timeStampInSeconds, eventData)
         val analyticsVars = processAnalyticsVars(eventData, timeStampInSeconds)
@@ -918,30 +914,4 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         return analyticsVars
     }
 
-    fun getVersionString(mobileCoreVersion: String, analyticsVersion: String): String? {
-        var coreVersion = mobileCoreVersion
-        var wrapperType = "N"
-        val mobileCoreVersionInfo = coreVersion.split("-").toTypedArray()
-        if (mobileCoreVersionInfo.size == 2) {
-            coreVersion = mobileCoreVersionInfo[0]
-            wrapperType = mobileCoreVersionInfo[1]
-        }
-        val mobileCoreFormattedVersion = getFormattedVersion(coreVersion)
-        val analyticsFormattedVersion = getFormattedVersion(analyticsVersion)
-
-        // version format <operatingsystem><wrappertype><analyticsversion><coreversion>
-        return OPERATING_SYSTEM + wrapperType + analyticsFormattedVersion + mobileCoreFormattedVersion
-    }
-
-    fun getFormattedVersion(versionString: String): String {
-        var formattedVersionString = "000000"
-        val versionInfo = versionString.split("\\.").toTypedArray()
-        if (versionInfo.size == 3) {
-            val major = if (versionInfo[0].length == 1) "0" + versionInfo[0] else versionInfo[0]
-            val minor = if (versionInfo[1].length == 1) "0" + versionInfo[1] else versionInfo[1]
-            val build = if (versionInfo[2].length == 1) "0" + versionInfo[2] else versionInfo[2]
-            formattedVersionString = major + minor + build
-        }
-        return formattedVersionString
-    }
 }

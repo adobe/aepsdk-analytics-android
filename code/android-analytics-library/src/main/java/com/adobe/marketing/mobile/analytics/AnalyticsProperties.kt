@@ -10,6 +10,7 @@
  */
 package com.adobe.marketing.mobile.analytics
 
+import androidx.annotation.VisibleForTesting
 import com.adobe.marketing.mobile.services.NamedCollection
 import java.nio.charset.StandardCharsets
 
@@ -17,12 +18,15 @@ import java.nio.charset.StandardCharsets
  * [AnalyticsProperties] class hosts the properties needed by [AnalyticsExtension] when processing events.
  */
 internal class AnalyticsProperties(private val dataStore: NamedCollection) {
+
+    companion object {
+        val CHARSET: String = StandardCharsets.UTF_8.name()
+    }
+
     fun reset() {
         mostRecentHitTimeStampInSeconds = 0L
         vid = null
         aid = null
-        dataStore.remove(AnalyticsConstants.DataStoreKeys.AID_KEY)
-        dataStore.remove(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY)
         dataStore.remove(AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS)
     }
 
@@ -30,13 +34,10 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
         this.vid = vid
     }
 
-    companion object {
-        val CHARSET: String = StandardCharsets.UTF_8.name()
-    }
-
-
+    //TODO: getter is never called??
     internal var aid: String? = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
-        private set(aid) {
+        @VisibleForTesting
+        internal set(aid) {
             if (aid == null || aid.isEmpty()) {
                 dataStore.remove(AnalyticsConstants.DataStoreKeys.AID_KEY)
             } else {
@@ -61,16 +62,16 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
             AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
             0L
         )
-        get() = field
-        set(timestampInSeconds) {
-            if (field < timestampInSeconds) {
-                dataStore.setLong(
-                    AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
-                    timestampInSeconds
-                )
-                field = timestampInSeconds
-            }
+        private set
+
+
+    internal fun setMostRecentHitTimeStamp(timestampInSeconds: Long) {
+        if (mostRecentHitTimeStampInSeconds < timestampInSeconds) {
+            dataStore.setLong(
+                AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
+                timestampInSeconds
+            )
+            mostRecentHitTimeStampInSeconds = timestampInSeconds
         }
-
-
+    }
 }

@@ -35,8 +35,7 @@ internal class AnalyticsHitProcessor(
     private val networkService: Networking = ServiceProvider.getInstance().networkService
     private var lastHitTimestamp: Long = 0L
 
-    private val version =
-        AnalyticsVersionProvider.getVersion()
+    private val version = AnalyticsVersionProvider.buildVersionString()
 
 
     override fun retryInterval(p0: DataEntity): Int {
