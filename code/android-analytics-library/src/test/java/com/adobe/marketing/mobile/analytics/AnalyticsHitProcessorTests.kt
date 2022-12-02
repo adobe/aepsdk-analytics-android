@@ -64,6 +64,12 @@ class AnalyticsHitProcessorTests {
     }
 
     @Test
+    fun `retryInterval is 30`() {
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        assertEquals(30, analyticsHitProcessor.retryInterval(DataEntity(null)))
+    }
+
+    @Test
     fun `Bad DataEntity should be dropped`() {
         val countDownLatch = CountDownLatch(1)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
@@ -253,7 +259,65 @@ class AnalyticsHitProcessorTests {
 
         Thread.sleep(50)
         assertNull(networkRequest)
+    }
 
+    @Test
+    fun `hit should be retried later if analytics configuration is not ready`() {
+        Mockito.`when`(mockedAnalyticsState.isOfflineTrackingEnabled).thenReturn(true)
+        Mockito.`when`(mockedAnalyticsState.isAnalyticsConfigured).thenReturn(false)
+
+        val countDownLatch = CountDownLatch(1)
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        val currentTimestamp = TimeUtils.getUnixTimeInSeconds()
+        val badDataEntity =
+            AnalyticsHit("payload", currentTimestamp - 65, "id1").toDataEntity()
+        var networkRequest: NetworkRequest? = null
+        networkMonitor = { request ->
+            networkRequest = request
+        }
+
+        analyticsHitProcessor.processHit(badDataEntity) {
+            assertFalse(it)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
+
+        Thread.sleep(50)
+        assertNull(networkRequest)
+    }
+
+    @Test
+    fun `hit should be retried later if network connection is null`() {
+        ServiceProvider.getInstance().networkService = Networking { request, callback ->
+            networkMonitor?.let { it(request) }
+            callback.call(null)
+        }
+        val countDownLatch = CountDownLatch(2)
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        val payload =
+            "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
+        val timestamp = TimeUtils.getUnixTimeInSeconds()
+        val dataEntity =
+            AnalyticsHit(payload, timestamp, "id1").toDataEntity()
+        mockedHttpConnecting.responseCode = 200
+        mockedHttpConnecting.responseProperties = mapOf(
+            "ETag" to "eTag",
+            "Server" to "abc.com",
+            "Content-Type" to "xyz"
+        )
+        networkMonitor = { request ->
+            assertTrue(request.url.contains("test.com"))
+            assertTrue(String(request.body).contains(payload))
+            countDownLatch.countDown()
+        }
+
+        assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
+
+        analyticsHitProcessor.processHit(dataEntity) {
+            assertFalse(it)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
     }
 
     @Test

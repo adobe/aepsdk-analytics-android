@@ -1,9 +1,11 @@
 package com.adobe.marketing.mobile;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -20,6 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class AnalyticsAPITests {
@@ -432,6 +435,37 @@ public class AnalyticsAPITests {
             );
         }
 
+    }
+
+    @Test
+    public void callbackIsNullForPublicAPIs() {
+        try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+            Analytics.getVisitorIdentifier(null);
+            Analytics.getTrackingIdentifier(null);
+            Analytics.getQueueSize(null);
+            mobileCoreMockedStatic
+                    .verify(() -> MobileCore.dispatchEventWithResponseCallback(any(), anyLong(), any()), never());
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void callbackWithoutErrorHandling() throws InterruptedException {
+        try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+            CountDownLatch countDownLatch = new CountDownLatch(3);
+            Analytics.getVisitorIdentifier(s -> countDownLatch.countDown());
+            Analytics.getTrackingIdentifier(s -> countDownLatch.countDown());
+            Analytics.getQueueSize(s -> countDownLatch.countDown());
+            ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+            ArgumentCaptor<AdobeCallbackWithError> callbackCaptor = ArgumentCaptor.forClass(
+                    AdobeCallbackWithError.class
+            );
+            mobileCoreMockedStatic
+                    .verify(() -> MobileCore.dispatchEventWithResponseCallback(eventCaptor.capture(), anyLong(), callbackCaptor.capture()), times(3));
+            AdobeCallbackWithError callback = callbackCaptor.getValue();
+            callback.fail(AdobeError.UNEXPECTED_ERROR);
+            assertFalse(countDownLatch.await(500, TimeUnit.MILLISECONDS));
+        }
     }
 
 }

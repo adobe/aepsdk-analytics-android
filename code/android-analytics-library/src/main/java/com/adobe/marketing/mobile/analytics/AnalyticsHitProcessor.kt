@@ -18,7 +18,6 @@ import com.adobe.marketing.mobile.ExtensionApi
 import com.adobe.marketing.mobile.services.*
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
-import java.sql.Timestamp
 
 internal class AnalyticsHitProcessor(
     private val analyticsState: AnalyticsState,
@@ -38,7 +37,7 @@ internal class AnalyticsHitProcessor(
     private val version = AnalyticsVersionProvider.buildVersionString()
 
 
-    override fun retryInterval(p0: DataEntity): Int {
+    override fun retryInterval(dataENtity: DataEntity): Int {
         return HIT_QUEUE_RETRY_TIME_SECONDS
     }
 

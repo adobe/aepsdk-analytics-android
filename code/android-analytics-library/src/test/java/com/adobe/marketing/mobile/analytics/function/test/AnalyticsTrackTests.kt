@@ -13,7 +13,7 @@ package com.adobe.marketing.mobile.analytics.function.test
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
-import com.adobe.marketing.mobile.analytics.TimeZone
+import com.adobe.marketing.mobile.analytics.TimeZoneHelper
 import com.adobe.marketing.mobile.analytics.extractContextDataFrom
 import com.adobe.marketing.mobile.analytics.extractContextDataKVPairFrom
 import com.adobe.marketing.mobile.analytics.extractQueryParamsFrom
@@ -81,7 +81,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(
@@ -151,7 +151,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(
@@ -223,7 +223,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(
@@ -291,7 +291,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(
@@ -371,7 +371,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "aamlh" to "lochint",
             //TODO:???
             "pageName" to "originalAppID",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(
@@ -446,7 +446,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(
@@ -520,7 +520,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         Assert.assertTrue("&a.&action=网页&.a&k1=网页&_=~!@#\$%^&*()_.-+" == contextDataKVPair)
@@ -593,7 +593,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(

@@ -15,9 +15,6 @@ import com.adobe.marketing.mobile.analytics.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
-import org.mockito.kotlin.anyOrNull
 import java.net.URLDecoder
 import java.util.concurrent.CountDownLatch
 
@@ -82,7 +79,7 @@ internal class ConsequenceRuleTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to consequenceEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(
