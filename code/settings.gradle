@@ -1,0 +1,3 @@
+include ':android-analytics-library'
+rootProject.name = "aepsdk-analytics-android"
+//include ':testapp'
