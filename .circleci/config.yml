@@ -23,6 +23,12 @@ jobs:
           name: build library
           command: |
             make assemble-phone
+
+      - run:
+          name: publish jitpack build to local repository
+          command: |
+            make publish-maven-local-jitpack
+
       - run:
           name: build test app
           command: |

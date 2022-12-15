@@ -2,6 +2,8 @@ plugins {
     id 'com.android.library'
     id "jacoco"
     id 'kotlin-android'
+    id 'maven-publish'
+    id 'signing'
 }
 
 android {
@@ -130,6 +132,80 @@ task functionalTestsCoverageReport(type: JacocoReport, dependsOn: "createPhoneDe
         csv.enabled false
         html.enabled true
     }
+}
+
+publish.dependsOn('assemblePhone')
+
+def isJitPackBuild() {
+    return hasProperty('jitpack')
+}
+
+def groupIdForPublish = isJitPackBuild()? 'com.github.adobe.aepsdk-analytics-android': 'com.adobe.marketing.mobile'
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = groupIdForPublish
+            artifactId = rootProject.moduleName
+            version = version
+            artifact("$buildDir/outputs/aar/${rootProject.moduleAARName}")
+
+            pom {
+                name = mavenRepoName
+                description = mavenRepoDescription
+                url = 'https://aep-sdks.gitbook.io'
+                licenses {
+                    license {
+                        name = 'Adobe Proprietary'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adobe'
+                        name = 'adobe'
+                        email = 'adobe-mobile-testing@adobe.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:github.com//Adobe-Marketing-Cloud/acp-sdks.git'
+                    developerConnection = 'scm:git:ssh://github.com//Adobe-Marketing-Cloud/acp-sdks.git'
+                    url = 'https://github.com/Adobe-Marketing-Cloud/acp-sdks'
+                }
+                withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+
+                    def coreDependencyNode = dependenciesNode.appendNode('dependency')
+                    coreDependencyNode.appendNode('groupId', 'com.adobe.marketing.mobile')
+                    coreDependencyNode.appendNode('artifactId', 'core')
+                    coreDependencyNode.appendNode('version', mavenCoreVersion)
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            credentials {
+                username = System.getenv("SONATYPE_USERNAME")
+                password = System.getenv("SONATYPE_PASSWORD")
+            }
+        }
+    }
+}
+
+ext."signing.gnupg.executable"="gpg"
+ext."signing.gnupg.keyName"=System.getenv("GPG_KEY_ID")
+ext."signing.gnupg.passphrase"=System.getenv("GPG_PASSPHRASE")
+
+signing {
+    useGpgCmd()
+    required {
+        tasks.withType(PublishToMavenRepository).find {
+            gradle.taskGraph.hasTask it
+        }
+    }
+    sign publishing.publications
 }
 
 
