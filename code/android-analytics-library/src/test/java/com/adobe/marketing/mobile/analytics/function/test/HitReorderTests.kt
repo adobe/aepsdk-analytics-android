@@ -13,7 +13,7 @@ package com.adobe.marketing.mobile.analytics.function.test
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
-import com.adobe.marketing.mobile.analytics.TimeZone
+import com.adobe.marketing.mobile.analytics.TimeZoneHelper
 import com.adobe.marketing.mobile.analytics.extractContextDataFrom
 import com.adobe.marketing.mobile.analytics.extractQueryParamsFrom
 import org.junit.Assert
@@ -117,7 +117,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(
@@ -240,7 +240,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData1: Map<String, String> = mapOf(
@@ -262,7 +262,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to acquisitionEvent?.timestampInSeconds.toString()
         )
         val expectedContextData2: Map<String, String> = mapOf(
@@ -382,7 +382,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData1: Map<String, String> = mapOf(
@@ -402,7 +402,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to lifecycleResponseEvent?.timestampInSeconds.toString()
         )
         val expectedContextData2: Map<String, String> = mapOf(
@@ -532,7 +532,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to lifecycleResponseEvent.timestampInSeconds.toString()
         )
         val expectedContextData1: Map<String, String> = mapOf(
@@ -565,7 +565,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
         val expectedContextData2: Map<String, String> = mapOf(
@@ -640,7 +640,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZone.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to acquisitionEvent.timestampInSeconds.toString()
         )
         val expectedContextData: Map<String, String> = mapOf(

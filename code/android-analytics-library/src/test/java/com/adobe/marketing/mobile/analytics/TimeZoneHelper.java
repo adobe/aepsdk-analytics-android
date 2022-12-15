@@ -9,26 +9,7 @@
   governing permissions and limitations under the License.
  */
 package com.adobe.marketing.mobile.analytics;
-import java.util.HashMap;
-import java.util.Map;
 
-final class ContextData {
-    Object value = null;
-    Map<String, Object> data = new HashMap<String, Object>();
-
-    boolean containsKey(final String key) {
-        return data.containsKey(key);
-    }
-
-    void put(final String key, final ContextData value) {
-        data.put(key, value);
-    }
-
-    ContextData get(final String key) {
-        return (ContextData) data.get(key);
-    }
-
-    int size() {
-        return data.size();
-    }
+public class TimeZoneHelper {
+    public static final String TIMESTAMP_TIMEZONE_OFFSET = TimeZone.TIMESTAMP_TIMEZONE_OFFSET;
 }

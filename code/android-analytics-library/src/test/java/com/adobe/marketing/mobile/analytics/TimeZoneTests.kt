@@ -8,27 +8,19 @@
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
  */
-package com.adobe.marketing.mobile.analytics;
-import java.util.HashMap;
-import java.util.Map;
+package com.adobe.marketing.mobile.analytics
 
-final class ContextData {
-    Object value = null;
-    Map<String, Object> data = new HashMap<String, Object>();
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.junit.MockitoJUnitRunner
 
-    boolean containsKey(final String key) {
-        return data.containsKey(key);
-    }
+@RunWith(MockitoJUnitRunner.Silent::class)
+class TimeZoneTests {
 
-    void put(final String key, final ContextData value) {
-        data.put(key, value);
-    }
-
-    ContextData get(final String key) {
-        return (ContextData) data.get(key);
-    }
-
-    int size() {
-        return data.size();
+    @Test
+    fun `test timezone offset format`(){
+        val regex = Regex("00/00/0000 00:00:00 0 \\d{1,}")
+        val timezoneOffsetFormat = TimeZone.TIMESTAMP_TIMEZONE_OFFSET
+        regex.matchEntire(timezoneOffsetFormat)
     }
 }

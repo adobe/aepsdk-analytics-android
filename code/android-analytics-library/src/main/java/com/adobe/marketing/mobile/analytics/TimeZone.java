@@ -13,7 +13,11 @@ package com.adobe.marketing.mobile.analytics;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-public class TimeZone {
+class TimeZone {
+    /**
+     * Retrieves a correctly-formatted timestamp string; this function returns an all 0 string except for the timezoneOffset
+     * backend platform only processes timezone offset from this string and it is wasted cycles to provide the rest of the data.
+     */
     public static final String TIMESTAMP_TIMEZONE_OFFSET;
 
     static {

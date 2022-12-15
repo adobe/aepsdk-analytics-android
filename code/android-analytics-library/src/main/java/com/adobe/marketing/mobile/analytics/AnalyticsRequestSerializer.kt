@@ -32,9 +32,10 @@ internal class AnalyticsRequestSerializer {
         internal fun buildRequest(
             state: AnalyticsState,
             data: MutableMap<String, String>?,
-            vars: MutableMap<String, String>
+            vars: MutableMap<String, String>?
         ): String {
-            val analyticsVars: MutableMap<String, Any> = HashMap(vars)
+            val analyticsVars: MutableMap<String, Any> =
+                if (vars == null) HashMap() else HashMap(vars)
 
             // It takes the provided data map and removes key-value pairs where the key is null or is prefixed with "&&"
             // The prefixed ones will be moved in the vars map

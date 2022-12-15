@@ -10,6 +10,7 @@
  */
 package com.adobe.marketing.mobile.analytics
 
+import androidx.annotation.VisibleForTesting
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
@@ -32,20 +33,30 @@ internal class AnalyticsHitProcessor(
 
     private val networkService: Networking = ServiceProvider.getInstance().networkService
     private var lastHitTimestamp: Long = 0L
-    private val version =
-        AnalyticsVersionProvider.getVersion()
+
+    private val version = AnalyticsVersionProvider.buildVersionString()
 
 
-    override fun retryInterval(p0: DataEntity): Int {
+    override fun retryInterval(dataENtity: DataEntity): Int {
         return HIT_QUEUE_RETRY_TIME_SECONDS
     }
 
     override fun processHit(entity: DataEntity, processingResult: HitProcessingResult) {
         val analyticsHit = AnalyticsHit.from(entity)
-
         val eventIdentifier = analyticsHit.eventIdentifier
         var payload = analyticsHit.payload
         var timestamp = analyticsHit.timestamp
+
+        if (payload.isEmpty()) {
+            Log.debug(
+                AnalyticsConstants.LOG_TAG,
+                CLASS_NAME,
+                "processHit - Dropping Analytics hit, payload is empty."
+            )
+            processingResult.complete(true)
+            return
+        }
+
         if (timestamp < analyticsState.lastResetIdentitiesTimestamp) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
@@ -201,6 +212,16 @@ internal class AnalyticsHitProcessor(
 
     private fun getAnalyticsResponseType(state: AnalyticsState): String {
         return if (state.isAnalyticsForwardingEnabled) "10" else "0"
+    }
+
+    @VisibleForTesting
+    internal fun getLastHitTimestamp(): Long {
+        return this.lastHitTimestamp
+    }
+
+    @VisibleForTesting
+    internal fun setLastHitTimestamp(timestamp: Long) {
+        this.lastHitTimestamp = timestamp
     }
 
 

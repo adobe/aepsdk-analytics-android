@@ -10,6 +10,7 @@
  */
 package com.adobe.marketing.mobile.analytics
 
+import androidx.annotation.VisibleForTesting
 import com.adobe.marketing.mobile.services.NamedCollection
 import java.nio.charset.StandardCharsets
 
@@ -26,8 +27,6 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
         mostRecentHitTimeStampInSeconds = 0L
         vid = null
         aid = null
-        dataStore.remove(AnalyticsConstants.DataStoreKeys.AID_KEY)
-        dataStore.remove(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY)
         dataStore.remove(AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS)
     }
 
@@ -35,8 +34,10 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
         this.vid = vid
     }
 
+    //TODO: getter is never called??
     internal var aid: String? = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
-        private set(aid) {
+        @VisibleForTesting
+        internal set(aid) {
             if (aid == null || aid.isEmpty()) {
                 dataStore.remove(AnalyticsConstants.DataStoreKeys.AID_KEY)
             } else {
@@ -61,15 +62,16 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
             AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
             0L
         )
-        set(timestampInSeconds) {
-            if (field < timestampInSeconds) {
-                dataStore.setLong(
-                    AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
-                    timestampInSeconds
-                )
-                field = timestampInSeconds
-            }
+        private set
+
+
+    internal fun setMostRecentHitTimeStamp(timestampInSeconds: Long) {
+        if (mostRecentHitTimeStampInSeconds < timestampInSeconds) {
+            dataStore.setLong(
+                AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
+                timestampInSeconds
+            )
+            mostRecentHitTimeStampInSeconds = timestampInSeconds
         }
-
-
+    }
 }
