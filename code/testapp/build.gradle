@@ -1,0 +1,75 @@
+apply plugin: 'com.android.application'
+
+
+configurations.all {
+    resolutionStrategy {
+        cacheDynamicVersionsFor 0, 'seconds'
+        cacheChangingModulesFor 0, 'seconds'
+    }
+}
+
+android {
+    compileSdkVersion 33
+
+    defaultConfig {
+        applicationId "com.adobe.analyticstestapp"
+        minSdkVersion 19
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+
+        //This says that my test app only wants to use the Phone variant
+        missingDimensionStrategy 'target', 'phone'
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+    implementation project(":android-analytics-library")
+    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
+    implementation('com.github.adobe.aepsdk-core-android:lifecycle:dev-v2.0.0-SNAPSHOT'){
+        transitive = false
+    }
+    implementation('com.github.adobe.aepsdk-core-android:identity:dev-v2.0.0-SNAPSHOT'){
+        transitive = false
+    }
+    implementation('com.github.adobe:aepsdk-assurance-android:2.0.0-alpha.1'){
+        transitive = false
+    }
+
+
+    //Staging
+    // implementation 'com.adobe.marketing.mobile:lifecycle:latest.integration'
+    // implementation 'com.adobe.marketing.mobile:identity:latest.integration'
+    // implementation 'com.adobe.marketing.mobile:signal:latest.integration'
+    // implementation 'com.adobe.marketing.mobile:core:latest.integration'
+    // //implementation 'com.adobe.marketing.mobile:analytics:latest.integration'
+    // implementation 'com.adobe.marketing.mobile:audience:latest.integration'
+    // implementation 'com.adobe.marketing.mobile:userprofile:latest.integration'
+    // implementation 'com.adobe.marketing.mobile:assurance:latest.integration'
+
+
+    //production
+//    implementation 'com.adobe.marketing.mobile:audience:1.+'
+//    implementation 'com.adobe.marketing.mobile:analytics:1.+'
+//    implementation 'com.adobe.marketing.mobile:userprofile:1.+'
+//    implementation 'com.adobe.marketing.mobile:sdk-core:1.+'
+}

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">AnalyticsTestApp</string>
+    <string name="btn_text_back_to_apis">Back To APIs</string>
+    <string name="btn_text_persist_vid">Persist as Vid</string>
+    <string name="btn_text_persist_aid">Persist as AID</string>
+    <string name="btn_text_update_config">Update</string>
+    <string name="et_hint_server">server URL</string>
+    <string name="et_hint_persist_id">Persist Identifier</string>
+    <string name="tv_update_config">Update Config</string>
+    <string name="et_hint_assurance_url">Enter Assurance URL</string>
+    <string name="btn_connect_assurance">Connect</string>
+</resources>

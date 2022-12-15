@@ -51,11 +51,11 @@ dependencies {
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.4.2'
 //    implementation 'com.adobe.marketing.mobile:core:2.0.0'
-//    implementation 'com.github.adobe.aepsdk-core-android:core:v2.0.0-alpha.3'
+    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
 //    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
-    implementation("com.github.adobe.aepsdk-core-android:core:DataQueueFix-SNAPSHOT") {
-        changing = true
-    }
+//    implementation("com.github.adobe.aepsdk-core-android:core:DataQueueFix-SNAPSHOT") {
+//        changing = true
+//    }
 
     testImplementation 'androidx.test:core-ktx:1.5.0'
     testImplementation "junit:junit:4.13.2"
