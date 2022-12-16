@@ -34,7 +34,6 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
         this.vid = vid
     }
 
-    //TODO: getter is never called??
     internal var aid: String? = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
         @VisibleForTesting
         internal set(aid) {
@@ -63,7 +62,6 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
             0L
         )
         private set
-
 
     internal fun setMostRecentHitTimeStamp(timestampInSeconds: Long) {
         if (mostRecentHitTimeStampInSeconds < timestampInSeconds) {

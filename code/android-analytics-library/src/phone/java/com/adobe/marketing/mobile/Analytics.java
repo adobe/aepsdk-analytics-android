@@ -23,12 +23,14 @@ import java.util.Map;
 public class Analytics {
     private final static String LOG_TAG = "Analytics";
     private final static String EXTENSION_VERSION = "2.0.0";
+    //The constants for EventData keys
     private final static String ANALYTICS_ID = "aid";
     private final static String GET_QUEUE_SIZE = "getqueuesize";
     private final static String QUEUE_SIZE = "queuesize";
     private final static String CLEAR_HITS_QUEUE = "clearhitsqueue";
     private final static String FORCE_KICK_HITS = "forcekick";
     private final static String VISITOR_IDENTIFIER = "vid";
+
     private final static long EVENT_PROCESSING_TIMEOUT_MS = 5000L;
 
     public static final Class<? extends Extension> EXTENSION = AnalyticsExtension.class;
@@ -36,7 +38,10 @@ public class Analytics {
     private Analytics() {
 
     }
-
+    /**
+     * Registers the extension with the Mobile SDK. This method should be called only once in your
+     * application class.
+     */
     @Deprecated
     public static void registerExtension() {
         MobileCore.registerExtension(AnalyticsExtension.class, extensionError -> {
