@@ -15,3 +15,10 @@ ci-publish-staging: build-release
 
 ci-publish-main: build-release
 	(./code/gradlew -p code/android-analytics-library publishReleasePublicationToSonatypeRepository -Prelease)
+
+integration-test: 
+		(./code/gradlew -p code/android-analytics-library connectedPhoneDebugAndroidTest)
+
+
+assemble-phone:
+		(./code/gradlew -p code/android-analytics-library assemblePhone)
