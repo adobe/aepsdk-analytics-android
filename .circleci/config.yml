@@ -72,19 +72,19 @@ jobs:
               shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep -w "codecov")
             done
             bash ./codecov -v -X s3 -c -D "./code/android-analytics-library/build/reports/coverage/test/phone/debug" -F unit-functional-tests
-    integration-test:
-      executor:
-        name: android/android-machine
-        resource-class: large
-        tag: 2022.01.1
+  integration-test:
+    executor:
+      name: android/android-machine
+      resource-class: large
+      tag: 2022.01.1
 
-      steps:
-        - checkout
+    steps:
+      - checkout
 
-        - android/start-emulator-and-run-tests:
-            system-image: system-images;android-29;default;x86
-            post-emulator-launch-assemble-command: make assemble-phone
-            test-command: make integration-test
+      - android/start-emulator-and-run-tests:
+          system-image: system-images;android-29;default;x86
+          post-emulator-launch-assemble-command: make assemble-phone
+          test-command: make integration-test
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
