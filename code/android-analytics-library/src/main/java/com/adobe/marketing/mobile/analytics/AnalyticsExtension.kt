@@ -70,9 +70,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             EventType.ANALYTICS, EventSource.REQUEST_IDENTITY, eventHandler
         )
         api.registerEventListener(
-            EventType.HUB, EventSource.SHARED_STATE
-        ) { handleIncomingEvent(it) }
-        api.registerEventListener(
             EventType.CONFIGURATION, EventSource.RESPONSE_CONTENT, eventHandler
         )
         api.registerEventListener(
@@ -97,15 +94,15 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             AnalyticsConstants.EventDataKeys.Configuration.SHARED_STATE_NAME,
             event,
             false,
-            SharedStateResolution.LAST_SET
+            SharedStateResolution.ANY
         )
         val identityStatus = api.getSharedState(
             AnalyticsConstants.EventDataKeys.Identity.SHARED_STATE_NAME,
             event,
             false,
-            SharedStateResolution.LAST_SET
+            SharedStateResolution.ANY
         )
-        return configurationStatus.status == SharedStateStatus.SET && identityStatus.status == SharedStateStatus.SET
+        return configurationStatus?.status == SharedStateStatus.SET && identityStatus?.status == SharedStateStatus.SET
     }
 
     @VisibleForTesting
@@ -697,12 +694,16 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     private fun updateAnalyticsState(event: Event, dependencies: List<String>) {
         val map = dependencies.associateWith { extensionName ->
-            api.getSharedState(extensionName, event, false, SharedStateResolution.LAST_SET)?.value
+            api.getSharedState(extensionName, event, true, SharedStateResolution.ANY)?.value
         }
         analyticsState.update(map)
     }
 
     private fun handleTrackRequest(event: Event, data: Map<String, Any?>) {
+        if (data.isEmpty()) {
+            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "track - event data is nil or empty.")
+            return
+        }
         if (data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION)
             || data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_STATE)
             || data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.CONTEXT_DATA)
@@ -734,8 +735,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             )
             return
         }
-
-//        setMostRecentHitTimestampInSeconds(timestampInSeconds) // set hit timestamp before OPT_OUT check
 
         analyticsProperties.setMostRecentHitTimeStamp(timeStampInSeconds)
 
@@ -773,7 +772,8 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             null
         )
         if (contextData != null) {
-            analyticsData.putAll(contextData)
+            val cleanedData = cleanContextData(contextData)
+            analyticsData.putAll(cleanedData)
         }
         val actionName = DataReader.optString(
             trackEventData,
@@ -792,10 +792,9 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
         val lifecycleSessionStartTimestamp = analyticsState.lifecycleSessionStartTimestamp
         if (lifecycleSessionStartTimestamp > 0) {
-            val maxSessionLengthInSeconds = analyticsState.lifecycleMaxSessionLength
             val timeSinceLaunchInSeconds: Long =
                 timeStampInSeconds - TimeUnit.MILLISECONDS.toSeconds(lifecycleSessionStartTimestamp)
-            if (timeSinceLaunchInSeconds in 1..maxSessionLengthInSeconds) {
+            if (timeSinceLaunchInSeconds in 1..analyticsState.lifecycleMaxSessionLength) {
                 analyticsData[AnalyticsConstants.ContextDataKeys.TIME_SINCE_LAUNCH_KEY] =
                     timeSinceLaunchInSeconds.toString()
             }
@@ -864,7 +863,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_PAGE_NAME_KEY] = it
         }
 
-
         if (!StringUtils.isNullOrEmpty(stateName)) {
             analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_PAGE_NAME_KEY] =
                 stateName
@@ -912,6 +910,10 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                 AnalyticsConstants.APP_STATE_FOREGROUND
         }
         return analyticsVars
+    }
+
+    private fun cleanContextData(eventData: Map<String, Any?>): Map<String, String> {
+        return eventData.filterValues { it is String }.mapValues { it.value as String }
     }
 
 }

@@ -43,8 +43,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    implementation project(":android-analytics-library")
+//    implementation project(":android-analytics-library")
     implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
+    implementation('com.adobe.marketing.mobile:analytics:2.0.0-SNAPSHOT'){
+        transitive = false
+    }
     implementation('com.github.adobe.aepsdk-core-android:lifecycle:dev-v2.0.0-SNAPSHOT'){
         transitive = false
     }

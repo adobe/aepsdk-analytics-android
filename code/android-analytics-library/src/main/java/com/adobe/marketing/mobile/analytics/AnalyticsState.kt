@@ -74,6 +74,9 @@ internal class AnalyticsState {
 
     internal fun update(dataMap: Map<String, Map<String, Any>?>) {
         for ((key, value) in dataMap) {
+            if(value == null) {
+                continue
+            }
             when (key) {
                 AnalyticsConstants.EventDataKeys.Configuration.EXTENSION_NAME -> {
                     extractConfigurationInfo(value)
