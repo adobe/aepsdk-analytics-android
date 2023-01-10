@@ -15,6 +15,7 @@ android {
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles "consumer-rules.pro"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     flavorDimensions "target"
@@ -38,6 +39,7 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
     compileOptions {
@@ -52,11 +54,7 @@ configurations.all {
 dependencies {
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.4.2'
-//    implementation 'com.adobe.marketing.mobile:core:2.0.0'
-    implementation("com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT") {
-        changing = true
-    }
-
+    implementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
     testImplementation 'androidx.test:core-ktx:1.5.0'
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:4.5.1"
@@ -65,7 +63,12 @@ dependencies {
     //noinspection GradleDependency
     testImplementation 'org.json:json:20180813'
     testImplementation fileTree(include: ['*.aar'], dir: 'libs')
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
+    androidTestImplementation 'com.adobe.marketing.mobile:identity:2.0.0-SNAPSHOT'
+
+    androidTestUtil 'androidx.test:orchestrator:1.4.2'
 }
 
 tasks.withType(Test) {

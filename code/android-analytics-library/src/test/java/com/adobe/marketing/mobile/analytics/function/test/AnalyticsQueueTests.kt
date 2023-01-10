@@ -112,7 +112,7 @@ internal class AnalyticsQueueTests : AnalyticsFunctionalTestBase() {
     }
 
     @Test(timeout = 10000)
-    fun `force hti processing`() {
+    fun `force hit processing`() {
         val countDownLatch = CountDownLatch(2)
         monitorNetwork { request ->
             if (request.url.startsWith("https://test.com/b/ss/rsid/0/")) {
@@ -126,7 +126,7 @@ internal class AnalyticsQueueTests : AnalyticsFunctionalTestBase() {
                 "analytics.rsids" to "rsid",
                 "global.privacy" to "optedin",
                 "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
+                "analytics.batchLimit" to 3,
                 "analytics.offlineEnabled" to true,
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 5
