@@ -102,8 +102,6 @@ public static void getQueueSize(@NonNull final AdobeCallback<Long> callback)
 
 ### Example
 
-Retrieves the total number of Analytics hits in the tracking queue.
-
 #### Java
 
 ```Java
