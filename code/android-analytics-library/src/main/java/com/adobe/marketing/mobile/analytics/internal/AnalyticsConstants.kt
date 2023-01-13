@@ -9,7 +9,7 @@
   governing permissions and limitations under the License.
  */
 
-package com.adobe.marketing.mobile.analytics
+package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.MobilePrivacyStatus
 

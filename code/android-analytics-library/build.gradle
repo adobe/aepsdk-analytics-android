@@ -66,7 +66,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
-    androidTestImplementation 'com.adobe.marketing.mobile:identity:2.0.0-SNAPSHOT'
+    implementation('com.adobe.marketing.mobile:identity:2.0.0-SNAPSHOT'){
+        transitive = false
+    }
 
     androidTestUtil 'androidx.test:orchestrator:1.4.2'
 }
