@@ -8,8 +8,9 @@
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
  */
-package com.adobe.marketing.mobile.analytics
+package com.adobe.marketing.mobile.analytics.internal
 
+import com.adobe.marketing.mobile.analytics.internal.TimeZone
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner

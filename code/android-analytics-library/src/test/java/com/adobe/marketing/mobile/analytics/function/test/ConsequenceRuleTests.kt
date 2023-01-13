@@ -11,7 +11,9 @@
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.*
-import com.adobe.marketing.mobile.analytics.*
+import com.adobe.marketing.mobile.analytics.internal.TimeZoneHelper
+import com.adobe.marketing.mobile.analytics.internal.extractContextDataFrom
+import com.adobe.marketing.mobile.analytics.internal.extractQueryParamsFrom
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

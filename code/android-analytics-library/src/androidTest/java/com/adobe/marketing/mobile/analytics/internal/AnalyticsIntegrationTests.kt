@@ -8,11 +8,12 @@
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
  */
-package com.adobe.marketing.mobile.analytics
+package com.adobe.marketing.mobile.analytics.internal
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.adobe.marketing.mobile.*
+import com.adobe.marketing.mobile.analytics.internal.ContextDataUtil
 import com.adobe.marketing.mobile.services.HttpConnecting
 import com.adobe.marketing.mobile.services.NetworkRequest
 import com.adobe.marketing.mobile.services.Networking

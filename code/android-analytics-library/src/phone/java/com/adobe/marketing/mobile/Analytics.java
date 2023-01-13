@@ -13,7 +13,7 @@ package com.adobe.marketing.mobile;
 
 import androidx.annotation.NonNull;
 
-import com.adobe.marketing.mobile.analytics.AnalyticsExtension;
+import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 

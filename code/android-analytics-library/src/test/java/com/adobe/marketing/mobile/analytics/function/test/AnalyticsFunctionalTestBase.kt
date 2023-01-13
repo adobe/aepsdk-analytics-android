@@ -11,10 +11,10 @@
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.*
-import com.adobe.marketing.mobile.analytics.AnalyticsExtension
-import com.adobe.marketing.mobile.analytics.MemoryDataQueue
-import com.adobe.marketing.mobile.analytics.MockedHttpConnecting
-import com.adobe.marketing.mobile.analytics.NetworkMonitor
+import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension
+import com.adobe.marketing.mobile.analytics.internal.MemoryDataQueue
+import com.adobe.marketing.mobile.analytics.internal.MockedHttpConnecting
+import com.adobe.marketing.mobile.analytics.internal.NetworkMonitor
 import com.adobe.marketing.mobile.services.*
 import org.junit.Before
 import org.junit.BeforeClass
@@ -25,9 +25,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.anyOrNull
-import java.io.InputStream
-import java.util.LinkedList
-import java.util.Queue
 
 @Ignore
 @RunWith(MockitoJUnitRunner.Silent::class)

@@ -8,9 +8,9 @@
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
  */
-package com.adobe.marketing.mobile.analytics
+package com.adobe.marketing.mobile.analytics.internal
 
-import com.adobe.marketing.mobile.analytics.ContextDataUtil.cleanContextDataKey
+import com.adobe.marketing.mobile.analytics.internal.ContextDataUtil.cleanContextDataKey
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

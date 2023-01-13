@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
-import com.adobe.marketing.mobile.analytics.AnalyticsExtension;
+import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

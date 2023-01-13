@@ -11,7 +11,6 @@
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.*
-import com.adobe.marketing.mobile.analytics.AnalyticsExtension
 import com.adobe.marketing.mobile.util.DataReader
 import org.junit.Assert
 import org.junit.Test

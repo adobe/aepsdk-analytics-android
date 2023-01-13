@@ -8,8 +8,27 @@
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
  */
-package com.adobe.marketing.mobile.analytics;
+package com.adobe.marketing.mobile.analytics.internal;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TimeZoneHelper {
-    public static final String TIMESTAMP_TIMEZONE_OFFSET = TimeZone.TIMESTAMP_TIMEZONE_OFFSET;
+final class ContextData {
+    Object value = null;
+    Map<String, Object> data = new HashMap<String, Object>();
+
+    boolean containsKey(final String key) {
+        return data.containsKey(key);
+    }
+
+    void put(final String key, final ContextData value) {
+        data.put(key, value);
+    }
+
+    ContextData get(final String key) {
+        return (ContextData) data.get(key);
+    }
+
+    int size() {
+        return data.size();
+    }
 }

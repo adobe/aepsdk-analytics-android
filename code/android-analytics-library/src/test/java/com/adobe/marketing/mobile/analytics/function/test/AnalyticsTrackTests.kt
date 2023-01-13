@@ -13,10 +13,10 @@ package com.adobe.marketing.mobile.analytics.function.test
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
-import com.adobe.marketing.mobile.analytics.TimeZoneHelper
-import com.adobe.marketing.mobile.analytics.extractContextDataFrom
-import com.adobe.marketing.mobile.analytics.extractContextDataKVPairFrom
-import com.adobe.marketing.mobile.analytics.extractQueryParamsFrom
+import com.adobe.marketing.mobile.analytics.internal.TimeZoneHelper
+import com.adobe.marketing.mobile.analytics.internal.extractContextDataFrom
+import com.adobe.marketing.mobile.analytics.internal.extractContextDataKVPairFrom
+import com.adobe.marketing.mobile.analytics.internal.extractQueryParamsFrom
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
