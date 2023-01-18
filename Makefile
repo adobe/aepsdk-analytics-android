@@ -23,5 +23,8 @@ integration-test:
 assemble-phone:
 		(./code/gradlew -p code/android-analytics-library assemblePhone)
 
+assemble-app:
+		(./code/gradlew -p code/testapp assemble)
+
 java-doc:
 		(./code/gradlew -p code/android-analytics-library javadocJar)
