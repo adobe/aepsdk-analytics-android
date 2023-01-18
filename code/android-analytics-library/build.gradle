@@ -5,6 +5,7 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'org.jetbrains.dokka'
+    id 'com.diffplug.spotless'
 }
 
 android {
@@ -169,7 +170,7 @@ publishing {
             pom {
                 name = mavenRepoName
                 description = mavenRepoDescription
-                url = 'https://aep-sdks.gitbook.io'
+                url = 'https://github.com/adobe/aepsdk-analytics-android'
                 licenses {
                     license {
                         name = 'Adobe Proprietary'
@@ -183,9 +184,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:github.com//Adobe-Marketing-Cloud/acp-sdks.git'
-                    developerConnection = 'scm:git:ssh://github.com//Adobe-Marketing-Cloud/acp-sdks.git'
-                    url = 'https://github.com/Adobe-Marketing-Cloud/acp-sdks'
+                    connection = 'scm:git:github.com/adobe/aepsdk-analytics-android.git'
+                    developerConnection = 'scm:git:ssh://github.com/adobe/aepsdk-analytics-android.git'
+                    url = 'https://github.com/adobe/aepsdk-analytics-android'
                 }
                 withXml {
                     def dependenciesNode = asNode().appendNode('dependencies')
@@ -235,8 +236,6 @@ dokkaJavadoc.configure {
         }
     }
 }
-
-apply plugin: 'com.diffplug.spotless'
 
 spotless {
     java {
