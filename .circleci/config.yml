@@ -20,6 +20,10 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - run:
+          name: Check format
+          command: make checkformat
+
+      - run:
           name: build library
           command: |
             make assemble-phone
