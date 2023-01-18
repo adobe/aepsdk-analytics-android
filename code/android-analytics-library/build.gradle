@@ -170,7 +170,7 @@ publishing {
             pom {
                 name = mavenRepoName
                 description = mavenRepoDescription
-                url = 'https://github.com/adobe/aepsdk-analytics-android'
+                url = 'https://developer.adobe.com/client-sdks'
                 licenses {
                     license {
                         name = 'Adobe Proprietary'
