@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.Event
@@ -86,7 +87,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            //TODO: ?? no timezone??
+            // TODO: ?? no timezone??
             "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
@@ -102,7 +103,6 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
     @Test(timeout = 10000)
     fun `hit contains vid and aid`() {
-
         Mockito.`when`(mockedNameCollection.getString(any(), anyOrNull()))
             .thenAnswer { invocation ->
                 when (invocation.arguments[0] as? String) {
@@ -116,7 +116,6 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                         return@thenAnswer ""
                     }
                 }
-
             }
 
         val countDownLatch = CountDownLatch(2)
@@ -194,7 +193,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             "vid" to "testvid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            //TODO: ?? no timezone??
+            // TODO: ?? no timezone??
             "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
@@ -210,13 +209,13 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             mapOf(
                 "aid" to "testaid",
                 "vid" to "testvid"
-            ), analyticsSharedState
+            ),
+            analyticsSharedState
         )
     }
 
     @Test(timeout = 10000)
     fun `optout - shared state should not contain vid and aid`() {
-
         val countDownLatch = CountDownLatch(1)
         var analyticsSharedState: Map<String, Any> = emptyMap()
 
@@ -259,7 +258,6 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
     @Test(timeout = 10000)
     fun `handleAnalyticsRequestIdentityEvent - shared state should contain vid`() {
-
         val countDownLatch = CountDownLatch(1)
         var analyticsSharedState: Map<String, Any> = emptyMap()
 
@@ -304,13 +302,13 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
         assertEquals(
             mapOf(
                 "vid" to "myvid"
-            ), analyticsSharedState
+            ),
+            analyticsSharedState
         )
     }
 
     @Test(timeout = 10000)
     fun `handleAnalyticsRequestIdentityEvent - shared state not should contain vid if optedout`() {
-
         val countDownLatch = CountDownLatch(2)
         var analyticsSharedState: Map<String, Any> = emptyMap()
 
@@ -363,7 +361,6 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
     @Test(timeout = 10000)
     fun `vid and aid should be cleared after optedout`() {
-
         Mockito.`when`(mockedNameCollection.getString(any(), anyOrNull()))
             .thenAnswer { invocation ->
                 when (invocation.arguments[0] as? String) {
@@ -377,7 +374,6 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                         return@thenAnswer ""
                     }
                 }
-
             }
 
         val countDownLatch = CountDownLatch(2)
@@ -424,7 +420,8 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
         analyticsExtension.handleIncomingEvent(configurationResponseEvent)
         updateMockedSharedState(
-            "com.adobe.module.configuration", mapOf(
+            "com.adobe.module.configuration",
+            mapOf(
                 "analytics.server" to "test.com",
                 "analytics.rsids" to "rsid",
                 "global.privacy" to "optedout",
@@ -443,21 +440,19 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             ).build()
         )
 
-
         countDownLatch.await()
         assertEquals(
             mapOf(
                 "aid" to "testaid",
                 "vid" to "testvid"
-            ), analyticsSharedState1
+            ),
+            analyticsSharedState1
         )
         assertTrue(analyticsSharedState2.isEmpty())
-
     }
 
     @Test(timeout = 10000)
     fun `vid and aid should be cleared after request reset event`() {
-
         Mockito.`when`(mockedNameCollection.getString(any(), anyOrNull()))
             .thenAnswer { invocation ->
                 when (invocation.arguments[0] as? String) {
@@ -471,7 +466,6 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                         return@thenAnswer ""
                     }
                 }
-
             }
 
         val countDownLatch = CountDownLatch(2)
@@ -525,17 +519,14 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             ).build()
         )
 
-
         countDownLatch.await()
         assertEquals(
             mapOf(
                 "aid" to "testaid",
                 "vid" to "testvid"
-            ), analyticsSharedState1
+            ),
+            analyticsSharedState1
         )
         assertTrue(analyticsSharedState2.isEmpty())
-
     }
-
-
 }

@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.Event
@@ -55,7 +56,8 @@ internal class AnalyticsTrackPlacesTests : AnalyticsFunctionalTestBase() {
         )
 
         updateMockedSharedState(
-            "com.adobe.module.places", mapOf(
+            "com.adobe.module.places",
+            mapOf(
                 "currentpoi" to mapOf(
                     "regionid" to "myRegionId",
                     "regionname" to "myRegionName"
@@ -137,7 +139,8 @@ internal class AnalyticsTrackPlacesTests : AnalyticsFunctionalTestBase() {
         )
 
         updateMockedSharedState(
-            "com.adobe.module.places", mapOf(
+            "com.adobe.module.places",
+            mapOf(
                 "currentpoi" to mapOf(
                     "regionid" to "myRegionId",
                     "regionname" to "myRegionName"
@@ -159,7 +162,8 @@ internal class AnalyticsTrackPlacesTests : AnalyticsFunctionalTestBase() {
             )
         ).build()
         updateMockedSharedState(
-            "com.adobe.module.places", mapOf(
+            "com.adobe.module.places",
+            mapOf(
                 "currentpoi" to mapOf(
                     "regionid" to "myRegionId2",
                     "regionname" to "myRegionName2"

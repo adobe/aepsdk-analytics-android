@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.Event
@@ -269,7 +270,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "a.internalaction" to "AdobeLink",
             "a.deeplink.id" to "test_deeplinkId",
             "test_key_0" to "test_value_0",
-            "test_key_1" to "test_value_1",
+            "test_key_1" to "test_value_1"
         )
         Assert.assertTrue(expectedContextData2 == contextDataMap2)
         Assert.assertEquals(expectedVars2.size, varMap2.size)
@@ -341,7 +342,6 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
         ).build()
         analyticsExtension.handleIncomingEvent(lifecycleStartEvent)
 
-
         val lifecycleResponseData = mapOf(
             "lifecyclecontextdata" to mapOf(
                 "lifecyclekey" to "value",
@@ -387,7 +387,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
         )
         val expectedContextData1: Map<String, String> = mapOf(
             "k1" to "v1",
-            "a.action" to "start",
+            "a.action" to "start"
         )
         Assert.assertTrue(expectedContextData1 == contextDataMap1)
         Assert.assertEquals(expectedVars1.size, varMap1.size)

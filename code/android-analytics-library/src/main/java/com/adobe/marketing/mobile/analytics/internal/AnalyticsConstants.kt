@@ -7,7 +7,7 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
 
 package com.adobe.marketing.mobile.analytics.internal
 
@@ -72,11 +72,11 @@ internal object AnalyticsConstants {
         const val DEFAULT_BACKDATE_SESSION_INFO_ENABLED = false
         const val DEFAULT_BATCH_LIMIT = 0
         const val DEFAULT_REFERRER_TIMEOUT = 0
-        const val DEFAULT_LIFECYCLE_RESPONSE_WAIT_TIMEOUT = 1000L //ms
-        const val DEFAULT_LAUNCH_DEEPLINK_DATA_WAIT_TIMEOUT = 500 //ms
+        const val DEFAULT_LIFECYCLE_RESPONSE_WAIT_TIMEOUT = 1000L // ms
+        const val DEFAULT_LAUNCH_DEEPLINK_DATA_WAIT_TIMEOUT = 500 // ms
         const val DEFAULT_ASSURANCE_SESSION_ENABLED = false
-        const val DEFAULT_LIFECYCLE_PAUSE_START_TIMEOUT = 1000 //ms
-        const val DEFAULT_LIFECYCLE_SESSION_TIMEOUT = 300000 //ms
+        const val DEFAULT_LIFECYCLE_PAUSE_START_TIMEOUT = 1000 // ms
+        const val DEFAULT_LIFECYCLE_SESSION_TIMEOUT = 300000 // ms
     }
 
     internal object DataStoreKeys {
@@ -147,6 +147,7 @@ internal object AnalyticsConstants {
         internal object Configuration {
             const val EXTENSION_NAME = "com.adobe.module.configuration"
             const val SHARED_STATE_NAME = "com.adobe.module.configuration"
+
             // config response keys
             const val GLOBAL_CONFIG_PRIVACY = "global.privacy"
             const val CONFIG_EXPERIENCE_CLOUD_ORGID_KEY = "experienceCloud.org"
@@ -263,6 +264,6 @@ internal object AnalyticsConstants {
         EventDataKeys.Lifecycle.RUN_MODE to ContextDataKeys.RUN_MODE,
         EventDataKeys.Lifecycle.UPGRADE_EVENT to ContextDataKeys.UPGRADE_EVENT_KEY,
         EventDataKeys.Lifecycle.PREVIOUS_OS_VERSION to ContextDataKeys.OPERATING_SYSTEM,
-        EventDataKeys.Lifecycle.PREVIOUS_APP_ID to ContextDataKeys.APPLICATION_IDENTIFIER,
+        EventDataKeys.Lifecycle.PREVIOUS_APP_ID to ContextDataKeys.APPLICATION_IDENTIFIER
     )
 }

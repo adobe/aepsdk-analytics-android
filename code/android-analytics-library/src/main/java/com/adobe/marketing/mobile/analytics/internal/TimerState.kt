@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.AdobeCallback
@@ -56,12 +57,15 @@ internal class TimerState(private val debugName: String) {
             isTimerRunning = true
             try {
                 timer = Timer(debugName)
-                timer?.schedule(object : TimerTask() {
-                    override fun run() {
-                        isTimerRunning = false
-                        callback.call(true)
-                    }
-                }, timeout)
+                timer?.schedule(
+                    object : TimerTask() {
+                        override fun run() {
+                            isTimerRunning = false
+                            callback.call(true)
+                        }
+                    },
+                    timeout
+                )
                 Log.trace(
                     AnalyticsConstants.LOG_TAG,
                     CLASS_NAME,
@@ -108,5 +112,4 @@ internal class TimerState(private val debugName: String) {
             isTimerRunning = false
         }
     }
-
 }

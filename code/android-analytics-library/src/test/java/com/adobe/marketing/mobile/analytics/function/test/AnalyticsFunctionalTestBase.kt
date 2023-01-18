@@ -7,15 +7,26 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.function.test
 
-import com.adobe.marketing.mobile.*
+import com.adobe.marketing.mobile.Event
+import com.adobe.marketing.mobile.EventSource
+import com.adobe.marketing.mobile.EventType
+import com.adobe.marketing.mobile.ExtensionApi
+import com.adobe.marketing.mobile.SharedStateResult
+import com.adobe.marketing.mobile.SharedStateStatus
 import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension
 import com.adobe.marketing.mobile.analytics.internal.MemoryDataQueue
 import com.adobe.marketing.mobile.analytics.internal.MockedHttpConnecting
 import com.adobe.marketing.mobile.analytics.internal.NetworkMonitor
-import com.adobe.marketing.mobile.services.*
+import com.adobe.marketing.mobile.services.DataQueue
+import com.adobe.marketing.mobile.services.DataQueuing
+import com.adobe.marketing.mobile.services.DataStoring
+import com.adobe.marketing.mobile.services.NamedCollection
+import com.adobe.marketing.mobile.services.Networking
+import com.adobe.marketing.mobile.services.ServiceProvider
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Ignore
@@ -66,32 +77,36 @@ internal open class AnalyticsFunctionalTestBase {
         val dataQueueServiceField =
             ServiceProvider.getInstance().javaClass.getDeclaredField("dataQueueService")
         dataQueueServiceField.isAccessible = true
-        dataQueueServiceField.set(serviceProvider, object : DataQueuing {
-            override fun getDataQueue(name: String?): DataQueue {
-                return when (name) {
-                    "com.adobe.module.analytics" -> {
-                        mockedMainDataQueue
-                    }
-                    "com.adobe.module.analyticsreorderqueue" -> {
-                        mockedReorderDataQueue
-                    }
-                    else -> {
-                        mockedMainDataQueue
+        dataQueueServiceField.set(
+            serviceProvider,
+            object : DataQueuing {
+                override fun getDataQueue(name: String?): DataQueue {
+                    return when (name) {
+                        "com.adobe.module.analytics" -> {
+                            mockedMainDataQueue
+                        }
+                        "com.adobe.module.analyticsreorderqueue" -> {
+                            mockedReorderDataQueue
+                        }
+                        else -> {
+                            mockedMainDataQueue
+                        }
                     }
                 }
             }
-
-        })
+        )
 
         val dataStoreServiceField =
             ServiceProvider.getInstance().javaClass.getDeclaredField("defaultDataStoreService")
         dataStoreServiceField.isAccessible = true
-        dataStoreServiceField.set(serviceProvider, object : DataStoring {
-            override fun getNamedCollection(name: String?): NamedCollection {
-                return mockedNameCollection
+        dataStoreServiceField.set(
+            serviceProvider,
+            object : DataStoring {
+                override fun getNamedCollection(name: String?): NamedCollection {
+                    return mockedNameCollection
+                }
             }
-        })
-
+        )
     }
 
     fun monitorNetwork(networkMonitor: NetworkMonitor) {
@@ -125,7 +140,8 @@ internal open class AnalyticsFunctionalTestBase {
         Mockito.`when`(
             mockedExtensionApi.getSharedState(
                 ArgumentMatchers.any(),
-                ArgumentMatchers.any(), anyOrNull(),
+                ArgumentMatchers.any(),
+                anyOrNull(),
                 ArgumentMatchers.any()
             )
         ).thenAnswer { invocation ->
@@ -137,6 +153,4 @@ internal open class AnalyticsFunctionalTestBase {
             mockedExtensionApi
         )
     }
-
 }
-

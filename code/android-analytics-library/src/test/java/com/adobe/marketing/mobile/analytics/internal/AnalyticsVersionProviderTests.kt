@@ -7,10 +7,10 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
-import com.adobe.marketing.mobile.analytics.internal.AnalyticsVersionProvider
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -39,6 +39,7 @@ class AnalyticsVersionProviderTests {
             AnalyticsVersionProvider.buildVersionString("55.66.77-F", "22.33.44")
         )
     }
+
     @Test
     fun `buildVersion - with invalid analytics version`() {
         assertEquals(
@@ -46,5 +47,4 @@ class AnalyticsVersionProviderTests {
             AnalyticsVersionProvider.buildVersionString("55.66.77-X", "33.44")
         )
     }
-
 }

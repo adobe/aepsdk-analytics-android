@@ -7,18 +7,27 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import androidx.annotation.VisibleForTesting
-import com.adobe.marketing.mobile.*
+import com.adobe.marketing.mobile.Event
+import com.adobe.marketing.mobile.EventSource
+import com.adobe.marketing.mobile.EventType
+import com.adobe.marketing.mobile.Extension
+import com.adobe.marketing.mobile.ExtensionApi
+import com.adobe.marketing.mobile.ExtensionEventListener
+import com.adobe.marketing.mobile.MobilePrivacyStatus
+import com.adobe.marketing.mobile.SharedStateResolution
+import com.adobe.marketing.mobile.SharedStateStatus
 import com.adobe.marketing.mobile.services.AppState
 import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.services.NamedCollection
 import com.adobe.marketing.mobile.services.ServiceProvider
 import com.adobe.marketing.mobile.util.DataReader
 import com.adobe.marketing.mobile.util.StringUtils
-import java.util.*
+import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
 internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extensionApi) {
@@ -61,31 +70,49 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     override fun onRegistered() {
         api.registerEventListener(
-            EventType.RULES_ENGINE, EventSource.RESPONSE_CONTENT, eventHandler
+            EventType.RULES_ENGINE,
+            EventSource.RESPONSE_CONTENT,
+            eventHandler
         )
         api.registerEventListener(
-            EventType.ANALYTICS, EventSource.REQUEST_CONTENT, eventHandler
+            EventType.ANALYTICS,
+            EventSource.REQUEST_CONTENT,
+            eventHandler
         )
         api.registerEventListener(
-            EventType.ANALYTICS, EventSource.REQUEST_IDENTITY, eventHandler
+            EventType.ANALYTICS,
+            EventSource.REQUEST_IDENTITY,
+            eventHandler
         )
         api.registerEventListener(
-            EventType.CONFIGURATION, EventSource.RESPONSE_CONTENT, eventHandler
+            EventType.CONFIGURATION,
+            EventSource.RESPONSE_CONTENT,
+            eventHandler
         )
         api.registerEventListener(
-            EventType.GENERIC_LIFECYCLE, EventSource.REQUEST_CONTENT, eventHandler
+            EventType.GENERIC_LIFECYCLE,
+            EventSource.REQUEST_CONTENT,
+            eventHandler
         )
         api.registerEventListener(
-            EventType.LIFECYCLE, EventSource.RESPONSE_CONTENT, eventHandler
+            EventType.LIFECYCLE,
+            EventSource.RESPONSE_CONTENT,
+            eventHandler
         )
         api.registerEventListener(
-            EventType.ACQUISITION, EventSource.RESPONSE_CONTENT, eventHandler
+            EventType.ACQUISITION,
+            EventSource.RESPONSE_CONTENT,
+            eventHandler
         )
         api.registerEventListener(
-            EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT, eventHandler
+            EventType.GENERIC_TRACK,
+            EventSource.REQUEST_CONTENT,
+            eventHandler
         )
         api.registerEventListener(
-            EventType.GENERIC_IDENTITY, EventSource.REQUEST_RESET, eventHandler
+            EventType.GENERIC_IDENTITY,
+            EventSource.REQUEST_RESET,
+            eventHandler
         )
     }
 
@@ -135,7 +162,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                         handleAnalyticsRequestContentEvent(event)
                     }
                 }
-
             }
             EventType.GENERIC_IDENTITY -> {
                 handleResetIdentitiesEvent(event)
@@ -229,7 +255,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                 "hear - Triggered rule is not a valid Analytics type. Cannot handle."
             )
             return
-
         }
         Log.trace(
             AnalyticsConstants.LOG_TAG,
@@ -238,7 +263,8 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
         updateAnalyticsState(event, ANALYTICS_HARD_DEPENDENCIES + ANALYTICS_SOFT_DEPENDENCIES)
         val consequenceDetail = DataReader.optTypedMap(
-            Any::class.java, triggeredConsequence,
+            Any::class.java,
+            triggeredConsequence,
             AnalyticsConstants.EventDataKeys.RuleEngine.RULES_RESPONSE_CONSEQUENCE_KEY_DETAIL,
             emptyMap()
         )
@@ -386,8 +412,8 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     private fun isTrackActionOrTrackStateEvent(eventData: Map<String, Any?>): Boolean {
         return eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.TRACK_STATE) ||
-                eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION) ||
-                eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.CONTEXT_DATA)
+            eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION) ||
+            eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.CONTEXT_DATA)
     }
 
     private fun trackAcquisitionData(event: Event) {
@@ -463,9 +489,9 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         // convert lifecycle event data keys into context data keys for AnalyticsExtension
         val lifecycleContextData: MutableMap<String, String> = HashMap()
 
-        //Removing them because they override current os and app id in the loop below.
+        // Removing them because they override current os and app id in the loop below.
 
-        //Removing them because they override current os and app id in the loop below.
+        // Removing them because they override current os and app id in the loop below.
         val previousOsVersion = tempLifecycleContextData.remove(
             AnalyticsConstants.EventDataKeys.Lifecycle.PREVIOUS_OS_VERSION
         )
@@ -480,7 +506,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                 tempLifecycleContextData.remove(entry.key)
             }
         }
-
 
         lifecycleContextData.putAll(tempLifecycleContextData)
 
@@ -503,7 +528,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
         // backdate hits
         if (analyticsState.isBackdateSessionInfoEnabled && analyticsState.isOfflineTrackingEnabled) {
-
             // crash
             if (lifecycleContextData.containsKey(AnalyticsConstants.ContextDataKeys.CRASH_EVENT_KEY)) {
                 lifecycleContextData.remove(AnalyticsConstants.ContextDataKeys.CRASH_EVENT_KEY)
@@ -607,7 +631,8 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     private fun backdateLifecycleCrash(
         previousOSVersion: String?,
-        previousAppIdVersion: String?, eventUniqueIdentifier: String
+        previousAppIdVersion: String?,
+        eventUniqueIdentifier: String
     ) {
         val crashContextData: MutableMap<String, String> = HashMap()
         crashContextData[AnalyticsConstants.ContextDataKeys.CRASH_EVENT_KEY] =
@@ -691,7 +716,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         api.dispatch(responseEvent)
     }
 
-
     private fun updateAnalyticsState(event: Event, dependencies: List<String>) {
         val map = dependencies.associateWith { extensionName ->
             api.getSharedState(extensionName, event, true, SharedStateResolution.ANY)?.value
@@ -704,9 +728,9 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "track - event data is nil or empty.")
             return
         }
-        if (data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION)
-            || data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_STATE)
-            || data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.CONTEXT_DATA)
+        if (data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION) ||
+            data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_STATE) ||
+            data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.CONTEXT_DATA)
         ) {
             track(data, event.timestampInSeconds, false, event.uniqueIdentifier)
         }
@@ -718,7 +742,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         isBackdatedHit: Boolean,
         eventUniqueIdentifier: String
     ) {
-
         if (MobilePrivacyStatus.OPT_OUT == analyticsState.privacyStatus) {
             Log.warning(
                 AnalyticsConstants.LOG_TAG,
@@ -762,7 +785,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         timeStampInSeconds: Long,
         trackEventData: Map<String, Any?>
     ): MutableMap<String, String> {
-
         val analyticsData: MutableMap<String, String> = HashMap()
         analyticsData.putAll(analyticsState.defaultData)
         val contextData = DataReader.optTypedMap(
@@ -816,7 +838,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
         return analyticsData
     }
-
 
     /**
      * Creates the vars map from the `EventData` object and the current `AnalyticsState`.
@@ -915,5 +936,4 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
     private fun cleanContextData(eventData: Map<String, Any?>): Map<String, String> {
         return eventData.filterValues { it is String }.mapValues { it.value as String }
     }
-
 }

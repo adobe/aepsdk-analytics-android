@@ -7,14 +7,18 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.analytics.internal.ContextDataUtil.cleanContextDataKey
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-
 
 class ContextDataUtilTests {
     private val testData: MutableMap<String, String> = HashMap()
@@ -241,10 +245,12 @@ class ContextDataUtilTests {
     @Test
     fun testAppendContextData_When_EmptySource() {
         assertEquals(
-            "", ContextDataUtil.appendContextData(
+            "",
+            ContextDataUtil.appendContextData(
                 mapOf(
                     "new-key" to "value"
-                ), ""
+                ),
+                ""
             )
         )
     }
@@ -252,10 +258,12 @@ class ContextDataUtilTests {
     @Test
     fun testAppendContextData_When_NoContextDataInSource() {
         assertEquals(
-            "abcde&c.&newkey=value&.c", ContextDataUtil.appendContextData(
+            "abcde&c.&newkey=value&.c",
+            ContextDataUtil.appendContextData(
                 mapOf(
                     "new-key" to "value"
-                ), "abcde"
+                ),
+                "abcde"
             )
         )
     }
@@ -266,7 +274,8 @@ class ContextDataUtilTests {
             ContextDataUtil.appendContextData(
                 mapOf(
                     "new-key" to "value"
-                ), null
+                ),
+                null
             )
         )
     }
@@ -274,17 +283,20 @@ class ContextDataUtilTests {
     @Test
     fun testAppendContextData_When_NullReferrerData() {
         assertEquals(
-            "&c.&newkey=value&.c", ContextDataUtil.appendContextData(null, "&c.&newkey=value&.c")
+            "&c.&newkey=value&.c",
+            ContextDataUtil.appendContextData(null, "&c.&newkey=value&.c")
         )
     }
 
     @Test
     fun testAppendContextData_When_ContextDataOnePair() {
         assertEquals(
-            "&c.&key=value&.c", ContextDataUtil.appendContextData(
+            "&c.&key=value&.c",
+            ContextDataUtil.appendContextData(
                 mapOf(
                     "key" to "value"
-                ), "&c.&.c"
+                ),
+                "&c.&.c"
             )
         )
     }
@@ -293,8 +305,10 @@ class ContextDataUtilTests {
     fun testAppendContextData_When_ContextDataTwoPair() {
         val result = ContextDataUtil.appendContextData(
             mapOf(
-                "key" to "value", "key1" to "value1"
-            ), "&c.&.c"
+                "key" to "value",
+                "key1" to "value1"
+            ),
+            "&c.&.c"
         )
         assertTrue(contextDataInCorrectSequence(result, "key=value", "&c.", "&.c"))
         assertTrue(contextDataInCorrectSequence(result, "key1=value1", "&c.", "&.c"))
@@ -304,8 +318,10 @@ class ContextDataUtilTests {
     fun testAppendContextData_When_ContextDataWithNestedKeyName() {
         val result = ContextDataUtil.appendContextData(
             mapOf(
-                "key" to "value", "key.nest" to "value1"
-            ), "&c.&.c"
+                "key" to "value",
+                "key.nest" to "value1"
+            ),
+            "&c.&.c"
         )
         assertTrue(contextDataInCorrectSequence(result, "key=value", "&c.", "&.c"))
         assertTrue(contextDataInCorrectSequence(result, "nest=value1", "&key.", "&.key"))
@@ -315,8 +331,10 @@ class ContextDataUtilTests {
     fun testAppendContextData_When_NestedKeyNameOverrideOldValue() {
         val result = ContextDataUtil.appendContextData(
             mapOf(
-                "key" to "new-value", "key.nest" to "new-value1"
-            ), "&c.&key=value&key.&nest=value1&.key&.c"
+                "key" to "new-value",
+                "key.nest" to "new-value1"
+            ),
+            "&c.&key=value&key.&nest=value1&.key&.c"
         )
         assertTrue(contextDataInCorrectSequence(result, "key=new-value", "&c.", "&.c"))
         assertTrue(contextDataInCorrectSequence(result, "nest=new-value1", "&key.", "&.key"))
@@ -326,8 +344,10 @@ class ContextDataUtilTests {
     fun testAppendContextData_When_NestedKeyNameAppendToExistingLevel() {
         val result = ContextDataUtil.appendContextData(
             mapOf(
-                "key.new" to "value", "key1.new" to "value"
-            ), "&c.&key=value&key.&nest=value1&.key&key1.&nest=value1&.key1&.c"
+                "key.new" to "value",
+                "key1.new" to "value"
+            ),
+            "&c.&key=value&key.&nest=value1&.key&key1.&nest=value1&.key1&.c"
         )
         assertTrue(contextDataInCorrectSequence(result, "new=value", "&key1.", "&.key1"))
         assertTrue(contextDataInCorrectSequence(result, "nest=value1", "&key1.", "&.key1"))
@@ -365,7 +385,10 @@ class ContextDataUtilTests {
         )
         assertTrue(
             contextDataInCorrectSequence(
-                result, "new=%E4%B8%AD%E6%96%87", "&level4.", "&.level4"
+                result,
+                "new=%E4%B8%AD%E6%96%87",
+                "&level4.",
+                "&.level4"
             )
         )
     }
@@ -382,12 +405,18 @@ class ContextDataUtilTests {
         )
         assertTrue(
             contextDataInCorrectSequence(
-                result, "new=%E4%B8%AD%E6%96%87", "&level4.", "&.level4"
+                result,
+                "new=%E4%B8%AD%E6%96%87",
+                "&level4.",
+                "&.level4"
             )
         )
         assertTrue(
             contextDataInCorrectSequence(
-                result, "nest=%E4%B8%AD%E6%96%87", "&key1.", "&.key1"
+                result,
+                "nest=%E4%B8%AD%E6%96%87",
+                "&key1.",
+                "&.key1"
             )
         )
     }
@@ -396,7 +425,8 @@ class ContextDataUtilTests {
     fun testAppendContextData_When_SourceIsARealHit() {
         val result = ContextDataUtil.appendContextData(
             mapOf(
-                "key1.new" to "value", "key.new" to "value"
+                "key1.new" to "value",
+                "key.new" to "value"
             ),
             "ndh=1&pe=lnk_o&pev2=ADBINTERNAL%3ALifecycle&pageName=My%20Application%201.0%20%281%29&t=00%2F00%2F0000%2000%3A00%3A00%200%20360&ts=1432159549&c.&a.&DeviceName=SAMSUNG-SGH-I337&Resolution=1080x1920&OSVersion=Android%204.3&CarrierName=&internalaction=Lifecycle&AppID=My%20Application%201.0%20%281%29&Launches=1&InstallEvent=InstallEvent&DayOfWeek=4&InstallDate=5%2F20%2F2015&LaunchEvent=LaunchEvent&DailyEngUserEvent=DailyEngUserEvent&RunMode=Application&HourOfDay=16&MonthlyEngUserEvent=MonthlyEngUserEvent&.a&.c&mid=45872199741202307594993613744306256830&ce=UTF-8"
         )
@@ -405,7 +435,10 @@ class ContextDataUtilTests {
     }
 
     private fun contextDataInCorrectSequence(
-        source: String, target: String, start: String, end: String
+        source: String,
+        target: String,
+        start: String,
+        end: String
     ): Boolean {
         val startIndex = source.indexOf(start)
         val endIndex = source.indexOf(end, startIndex)

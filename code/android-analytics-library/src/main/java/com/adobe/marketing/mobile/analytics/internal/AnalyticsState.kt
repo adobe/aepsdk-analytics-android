@@ -7,13 +7,17 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.MobilePrivacyStatus
 import com.adobe.marketing.mobile.internal.util.VisitorIDSerializer
 import com.adobe.marketing.mobile.services.Log
-import com.adobe.marketing.mobile.util.*
+import com.adobe.marketing.mobile.util.DataReader
+import com.adobe.marketing.mobile.util.DataReaderException
+import com.adobe.marketing.mobile.util.StringUtils
+import com.adobe.marketing.mobile.util.TimeUtils
 import java.util.HashMap
 
 /**
@@ -74,7 +78,7 @@ internal class AnalyticsState {
 
     internal fun update(dataMap: Map<String, Map<String, Any>?>) {
         for ((key, value) in dataMap) {
-            if(value == null) {
+            if (value == null) {
                 continue
             }
             when (key) {
@@ -162,7 +166,8 @@ internal class AnalyticsState {
             )
         )
         sessionTimeout = DataReader.optInt(
-            configuration, AnalyticsConstants.EventDataKeys.Configuration.LIFECYCLE_SESSION_TIMEOUT,
+            configuration,
+            AnalyticsConstants.EventDataKeys.Configuration.LIFECYCLE_SESSION_TIMEOUT,
             AnalyticsConstants.Default.DEFAULT_LIFECYCLE_SESSION_TIMEOUT
         )
     }
@@ -270,11 +275,13 @@ internal class AnalyticsState {
         }
         lifecycleSessionStartTimestamp = DataReader.optLong(
             lifecycleData,
-            AnalyticsConstants.EventDataKeys.Lifecycle.SESSION_START_TIMESTAMP, 0L
+            AnalyticsConstants.EventDataKeys.Lifecycle.SESSION_START_TIMESTAMP,
+            0L
         )
         lifecycleMaxSessionLength = DataReader.optLong(
             lifecycleData,
-            AnalyticsConstants.EventDataKeys.Lifecycle.MAX_SESSION_LENGTH, 0L
+            AnalyticsConstants.EventDataKeys.Lifecycle.MAX_SESSION_LENGTH,
+            0L
         )
         val lifecycleContextData = DataReader.optTypedMap(
             String::class.java,
@@ -334,7 +341,8 @@ internal class AnalyticsState {
             return
         }
         val assuranceSessionId = DataReader.optString(
-            assuranceInfo, AnalyticsConstants.EventDataKeys.Assurance.SESSION_ID,
+            assuranceInfo,
+            AnalyticsConstants.EventDataKeys.Assurance.SESSION_ID,
             null
         )
 
@@ -373,7 +381,6 @@ internal class AnalyticsState {
      */
     val isAnalyticsConfigured: Boolean
         get() = !StringUtils.isNullOrEmpty(rsids) && !StringUtils.isNullOrEmpty(host)
-
 
     val isVisitorIDServiceEnabled: Boolean
         get() = !StringUtils.isNullOrEmpty(marketingCloudOrganizationID)

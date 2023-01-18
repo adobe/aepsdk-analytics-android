@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.Event
@@ -21,7 +22,10 @@ import org.junit.Assert
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.verify
 import java.net.URLDecoder
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -42,7 +46,6 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
                         return@thenAnswer ""
                     }
                 }
-
             }
 
         val countDownLatch = CountDownLatch(2)
@@ -116,7 +119,8 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
         dispatchGetQueueSizeEvent(analyticsExtension)
 
         updateMockedSharedState(
-            "com.adobe.module.configuration", mapOf(
+            "com.adobe.module.configuration",
+            mapOf(
                 "analytics.server" to "test.com",
                 "analytics.rsids" to "rsid",
                 "global.privacy" to "optedout",
@@ -136,7 +140,6 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
         )
         dispatchGetQueueSizeEvent(analyticsExtension)
 
-
         countDownLatch.await()
 
         Assert.assertEquals(3, queueSize1)
@@ -147,12 +150,10 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
             mockedNameCollection,
             atLeast(1)
         ).remove("ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER")
-
     }
 
     @Test(timeout = 10000)
     fun `unknown to optedin - send out hits`() {
-
         val countDownLatch = CountDownLatch(1)
         var varMap: Map<String, Any> = emptyMap()
         var contextDataMap: Map<String, Any> = emptyMap()
@@ -200,7 +201,8 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
         updateMockedSharedState(
-            "com.adobe.module.configuration", mapOf(
+            "com.adobe.module.configuration",
+            mapOf(
                 "analytics.server" to "test.com",
                 "analytics.rsids" to "rsid",
                 "global.privacy" to "optedin",
@@ -244,7 +246,6 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
 
     @Test(timeout = 10000)
     fun `tack hits only sent on valid configuration`() {
-
         val countDownLatch = CountDownLatch(1)
         var varMap: Map<String, Any> = emptyMap()
         var contextDataMap: Map<String, Any> = emptyMap()
@@ -292,7 +293,8 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
         analyticsExtension.handleIncomingEvent(trackEvent1)
 
         updateMockedSharedState(
-            "com.adobe.module.configuration", mapOf(
+            "com.adobe.module.configuration",
+            mapOf(
                 "analytics.server" to "test.com",
                 "analytics.rsids" to "rsid",
                 "global.privacy" to "optedin",
@@ -349,7 +351,6 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
 
     @Test(timeout = 10000)
     fun `offline hits should not contain timestamp`() {
-
         val countDownLatch = CountDownLatch(1)
         var varMap: Map<String, Any> = emptyMap()
         var contextDataMap: Map<String, Any> = emptyMap()
@@ -371,7 +372,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
                 "analytics.batchLimit" to 0,
                 "analytics.offlineEnabled" to false,
                 "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1,
+                "analytics.launchHitDelay" to 1
             ),
             mapOf(
                 "mid" to "mid",
@@ -406,7 +407,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET
         )
         val expectedContextData: Map<String, String> = mapOf(
             "k1" to "v1",
@@ -419,7 +420,6 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
 
     @Test(timeout = 10000)
     fun `offline hits should be dropped after 60s`() {
-
         val countDownLatch = CountDownLatch(1)
         monitorNetwork { request ->
             if (request.url.startsWith("https://test.com/b/ss/rsid/0/")) {
@@ -436,7 +436,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
                 "analytics.batchLimit" to 0,
                 "analytics.offlineEnabled" to false,
                 "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1,
+                "analytics.launchHitDelay" to 1
             ),
             mapOf(
                 "mid" to "mid",
@@ -467,6 +467,5 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
         assertFalse(countDownLatch.await(1000, TimeUnit.MILLISECONDS))
-
     }
 }

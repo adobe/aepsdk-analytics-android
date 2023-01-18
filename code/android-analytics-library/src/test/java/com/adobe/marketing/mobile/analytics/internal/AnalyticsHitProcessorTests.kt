@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.Event
@@ -17,7 +18,11 @@ import com.adobe.marketing.mobile.services.NetworkRequest
 import com.adobe.marketing.mobile.services.Networking
 import com.adobe.marketing.mobile.services.ServiceProvider
 import com.adobe.marketing.mobile.util.TimeUtils
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -94,7 +99,7 @@ class AnalyticsHitProcessorTests {
         val badDataEntity =
             AnalyticsHit("payload1", TimeUtils.getUnixTimeInSeconds(), "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
-        //408, 504, 503, -1
+        // 408, 504, 503, -1
         mockedHttpConnecting.responseCode = 408
         networkMonitor = { request ->
             networkRequest = request
@@ -115,7 +120,7 @@ class AnalyticsHitProcessorTests {
         val badDataEntity =
             AnalyticsHit("payload1", TimeUtils.getUnixTimeInSeconds(), "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
-        //408, 504, 503, -1
+        // 408, 504, 503, -1
         mockedHttpConnecting.responseCode = 404
         networkMonitor = { request ->
             networkRequest = request
@@ -171,7 +176,8 @@ class AnalyticsHitProcessorTests {
                 "ETag" to "eTag",
                 "Server" to "abc.com",
                 "Content-Type" to "xyz"
-            ), event.eventData["analyticsserverresponse"]
+            ),
+            event.eventData["analyticsserverresponse"]
         )
         assertEquals("id1", event.eventData["requestEventIdentifier"])
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)
@@ -228,7 +234,8 @@ class AnalyticsHitProcessorTests {
                 "ETag" to "eTag",
                 "Server" to "abc.com",
                 "Content-Type" to "xyz"
-            ), event.eventData["analyticsserverresponse"]
+            ),
+            event.eventData["analyticsserverresponse"]
         )
         assertEquals("id1", event.eventData["requestEventIdentifier"])
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)
@@ -363,7 +370,8 @@ class AnalyticsHitProcessorTests {
                 "ETag" to "eTag",
                 "Server" to "abc.com",
                 "Content-Type" to "xyz"
-            ), event.eventData["analyticsserverresponse"]
+            ),
+            event.eventData["analyticsserverresponse"]
         )
         assertEquals("id1", event.eventData["requestEventIdentifier"])
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)

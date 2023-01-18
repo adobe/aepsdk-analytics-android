@@ -7,13 +7,13 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal;
 
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.StringUtils;
 import com.adobe.marketing.mobile.util.UrlUtils;
-
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -21,34 +21,51 @@ import java.util.regex.Pattern;
 
 class ContextDataUtil {
     private static final String LOG_TAG = ContextDataUtil.class.getSimpleName();
-    private static final boolean[] contextDataMask = new boolean[]{
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false,
-            true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false,
-            false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-            true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, true,
-            false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true,
-            true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
-    };
-    private static final Map<String, String> contextDataKeyWhiteList = new HashMap<String, String>(256);
+    private static final boolean[] contextDataMask =
+            new boolean[] {
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, true, false,
+                true, true, true, true, true, true, true, true, true, true, false, false, false,
+                        false, false, false,
+                false, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                        true, true,
+                true, true, true, true, true, true, true, true, true, true, true, false, false,
+                        false, false, true,
+                false, true, true, true, true, true, true, true, true, true, true, true, true, true,
+                        true, true,
+                true, true, true, true, true, true, true, true, true, true, true, false, false,
+                        false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false,
+                false, false, false, false, false, false, false, false, false, false, false, false,
+                        false, false, false, false
+            };
+    private static final Map<String, String> contextDataKeyWhiteList =
+            new HashMap<String, String>(256);
     private static final int MAX_LIMIT = 250;
     private static int contextDataKeyWhiteListCount = 0;
 
-    private ContextDataUtil() {
-    }
+    private ContextDataUtil() {}
 
     /**
-     * Translates string based context data into a nested dictionary format for serializing to query string.
-     * This method contains a recursive block.
+     * Translates string based context data into a nested dictionary format for serializing to query
+     * string. This method contains a recursive block.
      *
      * @param data the data map that we want to process
      * @return a new ContextData object containing the provided datas
@@ -100,12 +117,13 @@ class ContextDataUtil {
 
     /**
      * Cleans the input string by removing all characters that are disallowed in a context data key;
-     * context data keys only allow [A-Za-z0-9_.], periods may not prefix/suffix/occur consecutively.
-     * V4 Note: this is one of the hottest functions in the library.  this has been optimized to create
-     * minimal memory footprint while avoiding re-cleaning "known-good" keys.
+     * context data keys only allow [A-Za-z0-9_.], periods may not prefix/suffix/occur
+     * consecutively. V4 Note: this is one of the hottest functions in the library. this has been
+     * optimized to create minimal memory footprint while avoiding re-cleaning "known-good" keys.
      *
      * @param key that we want to process
-     * @return the sanitized key as described above or null if the key was null before or after processing it is invalid
+     * @return the sanitized key as described above or null if the key was null before or after
+     *     processing it is invalid
      */
     public static String cleanContextDataKey(final String key) {
         if (key == null) {
@@ -183,13 +201,14 @@ class ContextDataUtil {
     }
 
     /**
-     * Serializes a map to key value pairs for url string.
-     * This method is recursive to handle the nested data objects.
+     * Serializes a map to key value pairs for url string. This method is recursive to handle the
+     * nested data objects.
      *
      * @param parameters the query parameters that we want to serialize
-     * @param builder    used for recoursivity
+     * @param builder used for recoursivity
      */
-    public static void serializeToQueryString(final Map<String, Object> parameters, final StringBuilder builder) {
+    public static void serializeToQueryString(
+            final Map<String, Object> parameters, final StringBuilder builder) {
         // bail if we have nothing
         if (parameters == null) {
             return;
@@ -228,9 +247,10 @@ class ContextDataUtil {
     }
 
     /**
-     * Creates a new String composed of the elements joined together separated by the given delimiter
+     * Creates a new String composed of the elements joined together separated by the given
+     * delimiter
      *
-     * @param elements  the list of elements that we want ot merge
+     * @param elements the list of elements that we want ot merge
      * @param delimiter the delimiter character
      * @return the string with the elements joined together
      */
@@ -252,11 +272,12 @@ class ContextDataUtil {
     }
 
     /**
-     * Gets the url fragment, it deserialize it, appends the given map inside the context data node if that one
-     * exists and serialize it back to the initial format. Otherwise it returns the initial url fragment
+     * Gets the url fragment, it deserialize it, appends the given map inside the context data node
+     * if that one exists and serialize it back to the initial format. Otherwise it returns the
+     * initial url fragment
      *
      * @param referrerData the map that we want to append to the initial url fragment
-     * @param source       the url fragment as string
+     * @param source the url fragment as string
      * @return the url fragment that has the given map merged inside the context data node
      */
     static String appendContextData(final Map<String, String> referrerData, final String source) {
@@ -272,9 +293,17 @@ class ContextDataUtil {
         try {
             contextDataNotMatched = !matcher.matches() || matcher.group(2) == null;
         } catch (IndexOutOfBoundsException exception) {
-            Log.debug(AnalyticsConstants.LOG_TAG, LOG_TAG, "Context data matcher failed with %s", exception);
+            Log.debug(
+                    AnalyticsConstants.LOG_TAG,
+                    LOG_TAG,
+                    "Context data matcher failed with %s",
+                    exception);
         } catch (IllegalStateException exception) {
-            Log.debug(AnalyticsConstants.LOG_TAG, LOG_TAG, "Context data matcher failed with %s", exception);
+            Log.debug(
+                    AnalyticsConstants.LOG_TAG,
+                    LOG_TAG,
+                    "Context data matcher failed with %s",
+                    exception);
         }
 
         if (contextDataNotMatched) {
@@ -288,7 +317,8 @@ class ContextDataUtil {
         try {
             String contextDataString = matcher.group(2);
             // create dictionary to hold our decoded context data kvpairs
-            Map<String, String> contextData = deserializeContextDataKeyValuePairs(contextDataString);
+            Map<String, String> contextData =
+                    deserializeContextDataKeyValuePairs(contextDataString);
 
             // the referrer data should override the existing context data
             contextData.putAll(referrerData);
@@ -300,16 +330,27 @@ class ContextDataUtil {
             urlSb.append(source.substring(matcher.end(1)));
             return urlSb.toString();
         } catch (IndexOutOfBoundsException exception) {
-            Log.debug(AnalyticsConstants.LOG_TAG, LOG_TAG, "Context data matcher failed with %s", exception);
+            Log.debug(
+                    AnalyticsConstants.LOG_TAG,
+                    LOG_TAG,
+                    "Context data matcher failed with %s",
+                    exception);
         } catch (IllegalStateException exception) {
-            Log.debug(AnalyticsConstants.LOG_TAG, LOG_TAG, "Context data matcher failed with %s", exception);
+            Log.debug(
+                    AnalyticsConstants.LOG_TAG,
+                    LOG_TAG,
+                    "Context data matcher failed with %s",
+                    exception);
         }
 
         return source;
     }
 
-    private static void addValueToHashMap(final Object object, final ContextData table, final List<String> subKeyArray,
-                                          final int index) {
+    private static void addValueToHashMap(
+            final Object object,
+            final ContextData table,
+            final List<String> subKeyArray,
+            final int index) {
         if (table == null || subKeyArray == null) {
             return;
         }
@@ -339,15 +380,16 @@ class ContextDataUtil {
     }
 
     /**
-     * Encodes the key/value pair and prepares it in the URL format.
-     * If the value is a List, it will create a join string with the "," delimiter before encoding, otherwise it will use
-     * toString method on other objects.
+     * Encodes the key/value pair and prepares it in the URL format. If the value is a List, it will
+     * create a join string with the "," delimiter before encoding, otherwise it will use toString
+     * method on other objects.
      *
-     * @param key     the string value that we want to append to the builder
-     * @param value   the object value that we want to encode and append to the builder
+     * @param key the string value that we want to append to the builder
+     * @param value the object value that we want to encode and append to the builder
      * @param builder it will contain the final result
      */
-    private static void serializeKeyValuePair(final String key, final Object value, final StringBuilder builder) {
+    private static void serializeKeyValuePair(
+            final String key, final Object value, final StringBuilder builder) {
         if (key == null || value == null || value instanceof ContextData || key.length() <= 0) {
             return;
         }
@@ -373,7 +415,8 @@ class ContextDataUtil {
      * @param contextDataString the context data url fragment that we want to deserialize
      * @return context data as map
      */
-    public static Map<String, String> deserializeContextDataKeyValuePairs(final String contextDataString) {
+    public static Map<String, String> deserializeContextDataKeyValuePairs(
+            final String contextDataString) {
         final int mapCapacity = 64;
         final int listCapacity = 16;
         Map<String, String> contextData = new HashMap<String, String>(mapCapacity);
@@ -396,9 +439,16 @@ class ContextDataUtil {
                 String contextDataKey = contextDataStringPath(keyPath, kvpair[0]);
 
                 try {
-                    contextData.put(contextDataKey, java.net.URLDecoder.decode(kvpair[1], String.valueOf(StandardCharsets.UTF_8)));
+                    contextData.put(
+                            contextDataKey,
+                            java.net.URLDecoder.decode(
+                                    kvpair[1], String.valueOf(StandardCharsets.UTF_8)));
                 } catch (Exception e) {
-                    Log.warning(AnalyticsConstants.LOG_TAG, LOG_TAG, "Appending the context data information failed with %s", e);
+                    Log.warning(
+                            AnalyticsConstants.LOG_TAG,
+                            LOG_TAG,
+                            "Appending the context data information failed with %s",
+                            e);
                 }
             }
         }
@@ -406,7 +456,8 @@ class ContextDataUtil {
         return contextData;
     }
 
-    private static String contextDataStringPath(final List<String> keyPath, final String lastComponent) {
+    private static String contextDataStringPath(
+            final List<String> keyPath, final String lastComponent) {
         StringBuilder sb = new StringBuilder();
 
         for (String pathComponent : keyPath) {
@@ -415,6 +466,5 @@ class ContextDataUtil {
 
         sb.append(lastComponent);
         return sb.toString();
-
     }
 }

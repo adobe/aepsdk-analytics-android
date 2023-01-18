@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.Event
@@ -335,7 +336,8 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             )
         )
         updateMockedSharedState(
-            "com.adobe.module.lifecycle", mapOf(
+            "com.adobe.module.lifecycle",
+            mapOf(
                 "lifecyclecontextdata" to mapOf(
                     "osversion" to "originalOS",
                     "devicename" to "originalDeviceName",
@@ -354,7 +356,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "k2" to "v2",
                     "a.AppID" to "overwrittenApp",
                     "a.DeviceName" to "overwrittenDevice",
-                    "a.OSVersion" to "overwrittenOS",
+                    "a.OSVersion" to "overwrittenOS"
                 )
             )
         ).build()
@@ -369,7 +371,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "mid" to "mid",
             "aamb" to "blob",
             "aamlh" to "lochint",
-            //TODO:???
+            // TODO:???
             "pageName" to "originalAppID",
             "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
@@ -452,7 +454,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         val expectedContextData: Map<String, String> = mapOf(
             "k1" to "v1",
             "k2" to "v2",
-            "a.action" to "testAction",
+            "a.action" to "testAction"
         )
         Assert.assertTrue(expectedContextData == contextDataMap)
         Assert.assertEquals(expectedVars.size, varMap.size)
@@ -581,7 +583,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 )
             )
         ).build()
-        //TODO: the event data was set to null because of the above unsupported value types, like emptyArray.
+        // TODO: the event data was set to null because of the above unsupported value types, like emptyArray.
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 

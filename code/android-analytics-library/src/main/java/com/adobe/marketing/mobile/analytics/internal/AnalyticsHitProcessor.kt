@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import androidx.annotation.VisibleForTesting
@@ -15,7 +16,14 @@ import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
 import com.adobe.marketing.mobile.ExtensionApi
-import com.adobe.marketing.mobile.services.*
+import com.adobe.marketing.mobile.services.DataEntity
+import com.adobe.marketing.mobile.services.HitProcessing
+import com.adobe.marketing.mobile.services.HitProcessingResult
+import com.adobe.marketing.mobile.services.HttpMethod
+import com.adobe.marketing.mobile.services.Log
+import com.adobe.marketing.mobile.services.NetworkRequest
+import com.adobe.marketing.mobile.services.Networking
+import com.adobe.marketing.mobile.services.ServiceProvider
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
 
@@ -35,7 +43,6 @@ internal class AnalyticsHitProcessor(
     private var lastHitTimestamp: Long = 0L
 
     private val version = AnalyticsVersionProvider.buildVersionString()
-
 
     override fun retryInterval(dataENtity: DataEntity): Int {
         return HIT_QUEUE_RETRY_TIME_SECONDS
@@ -183,7 +190,6 @@ internal class AnalyticsHitProcessor(
                     processingResult.complete(true)
                 }
             }
-
         }
     }
 
@@ -198,7 +204,7 @@ internal class AnalyticsHitProcessor(
             return null
         }
         val baseUrl =
-            "https://${state.host}/b/ss/${state.rsids ?: ""}/${getAnalyticsResponseType(state)}/${version}/s${(0..100000000).random()}"
+            "https://${state.host}/b/ss/${state.rsids ?: ""}/${getAnalyticsResponseType(state)}/$version/s${(0..100000000).random()}"
         if (!UrlUtils.isValidUrl(baseUrl)) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
@@ -223,6 +229,4 @@ internal class AnalyticsHitProcessor(
     internal fun setLastHitTimestamp(timestamp: Long) {
         this.lastHitTimestamp = timestamp
     }
-
-
 }
