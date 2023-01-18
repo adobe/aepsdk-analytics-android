@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-android'
     id 'maven-publish'
     id 'signing'
+    id 'org.jetbrains.dokka'
 }
 
 android {
@@ -151,6 +152,11 @@ def isJitPackBuild() {
 
 def groupIdForPublish = isJitPackBuild()? 'com.github.adobe.aepsdk-analytics-android': 'com.adobe.marketing.mobile'
 
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    archiveClassifier.set('javadoc')
+    from dokkaJavadoc.outputDirectory
+}
+
 publishing {
     publications {
         release(MavenPublication) {
@@ -158,7 +164,7 @@ publishing {
             artifactId = rootProject.moduleName
             version = version
             artifact("$buildDir/outputs/aar/${rootProject.moduleAARName}")
-//            artifact javadocPublish
+            artifact javadocJar
 
             pom {
                 name = mavenRepoName
@@ -216,6 +222,18 @@ signing {
         }
     }
     sign publishing.publications
+}
+
+dokkaJavadoc.configure {
+    dokkaSourceSets {
+        named("main") {
+            noAndroidSdkLink.set(false)
+            perPackageOption {
+                matchingRegex.set(".*\\.internal.*") // proper setting
+                suppress.set(true)
+            }
+        }
+    }
 }
 
 
