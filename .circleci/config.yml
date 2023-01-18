@@ -36,7 +36,10 @@ jobs:
       - run:
           name: build java doc
           command: |
-            make javadoc
+            make java-doc
+      - store_artifacts:
+          path: code/android-analytics-library/build/libs
+
   unit-test:
     executor:
       name: android/android-machine
