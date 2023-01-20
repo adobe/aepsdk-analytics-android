@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.function.test
 
 import com.adobe.marketing.mobile.Event
@@ -146,7 +147,6 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
                         return@thenAnswer 0L
                     }
                 }
-
             }
 
         val countDownLatch = CountDownLatch(2)
@@ -288,7 +288,6 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
                         return@thenAnswer 0L
                     }
                 }
-
             }
         val countDownLatch = CountDownLatch(2)
         var varMap1: Map<String, Any> = emptyMap()
@@ -454,7 +453,8 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
         )
 
         updateMockedSharedState(
-            "com.adobe.module.lifecycle", mapOf(
+            "com.adobe.module.lifecycle",
+            mapOf(
                 "lifecyclecontextdata" to mapOf(
                     "osversion" to "mockOSName",
                     "locale" to "en-US",
@@ -520,5 +520,4 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
         Assert.assertEquals(expectedVars.size, varMap.size)
         Assert.assertEquals(expectedVars, varMap)
     }
-
 }

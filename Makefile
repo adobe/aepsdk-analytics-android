@@ -28,3 +28,9 @@ assemble-app:
 
 java-doc:
 		(./code/gradlew -p code/android-analytics-library javadocJar)
+
+checkformat:
+		(./code/gradlew -p code/android-analytics-library spotlessCheck)
+
+format:
+		(./code/gradlew -p code/android-analytics-library spotlessApply)

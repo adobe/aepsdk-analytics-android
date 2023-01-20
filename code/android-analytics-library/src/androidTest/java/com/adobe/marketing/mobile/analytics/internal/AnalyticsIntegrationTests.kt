@@ -7,23 +7,29 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.adobe.marketing.mobile.*
-import com.adobe.marketing.mobile.analytics.internal.ContextDataUtil
+import com.adobe.marketing.mobile.Analytics
+import com.adobe.marketing.mobile.Identity
+import com.adobe.marketing.mobile.LoggingMode
+import com.adobe.marketing.mobile.MobileCore
+import com.adobe.marketing.mobile.SDKHelper
 import com.adobe.marketing.mobile.services.HttpConnecting
 import com.adobe.marketing.mobile.services.NetworkRequest
 import com.adobe.marketing.mobile.services.Networking
 import com.adobe.marketing.mobile.services.ServiceProvider
-import org.junit.*
-import org.junit.Assert.*
-
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.BeforeClass
+import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.InputStream
-
 import java.net.HttpURLConnection
 import java.net.URLDecoder
 import java.util.concurrent.CountDownLatch
@@ -67,7 +73,6 @@ class AnalyticsIntegrationTests {
                     }
 
                     override fun close() {}
-
                 })
             }
         }
@@ -125,7 +130,8 @@ class AnalyticsIntegrationTests {
             }
         }
         MobileCore.trackAction(
-            "clickOK", mapOf(
+            "clickOK",
+            mapOf(
                 "key1" to "value1"
             )
         )
@@ -176,7 +182,8 @@ class AnalyticsIntegrationTests {
             }
         }
         MobileCore.trackState(
-            "homePage", mapOf(
+            "homePage",
+            mapOf(
                 "key1" to "value1"
             )
         )
@@ -213,17 +220,20 @@ class AnalyticsIntegrationTests {
         identityAwareness { sharedStatesLatch.countDown() }
         sharedStatesLatch.await()
         MobileCore.trackState(
-            "homePage", mapOf(
+            "homePage",
+            mapOf(
                 "key1" to "value1"
             )
         )
         MobileCore.trackState(
-            "homePage", mapOf(
+            "homePage",
+            mapOf(
                 "key1" to "value1"
             )
         )
         MobileCore.trackState(
-            "homePage", mapOf(
+            "homePage",
+            mapOf(
                 "key1" to "value1"
             )
         )
@@ -232,8 +242,8 @@ class AnalyticsIntegrationTests {
             countDownLatch.countDown()
         }
         countDownLatch.await()
-
     }
+
     @Test
     fun testClearQueue() {
         val countDownLatch = CountDownLatch(1)
@@ -254,17 +264,20 @@ class AnalyticsIntegrationTests {
         identityAwareness { sharedStatesLatch.countDown() }
         sharedStatesLatch.await()
         MobileCore.trackState(
-            "homePage", mapOf(
+            "homePage",
+            mapOf(
                 "key1" to "value1"
             )
         )
         MobileCore.trackState(
-            "homePage", mapOf(
+            "homePage",
+            mapOf(
                 "key1" to "value1"
             )
         )
         MobileCore.trackState(
-            "homePage", mapOf(
+            "homePage",
+            mapOf(
                 "key1" to "value1"
             )
         )
@@ -274,8 +287,8 @@ class AnalyticsIntegrationTests {
             countDownLatch.countDown()
         }
         countDownLatch.await()
-
     }
+
     @Test(timeout = 10000)
     fun testSendQueuedHits() {
         val countDownLatch = CountDownLatch(2)
@@ -302,12 +315,14 @@ class AnalyticsIntegrationTests {
             }
         }
         MobileCore.trackAction(
-            "clickOK", mapOf(
+            "clickOK",
+            mapOf(
                 "key1" to "value1"
             )
         )
         MobileCore.trackAction(
-            "clickOK", mapOf(
+            "clickOK",
+            mapOf(
                 "key2" to "value2"
             )
         )
@@ -322,7 +337,6 @@ class AnalyticsIntegrationTests {
     private fun identityAwareness(callback: SharedStateMonitor) {
         MonitorExtension.identityAwareness(callback)
     }
-
 }
 
 private val CONTEXT_DATA_REGEX = Regex("(&c\\.(.*)&\\.c)")

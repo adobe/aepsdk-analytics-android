@@ -5,6 +5,7 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'org.jetbrains.dokka'
+    id 'com.diffplug.spotless'
 }
 
 android {
@@ -67,7 +68,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
-    implementation('com.adobe.marketing.mobile:identity:2.0.0-SNAPSHOT'){
+    androidTestImplementation('com.adobe.marketing.mobile:identity:2.0.0-SNAPSHOT'){
         transitive = false
     }
 
@@ -169,7 +170,7 @@ publishing {
             pom {
                 name = mavenRepoName
                 description = mavenRepoDescription
-                url = 'https://aep-sdks.gitbook.io'
+                url = 'https://developer.adobe.com/client-sdks'
                 licenses {
                     license {
                         name = 'Adobe Proprietary'
@@ -183,9 +184,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:github.com//Adobe-Marketing-Cloud/acp-sdks.git'
-                    developerConnection = 'scm:git:ssh://github.com//Adobe-Marketing-Cloud/acp-sdks.git'
-                    url = 'https://github.com/Adobe-Marketing-Cloud/acp-sdks'
+                    connection = 'scm:git:github.com/adobe/aepsdk-analytics-android.git'
+                    developerConnection = 'scm:git:ssh://github.com/adobe/aepsdk-analytics-android.git'
+                    url = 'https://github.com/adobe/aepsdk-analytics-android'
                 }
                 withXml {
                     def dependenciesNode = asNode().appendNode('dependencies')
@@ -233,6 +234,25 @@ dokkaJavadoc.configure {
                 suppress.set(true)
             }
         }
+    }
+}
+
+spotless {
+    java {
+        toggleOffOn("format:off", "format:on")
+        target "src/*/java/**/*.java"
+        googleJavaFormat('1.8').aosp().reflowLongStrings()
+        importOrder()
+        removeUnusedImports()
+        endWithNewline()
+        formatAnnotations()
+        licenseHeaderFile "../../config/formatter/adobe.header.txt"
+    }
+    kotlin {
+        target "src/*/java/**/*.kt"
+        ktlint('0.47.0')
+        endWithNewline()
+        licenseHeaderFile "../../config/formatter/adobe.header.txt"
     }
 }
 

@@ -7,10 +7,16 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
-import com.adobe.marketing.mobile.services.*
+import com.adobe.marketing.mobile.services.DataEntity
+import com.adobe.marketing.mobile.services.DataQueue
+import com.adobe.marketing.mobile.services.DataQueuing
+import com.adobe.marketing.mobile.services.HitProcessing
+import com.adobe.marketing.mobile.services.HitProcessingResult
+import com.adobe.marketing.mobile.services.ServiceProvider
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -19,7 +25,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
-import java.util.*
 import kotlin.collections.ArrayList
 
 @RunWith(MockitoJUnitRunner.Silent::class)
@@ -41,22 +46,24 @@ class AnalyticsDatabaseTest {
         val dataQueueServiceField =
             ServiceProvider.getInstance().javaClass.getDeclaredField("dataQueueService")
         dataQueueServiceField.isAccessible = true
-        dataQueueServiceField.set(serviceProvider, object : DataQueuing {
-            override fun getDataQueue(name: String?): DataQueue {
-                return when (name) {
-                    "com.adobe.module.analytics" -> {
-                        mockedMainDataQueue
-                    }
-                    "com.adobe.module.analyticsreorderqueue" -> {
-                        mockedReorderDataQueue
-                    }
-                    else -> {
-                        mockedMainDataQueue
+        dataQueueServiceField.set(
+            serviceProvider,
+            object : DataQueuing {
+                override fun getDataQueue(name: String?): DataQueue {
+                    return when (name) {
+                        "com.adobe.module.analytics" -> {
+                            mockedMainDataQueue
+                        }
+                        "com.adobe.module.analyticsreorderqueue" -> {
+                            mockedReorderDataQueue
+                        }
+                        else -> {
+                            mockedMainDataQueue
+                        }
                     }
                 }
             }
-
-        })
+        )
     }
 
     private fun initAnalyticsDatabase(mockedProcessor: HitProcessing = MockedHitProcessing()): AnalyticsDatabase {
@@ -66,10 +73,10 @@ class AnalyticsDatabaseTest {
     @Test
     fun `kick with additional data - move hit to main queue`() {
         val analyticsDatabase = initAnalyticsDatabase()
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         analyticsDatabase.waitForAdditionalData(AnalyticsDatabase.DataType.LIFECYCLE)
-        //reorder queue
+        // reorder queue
         analyticsDatabase.queue("payload2", 123456789L, "id2", false)
         assertEquals(1, mockedMainDataQueue.count())
         assertEquals(1, mockedReorderDataQueue.count())
@@ -88,14 +95,15 @@ class AnalyticsDatabaseTest {
     @Test
     fun `kick with additional data - append data to the first hit`() {
         val analyticsDatabase = initAnalyticsDatabase()
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         analyticsDatabase.waitForAdditionalData(AnalyticsDatabase.DataType.LIFECYCLE)
         analyticsDatabase.waitForAdditionalData(AnalyticsDatabase.DataType.REFERRER)
-        //reorder queue
+        // reorder queue
         analyticsDatabase.queue("payload2", 123456789L, "id2", false)
         analyticsDatabase.kickWithAdditionalData(
-            AnalyticsDatabase.DataType.LIFECYCLE, mapOf(
+            AnalyticsDatabase.DataType.LIFECYCLE,
+            mapOf(
                 "lk1" to "v1",
                 "lk2" to "v2"
             )
@@ -111,7 +119,8 @@ class AnalyticsDatabaseTest {
         assertEquals("payload3", AnalyticsHit.from(list[1]).payload)
 
         analyticsDatabase.kickWithAdditionalData(
-            AnalyticsDatabase.DataType.REFERRER, mapOf(
+            AnalyticsDatabase.DataType.REFERRER,
+            mapOf(
                 "rk1" to "v1",
                 "rk2" to "v2"
             )
@@ -132,7 +141,7 @@ class AnalyticsDatabaseTest {
     fun `queue() - append to reorder queue when waiting`() {
         val analyticsDatabase = initAnalyticsDatabase()
         analyticsDatabase.waitForAdditionalData(AnalyticsDatabase.DataType.REFERRER)
-        //reorder queue
+        // reorder queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         analyticsDatabase.queue("payload2", 123456789L, "id2", false)
 
@@ -147,7 +156,7 @@ class AnalyticsDatabaseTest {
     fun `queue() - append to main queue when not waiting`() {
         val analyticsDatabase = initAnalyticsDatabase()
 
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         analyticsDatabase.queue("payload2", 123456789L, "id2", false)
 
@@ -167,7 +176,7 @@ class AnalyticsDatabaseTest {
         Mockito.`when`(mockedAnalyticsState.isAnalyticsConfigured).thenReturn(true)
         Mockito.`when`(mockedAnalyticsState.isOfflineTrackingEnabled).thenReturn(true)
 
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         analyticsDatabase.queue("payload2", 123456789L, "id2", false)
 
@@ -189,7 +198,7 @@ class AnalyticsDatabaseTest {
         Mockito.`when`(mockedAnalyticsState.isAnalyticsConfigured).thenReturn(true)
         Mockito.`when`(mockedAnalyticsState.isOfflineTrackingEnabled).thenReturn(false)
 
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
 
         Thread.sleep(50)
@@ -206,7 +215,7 @@ class AnalyticsDatabaseTest {
         Mockito.`when`(mockedAnalyticsState.batchLimit).thenReturn(1)
         Mockito.`when`(mockedAnalyticsState.isOfflineTrackingEnabled).thenReturn(true)
 
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         Thread.sleep(50)
         assertEquals(0, mockedHitProcessing.processedHits.size)
@@ -229,7 +238,7 @@ class AnalyticsDatabaseTest {
         Mockito.`when`(mockedAnalyticsState.batchLimit).thenReturn(1)
         Mockito.`when`(mockedAnalyticsState.isOfflineTrackingEnabled).thenReturn(true)
 
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         Thread.sleep(50)
         assertEquals(0, mockedHitProcessing.processedHits.size)
@@ -247,7 +256,7 @@ class AnalyticsDatabaseTest {
     fun `queue() - drop backdated hits when not waiting`() {
         val analyticsDatabase = initAnalyticsDatabase()
 
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         analyticsDatabase.queue("payload2", 123456789L, "id2", true)
 
@@ -297,7 +306,7 @@ class AnalyticsDatabaseTest {
         Mockito.`when`(mockedAnalyticsState.batchLimit).thenReturn(10)
         Mockito.`when`(mockedAnalyticsState.isOfflineTrackingEnabled).thenReturn(true)
 
-        //main queue
+        // main queue
         analyticsDatabase.queue("payload1", 123456789L, "id1", false)
         analyticsDatabase.queue("payload2", 123456789L, "id2", false)
 
@@ -324,5 +333,3 @@ private class MockedHitProcessing : HitProcessing {
         result.complete(true)
     }
 }
-
-

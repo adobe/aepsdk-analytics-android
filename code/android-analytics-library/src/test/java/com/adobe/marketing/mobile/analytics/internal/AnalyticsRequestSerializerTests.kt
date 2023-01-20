@@ -7,7 +7,8 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.VisitorID
@@ -25,25 +26,33 @@ class AnalyticsRequestSerializerTests {
         val visitorIDList: MutableList<VisitorID> = ArrayList()
         visitorIDList.add(
             VisitorID(
-                "d_cid_ic", "loginidhash", "97717",
+                "d_cid_ic",
+                "loginidhash",
+                "97717",
                 VisitorID.AuthenticationState.UNKNOWN
             )
         )
         visitorIDList.add(
             VisitorID(
-                "d_cid_ic", "xboxlivehash", "1629158955",
+                "d_cid_ic",
+                "xboxlivehash",
+                "1629158955",
                 VisitorID.AuthenticationState.AUTHENTICATED
             )
         )
         visitorIDList.add(
             VisitorID(
-                "d_cid_ic", "psnidhash", "1144032295",
+                "d_cid_ic",
+                "psnidhash",
+                "1144032295",
                 VisitorID.AuthenticationState.LOGGED_OUT
             )
         )
         visitorIDList.add(
             VisitorID(
-                "d_cid", "pushid", "testPushId",
+                "d_cid",
+                "pushid",
+                "testPushId",
                 VisitorID.AuthenticationState.AUTHENTICATED
             )
         )
@@ -59,8 +68,10 @@ class AnalyticsRequestSerializerTests {
         Assert.assertTrue(
             String.format(
                 "Lists don't match. \nExpected: %s\nActual  : %s",
-                expectedList.toString(), testList.toString()
-            ), expectedList == testList
+                expectedList.toString(),
+                testList.toString()
+            ),
+            expectedList == testList
         )
     }
 
@@ -161,5 +172,4 @@ class AnalyticsRequestSerializerTests {
     private fun getAdditionalData(source: String): String {
         return source.replace(getCidData(source), "").replace(getContextData(source), "")
     }
-
 }

@@ -7,11 +7,15 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.MobilePrivacyStatus
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AnalyticsStateTests {
@@ -267,7 +271,8 @@ class AnalyticsStateTests {
                 "mid" to "testMID",
                 "aamb" to "testBlob",
                 "aamlh" to "testLocHint"
-            ), state.analyticsIdVisitorParameters
+            ),
+            state.analyticsIdVisitorParameters
         )
     }
 
@@ -276,5 +281,4 @@ class AnalyticsStateTests {
         val state = AnalyticsState()
         assertTrue(state.analyticsIdVisitorParameters.isEmpty())
     }
-
 }

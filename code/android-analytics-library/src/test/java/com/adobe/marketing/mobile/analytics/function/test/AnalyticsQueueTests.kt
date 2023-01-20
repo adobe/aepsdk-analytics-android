@@ -7,10 +7,13 @@
   the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
- */
+*/
+
 package com.adobe.marketing.mobile.analytics.function.test
 
-import com.adobe.marketing.mobile.*
+import com.adobe.marketing.mobile.Event
+import com.adobe.marketing.mobile.EventSource
+import com.adobe.marketing.mobile.EventType
 import com.adobe.marketing.mobile.util.DataReader
 import org.junit.Assert
 import org.junit.Test
@@ -389,5 +392,4 @@ internal class AnalyticsQueueTests : AnalyticsFunctionalTestBase() {
         Assert.assertEquals(4, queueSize1)
         Assert.assertEquals(0, queueSize2)
     }
-
 }
