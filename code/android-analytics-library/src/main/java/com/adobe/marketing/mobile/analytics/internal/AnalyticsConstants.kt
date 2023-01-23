@@ -22,6 +22,7 @@ internal object AnalyticsConstants {
     const val DATASTORE_NAME = EXTENSION_NAME
     const val DATA_QUEUE_NAME = EXTENSION_NAME
     const val REORDER_QUEUE_NAME = "com.adobe.module.analyticsreorderqueue"
+    const val DEPRECATED_1X_HIT_DATABASE_FILENAME = "ADBMobileDataCache.sqlite"
 
     // ================================================================================
     // String value constants - Data store names
