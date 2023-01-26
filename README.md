@@ -29,7 +29,7 @@ Once you open the project in Android Studio (see above), select the `testapp` ru
 
 ## Documentation
 
-Additional documentation for usage and SDK architecture can be found under the [docs](docs) directory.
+Additional documentation for usage and SDK architecture can be found under the [Documentation](Documentation) directory.
 
 ## Contributing
 
