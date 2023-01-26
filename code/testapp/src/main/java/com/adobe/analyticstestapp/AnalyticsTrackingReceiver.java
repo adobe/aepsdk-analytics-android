@@ -56,6 +56,16 @@ public class AnalyticsTrackingReceiver extends BroadcastReceiver {
 			}
 		});
 
+//		try {
+//			Analytics.registerExtension();
+//			Identity.registerExtension();
+//			Lifecycle.registerExtension();
+//			Assurance.registerExtension();
+//		} catch (Exception e) {
+//			Log.e("AEPSDKInitError", e.getLocalizedMessage());
+//		}
+//		MobileCore.start(o -> MobileCore.configureWithAppID(AnalyticsTestApp.APP_ID));
+
 		// Send Analytics ping
 		MobileCore.trackAction("ActionTriggeredByAlarm", null);
 	}

@@ -26,7 +26,7 @@ import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.services.NamedCollection
 import com.adobe.marketing.mobile.services.ServiceProvider
 import com.adobe.marketing.mobile.util.DataReader
-import com.adobe.marketing.mobile.util.FileUtils
+import com.adobe.marketing.mobile.util.SQLiteUtils
 import com.adobe.marketing.mobile.util.StringUtils
 import java.util.HashMap
 import java.util.concurrent.TimeUnit
@@ -119,7 +119,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
     }
 
     private fun deleteDeprecatedV5HitDatabase() {
-        FileUtils.deleteFileFromCacheDir(AnalyticsConstants.DEPRECATED_1X_HIT_DATABASE_FILENAME)
+        SQLiteUtils.deleteDBFromCacheDir(AnalyticsConstants.DEPRECATED_1X_HIT_DATABASE_FILENAME)
     }
 
     override fun readyForEvent(event: Event): Boolean {

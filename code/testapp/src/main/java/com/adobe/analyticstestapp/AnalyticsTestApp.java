@@ -34,8 +34,10 @@ public class AnalyticsTestApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
         MobileCore.setApplication(this);
         MobileCore.setLogLevel(LoggingMode.VERBOSE);
+
         List<Class<? extends Extension>> extensions = new ArrayList<>();
         extensions.add(Lifecycle.EXTENSION);
         extensions.add(Identity.EXTENSION);
@@ -53,6 +55,17 @@ public class AnalyticsTestApp extends Application {
                 Log.e("AEPSDKInitError", adobeError.getErrorName());
             }
         });
-        //Using assets ADBMobileConfig.json by default
+
+//        try {
+//            Analytics.registerExtension();
+//            Identity.registerExtension();
+//            Lifecycle.registerExtension();
+//            Assurance.registerExtension();
+//        } catch (Exception e) {
+//            Log.e("AEPSDKInitError", e.getLocalizedMessage());
+//        }
+//
+//        MobileCore.start(o -> MobileCore.configureWithAppID(APP_ID));
+
     }
 }
