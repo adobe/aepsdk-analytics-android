@@ -31,10 +31,6 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
         dataStore.remove(AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS)
     }
 
-    fun setVisitorIdentifier(vid: String) {
-        this.vid = vid
-    }
-
     internal var aid: String? = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
         @VisibleForTesting
         internal set(aid) {
@@ -48,7 +44,7 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
 
     internal var vid: String? =
         dataStore.getString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, null)
-        private set(vid) {
+        internal set(vid) {
             if (vid == null || vid.isEmpty()) {
                 dataStore.remove(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY)
             } else {
