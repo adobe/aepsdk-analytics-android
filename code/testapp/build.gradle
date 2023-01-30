@@ -38,13 +38,19 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    implementation project(":android-analytics-library")
+
+//    implementation project(":analytics")
+
     implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
+    implementation('com.adobe.marketing.mobile:analytics:2.0.0-SNAPSHOT'){
+        transitive = false
+    }
     implementation('com.github.adobe.aepsdk-core-android:lifecycle:dev-v2.0.0-SNAPSHOT'){
         transitive = false
     }
@@ -55,21 +61,10 @@ dependencies {
         transitive = false
     }
 
-
-    //Staging
-    // implementation 'com.adobe.marketing.mobile:lifecycle:latest.integration'
-    // implementation 'com.adobe.marketing.mobile:identity:latest.integration'
-    // implementation 'com.adobe.marketing.mobile:signal:latest.integration'
-    // implementation 'com.adobe.marketing.mobile:core:latest.integration'
-    // //implementation 'com.adobe.marketing.mobile:analytics:latest.integration'
-    // implementation 'com.adobe.marketing.mobile:audience:latest.integration'
-    // implementation 'com.adobe.marketing.mobile:userprofile:latest.integration'
-    // implementation 'com.adobe.marketing.mobile:assurance:latest.integration'
-
-
-    //production
-//    implementation 'com.adobe.marketing.mobile:audience:1.+'
+//    implementation 'com.adobe.marketing.mobile:lifecycle:1.+'
+//    implementation 'com.adobe.marketing.mobile:identity:1.+'
+//    implementation 'com.adobe.marketing.mobile:core:1.+'
 //    implementation 'com.adobe.marketing.mobile:analytics:1.+'
-//    implementation 'com.adobe.marketing.mobile:userprofile:1.+'
-//    implementation 'com.adobe.marketing.mobile:sdk-core:1.+'
+//    implementation 'com.adobe.marketing.mobile:assurance:1.+'
+
 }

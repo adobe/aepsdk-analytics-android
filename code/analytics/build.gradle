@@ -1,0 +1,259 @@
+plugins {
+    id 'com.android.library'
+    id "jacoco"
+    id 'kotlin-android'
+    id 'maven-publish'
+    id 'signing'
+    id 'org.jetbrains.dokka'
+    id 'com.diffplug.spotless'
+}
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        minSdk 19
+        targetSdk 31
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        consumerProguardFiles "consumer-rules.pro"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+    }
+
+    flavorDimensions "target"
+
+    productFlavors {
+        phone {
+            dimension "target"
+        }
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+dependencies {
+    //noinspection GradleDependency
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
+    testImplementation 'androidx.test:core-ktx:1.5.0'
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "org.mockito:mockito-core:4.5.1"
+    testImplementation 'org.mockito:mockito-inline:4.5.1'
+    testImplementation "org.mockito.kotlin:mockito-kotlin:3.2.0"
+    //noinspection GradleDependency
+    testImplementation 'org.json:json:20180813'
+    testImplementation fileTree(include: ['*.aar'], dir: 'libs')
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
+    androidTestImplementation('com.adobe.marketing.mobile:identity:2.0.0-SNAPSHOT'){
+        transitive = false
+    }
+
+    androidTestUtil 'androidx.test:orchestrator:1.4.2'
+}
+
+tasks.withType(Test) {
+    testLogging {
+        showStandardStreams = true
+    }
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+task codeCoverageReport(type: JacocoReport, dependsOn: ['testPhoneDebugUnitTest', 'createPhoneDebugCoverageReport']) {
+    def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
+    def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes", excludes: excludeRegex)
+
+    additionalClassDirs.setFrom files([debugTree])
+    additionalSourceDirs.setFrom files(android.sourceSets.phone.java.sourceFiles)
+    sourceDirectories.setFrom files(android.sourceSets.main.java.sourceFiles)
+    executionData.setFrom fileTree(dir: "$buildDir", includes: [
+            "outputs/unit_test_code_coverage/phoneDebugUnitTest/*.exec",
+            "outputs/code_coverage/phoneDebugAndroidTest/connected/*coverage.ec"
+    ])
+
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
+    }
+}
+
+task unitTestsCoverageReport(type: JacocoReport, dependsOn: "testPhoneDebugUnitTest") {
+    def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
+    def javaClasses = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes", excludes: excludeRegex)
+    def kotlinClasses = fileTree(dir: "${project.buildDir}/tmp/kotlin-classes/phoneDebug", excludes: excludeRegex)
+    classDirectories.setFrom(files([javaClasses, kotlinClasses]))
+
+    def mainSrc = "${project.projectDir}/src/main/java"
+    def phoneSrc = "${project.projectDir}/src/phone/java"
+    sourceDirectories.setFrom files([mainSrc, phoneSrc])
+
+    executionData.setFrom fileTree(dir: "$buildDir", includes: [
+            "outputs/unit_test_code_coverage/phoneDebugUnitTest/*.exec"
+    ])
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
+    }
+}
+
+task functionalTestsCoverageReport(type: JacocoReport, dependsOn: "createPhoneDebugCoverageReport") {
+    def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
+    def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes", excludes: excludeRegex)
+
+    additionalClassDirs.setFrom files([debugTree])
+    additionalSourceDirs.setFrom files(android.sourceSets.phone.java.sourceFiles)
+    sourceDirectories.setFrom files(android.sourceSets.main.java.sourceFiles)
+    executionData.setFrom fileTree(dir: "$buildDir", includes: [
+            "outputs/code_coverage/phoneDebugAndroidTest/connected/*coverage.ec"
+    ])
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
+    }
+}
+
+def isReleaseBuild() {
+    return hasProperty('release')
+}
+
+version = isReleaseBuild() ? rootProject.moduleVersion : rootProject.moduleVersion+"-SNAPSHOT"
+
+publish.dependsOn('assemblePhone')
+
+def isJitPackBuild() {
+    return hasProperty('jitpack')
+}
+
+def groupIdForPublish = isJitPackBuild()? 'com.github.adobe.aepsdk-analytics-android': 'com.adobe.marketing.mobile'
+
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    archiveClassifier.set('javadoc')
+    from dokkaJavadoc.outputDirectory
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = groupIdForPublish
+            artifactId = rootProject.moduleName
+            version = version
+            artifact("$buildDir/outputs/aar/${rootProject.moduleAARName}")
+            artifact javadocJar
+
+            pom {
+                name = mavenRepoName
+                description = mavenRepoDescription
+                url = 'https://developer.adobe.com/client-sdks'
+                licenses {
+                    license {
+                        name = 'Adobe Proprietary'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adobe'
+                        name = 'adobe'
+                        email = 'adobe-mobile-testing@adobe.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:github.com/adobe/aepsdk-analytics-android.git'
+                    developerConnection = 'scm:git:ssh://github.com/adobe/aepsdk-analytics-android.git'
+                    url = 'https://github.com/adobe/aepsdk-analytics-android'
+                }
+                withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+
+                    def coreDependencyNode = dependenciesNode.appendNode('dependency')
+                    coreDependencyNode.appendNode('groupId', 'com.adobe.marketing.mobile')
+                    coreDependencyNode.appendNode('artifactId', 'core')
+                    coreDependencyNode.appendNode('version', mavenCoreVersion)
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "sonatype"
+            url = version.endsWith('SNAPSHOT') ? "https://oss.sonatype.org/content/repositories/snapshots/" : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("SONATYPE_USERNAME")
+                password = System.getenv("SONATYPE_PASSWORD")
+            }
+        }
+    }
+}
+
+ext."signing.gnupg.executable"="gpg"
+ext."signing.gnupg.keyName"=System.getenv("GPG_KEY_ID")
+ext."signing.gnupg.passphrase"=System.getenv("GPG_PASSPHRASE")
+
+signing {
+    useGpgCmd()
+    required {
+        tasks.withType(PublishToMavenRepository).find {
+            gradle.taskGraph.hasTask it
+        }
+    }
+    sign publishing.publications
+}
+
+dokkaJavadoc.configure {
+    dokkaSourceSets {
+        named("main") {
+            noAndroidSdkLink.set(false)
+            perPackageOption {
+                matchingRegex.set(".*\\.internal.*") // proper setting
+                suppress.set(true)
+            }
+        }
+    }
+}
+
+spotless {
+    java {
+        toggleOffOn("format:off", "format:on")
+        target "src/*/java/**/*.java"
+        googleJavaFormat('1.8').aosp().reflowLongStrings()
+        importOrder()
+        removeUnusedImports()
+        endWithNewline()
+        formatAnnotations()
+        licenseHeaderFile "../../config/formatter/adobe.header.txt"
+    }
+    kotlin {
+        target "src/*/java/**/*.kt"
+        ktlint('0.47.0')
+        endWithNewline()
+        licenseHeaderFile "../../config/formatter/adobe.header.txt"
+    }
+}
+
+

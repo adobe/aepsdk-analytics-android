@@ -29,19 +29,21 @@ import java.util.HashMap;
 import java.util.List;
 
 public class AnalyticsTestApp extends Application {
-    //Remote conf from AnalyticsMultipleRSID on OBU Mobile5
-    static final String APP_ID = "";
+    static final String APP_ID = "3805cb8645dd/c88b47919e6b/launch-7980c4779712-development";
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         MobileCore.setApplication(this);
         MobileCore.setLogLevel(LoggingMode.VERBOSE);
+
         List<Class<? extends Extension>> extensions = new ArrayList<>();
         extensions.add(Lifecycle.EXTENSION);
         extensions.add(Identity.EXTENSION);
         extensions.add(Analytics.EXTENSION);
         extensions.add(Assurance.EXTENSION);
+        MobileCore.configureWithAppID(APP_ID);
         MobileCore.registerExtensions(extensions, new AdobeCallbackWithError<Object>() {
             @Override
             public void call(Object o) {
@@ -53,6 +55,17 @@ public class AnalyticsTestApp extends Application {
                 Log.e("AEPSDKInitError", adobeError.getErrorName());
             }
         });
-        //Using assets ADBMobileConfig.json by default
+
+//        try {
+//            Analytics.registerExtension();
+//            Identity.registerExtension();
+//            Lifecycle.registerExtension();
+//            Assurance.registerExtension();
+//        } catch (Exception e) {
+//            Log.e("AEPSDKInitError", e.getLocalizedMessage());
+//        }
+//
+//        MobileCore.start(o -> MobileCore.configureWithAppID(APP_ID));
+
     }
 }

@@ -1,14 +1,35 @@
 # aepsdk-analytics-android
 
-## BETA ACKNOWLEDGEMENT
-
-AEPAnalytics is currently in Beta. Use of this code is by invitation only and not otherwise supported by Adobe. Please contact your Adobe Customer Success Manager to learn more.
-
-By using the Beta, you hereby acknowledge that the Beta is provided "as is" without warranty of any kind. Adobe shall have no obligation to maintain, correct, update, change, modify or otherwise support the Beta. You are advised to use caution and not to rely in any way on the correct functioning or performance of such Beta and/or accompanying materials.
+[![Maven Central](https://img.shields.io/maven-central/v/com.adobe.marketing.mobile/analytics.svg?logo=android&logoColor=white&label=analytics)](https://mvnrepository.com/artifact/com.adobe.marketing.mobile/analytics)
 
 ## About this project
 
-The Adobe Experience Platform Analytics Mobile Extension is an extension for the [Adobe Experience Platform SDK](https://github.com/Adobe-Marketing-Cloud/acp-sdks).
+The [`Analytics`](https://developer.adobe.com/client-sdks/documentation/adobe-analytics/) extension represents the Analytics Adobe Experience Platform SDK that is required for sending mobile interaction data from your app to Adobe Analytics.
+
+## Installing the AEP Analytics SDK for Android
+
+The AEP SDK supports Android API 19 (Kitkat) and newer.
+
+Installation via [Maven](https://maven.apache.org/) & [Gradle](https://gradle.org/) is the easiest and recommended way to get the AEP SDK into your Android app. In your `build.gradle` file, include the latest version of following dependencies:
+
+```gradle
+implementation 'com.adobe.marketing.mobile:core:2.x.x'
+implementation 'com.adobe.marketing.mobile:analytics:2.x.x'
+```
+
+## Development
+
+**Open the project**
+
+To open and run the project, open the `code/build.gradle` file in Android Studio
+
+**Run test application**
+
+Once you open the project in Android Studio (see above), select the `testapp` runnable and your favorite emulator and run the program.
+
+## Documentation
+
+Additional documentation for usage and SDK architecture can be found under the [Documentation](Documentation) directory.
 
 ## Contributing
 
