@@ -251,7 +251,7 @@ public class Analytics {
                 new Event.Builder(
                                 "UpdateVisitorIdentifier",
                                 EventType.ANALYTICS,
-                                EventSource.REQUEST_CONTENT)
+                                EventSource.REQUEST_IDENTITY)
                         .setEventData(eventDataMap)
                         .build());
         Log.debug(LOG_TAG, LOG_TAG, "setVisitorIdentifier - vid is (%s)", visitorID);
