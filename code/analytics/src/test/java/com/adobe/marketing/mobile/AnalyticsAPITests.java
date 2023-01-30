@@ -451,7 +451,7 @@ public class AnalyticsAPITests {
             assertNotNull(event);
             assertEquals("UpdateVisitorIdentifier", event.getName());
             assertEquals("com.adobe.eventType.analytics", event.getType());
-            assertEquals("com.adobe.eventSource.requestContent", event.getSource());
+            assertEquals("com.adobe.eventSource.requestIdentity", event.getSource());
             assertEquals(
                     new HashMap<String, Object>() {
                         {
