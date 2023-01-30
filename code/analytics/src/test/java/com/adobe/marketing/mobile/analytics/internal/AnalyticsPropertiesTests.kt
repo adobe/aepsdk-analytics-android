@@ -42,7 +42,7 @@ class AnalyticsPropertiesTests {
     fun `reset()`() {
         val analyticsProperties = AnalyticsProperties(mockedNameCollection)
         analyticsProperties.setMostRecentHitTimeStamp(123456L)
-        analyticsProperties.setVisitorIdentifier("vid")
+        analyticsProperties.vid = "vid"
         analyticsProperties.aid = "aid"
         Mockito.reset(mockedNameCollection)
         analyticsProperties.reset()

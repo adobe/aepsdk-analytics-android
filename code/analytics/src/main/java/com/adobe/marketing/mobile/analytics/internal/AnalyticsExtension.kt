@@ -359,7 +359,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             event.eventData?.get(AnalyticsConstants.EventDataKeys.Analytics.VISITOR_IDENTIFIER) as String?
         vid?.let {
             if (analyticsState.privacyStatus != MobilePrivacyStatus.OPT_OUT) {
-                analyticsProperties.setVisitorIdentifier(vid)
+                analyticsProperties.vid = vid
             } else {
                 Log.warning(
                     AnalyticsConstants.LOG_TAG,
