@@ -51,16 +51,10 @@ dependencies {
 //    }
 
     implementation 'com.adobe.marketing.mobile:core:2.0.0'
+    implementation 'com.adobe.marketing.mobile:lifecycle:2.0.0'
+    implementation 'com.adobe.marketing.mobile:identity:2.0.0'
+    implementation 'com.adobe.marketing.mobile:assurance:2.0.0'
 
-    implementation('com.github.adobe.aepsdk-core-android:lifecycle:dev-v2.0.0-SNAPSHOT') {
-        transitive = false
-    }
-    implementation('com.github.adobe.aepsdk-core-android:identity:dev-v2.0.0-SNAPSHOT') {
-        transitive = false
-    }
-    implementation('com.github.adobe:aepsdk-assurance-android:2.0.0-alpha.1') {
-        transitive = false
-    }
 
 // 1.x -> 2.0 upgrade tests
 //    implementation 'com.adobe.marketing.mobile:lifecycle:1.+'
