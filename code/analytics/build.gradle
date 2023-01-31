@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         minSdk 19
-        targetSdk 31
+        targetSdk 33
 
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles "consumer-rules.pro"
@@ -56,7 +56,7 @@ configurations.all {
 dependencies {
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
+    implementation 'com.adobe.marketing.mobile:core:2.0.0'
     testImplementation 'androidx.test:core-ktx:1.5.0'
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:4.5.1"
@@ -67,10 +67,8 @@ dependencies {
     testImplementation fileTree(include: ['*.aar'], dir: 'libs')
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
-    androidTestImplementation('com.adobe.marketing.mobile:identity:2.0.0-SNAPSHOT'){
-        transitive = false
-    }
+    androidTestImplementation 'com.adobe.marketing.mobile:core:2.0.0'
+    androidTestImplementation 'com.adobe.marketing.mobile:identity:2.0.0'
 
     androidTestUtil 'androidx.test:orchestrator:1.4.2'
 }
