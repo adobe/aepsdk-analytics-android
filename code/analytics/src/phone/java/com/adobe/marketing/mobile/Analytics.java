@@ -40,7 +40,7 @@ public class Analytics {
      * application class.
      *
      * @deprecated as of 2.0.0, use {@link MobileCore#registerExtensions(List, AdobeCallback)} with
-     * {@link Analytics#EXTENSION} instead.
+     *     {@link Analytics#EXTENSION} instead.
      */
     @Deprecated
     public static void registerExtension() {
