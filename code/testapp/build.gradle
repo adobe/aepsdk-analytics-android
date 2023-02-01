@@ -46,9 +46,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
 
     implementation project(":analytics")
-    //    implementation('com.adobe.marketing.mobile:analytics:2.0.0-SNAPSHOT'){
-//        transitive = false
-//    }
 
     implementation 'com.adobe.marketing.mobile:core:2.0.0'
     implementation 'com.adobe.marketing.mobile:lifecycle:2.0.0'

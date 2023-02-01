@@ -2,7 +2,7 @@
 
 ## Before starting
 
-Analytics extension has a dependency on [AEP Core SDK](https://github.com/adobe/aepsdk-core-android#readme) which must be installed to use the extension.
+Analytics extension has a dependency on [AEP Core SDK and AEP Identity SDK](https://github.com/adobe/aepsdk-core-android#readme) which must be installed to use the extension.
 
 ## Add Analytics extension to your app
 
@@ -10,15 +10,20 @@ Analytics extension has a dependency on [AEP Core SDK](https://github.com/adobe/
 
    ```
    implementation 'com.adobe.marketing.mobile:core:2.+'
+   implementation 'com.adobe.marketing.mobile:identity:2.+'
    implementation 'com.adobe.marketing.mobile:analytics:2.+'
    ```
 
-2. Import MobileCore and Analytics extensions:
+> **Warning**  
+> Using dynamic dependency versions is not recommended for production apps. Refer to this [page](https://github.com/adobe/aepsdk-core-android/blob/main/Documentation/MobileCore/gradle-dependencies.md) for managing Gradle dependencies.
+
+2. Import MobileCore, Identity and Analytics extensions:
 
    ### Java
 
    ```java
    import com.adobe.marketing.mobile.MobileCore;
+   import com.adobe.marketing.mobile.Identity;
    import com.adobe.marketing.mobile.Analytics;
    ```
 
@@ -26,6 +31,7 @@ Analytics extension has a dependency on [AEP Core SDK](https://github.com/adobe/
 
    ```kotlin
    import com.adobe.marketing.mobile.MobileCore
+   import com.adobe.marketing.mobile.Identity
    import com.adobe.marketing.mobile.Analytics
    ```
 
@@ -42,11 +48,10 @@ Analytics extension has a dependency on [AEP Core SDK](https://github.com/adobe/
             super.onCreate();
 
             MobileCore.setApplication(this);
-            MobileCore.setLogLevel(LoggingMode.VERBOSE);
             MobileCore.configureWithAppID(APP_ID);
 
             List<Class<? extends Extension>> extensions = Arrays.asList(
-                    Analytics.EXTENSION,...);
+                    Analytics.EXTENSION, Identity.EXTENSION, ...);
             MobileCore.registerExtensions(extensions, o -> {
                 Log.d(LOG_TAG, "AEP Mobile SDK is initialized");
             });
@@ -62,10 +67,9 @@ Analytics extension has a dependency on [AEP Core SDK](https://github.com/adobe/
        override fun onCreate() {
            super.onCreate()
            MobileCore.setApplication(this)
-           MobileCore.setLogLevel(LoggingMode.VERBOSE)
            MobileCore.configureWithAppID("YOUR_APP_ID")
 
-           val extensions = listOf(Analytics.EXTENSION, ...)
+           val extensions = listOf(Analytics.EXTENSION, Identity.EXTENSION, ...)
            MobileCore.registerExtensions(extensions) {
                Log.d(LOG_TAG, "AEP Mobile SDK is initialized")
            }

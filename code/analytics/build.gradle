@@ -56,7 +56,7 @@ configurations.all {
 dependencies {
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'com.adobe.marketing.mobile:core:2.0.0'
+    implementation "com.adobe.marketing.mobile:core:$mavenCoreVersion"
     testImplementation 'androidx.test:core-ktx:1.5.0'
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:4.5.1"
@@ -67,7 +67,6 @@ dependencies {
     testImplementation fileTree(include: ['*.aar'], dir: 'libs')
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'com.adobe.marketing.mobile:core:2.0.0'
     androidTestImplementation 'com.adobe.marketing.mobile:identity:2.0.0'
 
     androidTestUtil 'androidx.test:orchestrator:1.4.2'
