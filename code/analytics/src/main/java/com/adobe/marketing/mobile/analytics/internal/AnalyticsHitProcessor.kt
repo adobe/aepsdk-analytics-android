@@ -16,14 +16,17 @@ import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
 import com.adobe.marketing.mobile.ExtensionApi
-import com.adobe.marketing.mobile.services.*
+import com.adobe.marketing.mobile.services.Log
+import com.adobe.marketing.mobile.services.ServiceProvider
+import com.adobe.marketing.mobile.services.DataEntity
+import com.adobe.marketing.mobile.services.HitProcessingResult
+import com.adobe.marketing.mobile.services.Networking
+import com.adobe.marketing.mobile.services.NetworkRequest
+import com.adobe.marketing.mobile.services.HttpMethod
+import com.adobe.marketing.mobile.services.HitProcessing
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
 import com.adobe.marketing.mobile.util.StreamUtils
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
 
 internal class AnalyticsHitProcessor(
     private val analyticsState: AnalyticsState,
