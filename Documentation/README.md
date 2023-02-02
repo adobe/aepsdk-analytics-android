@@ -1,4 +1,4 @@
-# AEP Analytics SDK Documentation
+# Adobe Analytics Extension Documentation
 
 ### Contents
 
