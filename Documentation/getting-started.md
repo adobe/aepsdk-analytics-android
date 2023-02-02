@@ -6,7 +6,7 @@ Analytics extension has a dependency on [AEP Core SDK and AEP Identity SDK](http
 
 ## Add Analytics extension to your app
 
-1. Installation via [Maven](https://maven.apache.org/) & [Gradle](https://gradle.org/) is the easiest and recommended way to get the AEP SDK into your Android app. Add a dependency on Analytics and Core to your mobile application. To ensure consistent builds, it is best to explicitly specify the dependency version and update them manually.
+1. Installation via [Maven](https://maven.apache.org/) & [Gradle](https://gradle.org/) is the easiest and recommended way to get the Mobile SDK. Add a dependency on Analytics and Mobile Core to your mobile application. To ensure consistent builds, it is best to explicitly specify the dependency version and update them manually.
 
    ```
    implementation 'com.adobe.marketing.mobile:core:2.+'
@@ -41,17 +41,17 @@ Analytics extension has a dependency on [AEP Core SDK and AEP Identity SDK](http
 
    ```java
    public class MainApp extends Application {
-        private static final String APP_ID = "YOUR_APP_ID";
+        private final String ENVIRONMENT_FILE_ID = "YOUR_APP_ENVIRONMENT_ID";
 
         @Override
         public void onCreate() {
             super.onCreate();
 
             MobileCore.setApplication(this);
-            MobileCore.configureWithAppID(APP_ID);
+            MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID);
 
             List<Class<? extends Extension>> extensions = Arrays.asList(
-                    Analytics.EXTENSION, Identity.EXTENSION, ...);
+                    Analytics.EXTENSION, Identity.EXTENSION);
             MobileCore.registerExtensions(extensions, o -> {
                 Log.d(LOG_TAG, "AEP Mobile SDK is initialized");
             });
@@ -63,13 +63,14 @@ Analytics extension has a dependency on [AEP Core SDK and AEP Identity SDK](http
 
    ```kotlin
    class MyApp : Application() {
+       val ENVIRONMENT_FILE_ID = "YOUR_APP_ENVIRONMENT_ID"
 
        override fun onCreate() {
            super.onCreate()
            MobileCore.setApplication(this)
-           MobileCore.configureWithAppID("YOUR_APP_ID")
+           MobileCore.configureWithAppID("ENVIRONMENT_FILE_ID")
 
-           val extensions = listOf(Analytics.EXTENSION, Identity.EXTENSION, ...)
+           val extensions = listOf(Analytics.EXTENSION, Identity.EXTENSION)
            MobileCore.registerExtensions(extensions) {
                Log.d(LOG_TAG, "AEP Mobile SDK is initialized")
            }
@@ -79,4 +80,4 @@ Analytics extension has a dependency on [AEP Core SDK and AEP Identity SDK](http
 
 ## Next Steps
 
-Get familiar with the various APIs offered by the AEP SDK by checking out the [Analytics API reference](./api-reference.md).
+Get familiar with the various APIs offered by the Analytics extension by checking out the [API reference](./api-reference.md).

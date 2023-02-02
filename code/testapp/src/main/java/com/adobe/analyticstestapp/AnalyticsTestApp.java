@@ -13,7 +13,6 @@ package com.adobe.analyticstestapp;
 import android.app.Application;
 import android.util.Log;
 
-import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
 import com.adobe.marketing.mobile.Analytics;
@@ -29,7 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public class AnalyticsTestApp extends Application {
-    static final String APP_ID = "3805cb8645dd/c88b47919e6b/launch-7980c4779712-development";
+
+    // Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
+    static final String ENVIRONMENT_FILE_ID = "";
 
     @Override
     public void onCreate() {
@@ -43,7 +44,7 @@ public class AnalyticsTestApp extends Application {
         extensions.add(Identity.EXTENSION);
         extensions.add(Analytics.EXTENSION);
         extensions.add(Assurance.EXTENSION);
-        MobileCore.configureWithAppID(APP_ID);
+        MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID);
         MobileCore.registerExtensions(extensions, new AdobeCallbackWithError<Object>() {
             @Override
             public void call(Object o) {
@@ -55,6 +56,7 @@ public class AnalyticsTestApp extends Application {
                 Log.e("AEPSDKInitError", adobeError.getErrorName());
             }
         });
+
 
 //        try {
 //            Analytics.registerExtension();
