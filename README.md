@@ -6,16 +6,9 @@
 
 The [`Analytics`](https://developer.adobe.com/client-sdks/documentation/adobe-analytics/) extension represents the Analytics Adobe Experience Platform SDK that is required for sending mobile interaction data from your app to Adobe Analytics.
 
-## Installing the AEP Analytics SDK for Android
+## Getting Started
 
-The AEP SDK supports Android API 19 (Kitkat) and newer.
-
-Installation via [Maven](https://maven.apache.org/) & [Gradle](https://gradle.org/) is the easiest and recommended way to get the AEP SDK into your Android app. In your `build.gradle` file, include the latest version of following dependencies:
-
-```gradle
-implementation 'com.adobe.marketing.mobile:core:2.x.x'
-implementation 'com.adobe.marketing.mobile:analytics:2.x.x'
-```
+Refer to the [getting started guide](./Documentation/getting-started.md) for setting up and using the Analytics SDK with your application.
 
 ## Development
 
@@ -26,6 +19,12 @@ To open and run the project, open the `code/build.gradle` file in Android Studio
 **Run test application**
 
 Once you open the project in Android Studio (see above), select the `testapp` runnable and your favorite emulator and run the program.
+
+## Related Projects
+
+| Project                                                         | Description                                                                            |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [Core extensions](https://github.com/adobe/aepsdk-core-android) | The Mobile Core represents the foundation of the Adobe Experience Platform mobile SDK. |
 
 ## Documentation
 
