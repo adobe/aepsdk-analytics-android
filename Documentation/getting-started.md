@@ -2,7 +2,7 @@
 
 ## Before starting
 
-Analytics extension has a dependency on [AEP Core SDK and AEP Identity SDK](https://github.com/adobe/aepsdk-core-android#readme) which must be installed to use the extension.
+Analytics extension has a dependency on the [Mobile Core and Identity extensions](https://github.com/adobe/aepsdk-core-android#readme) which must be installed to use the extension.
 
 ## Add Analytics extension to your app
 
