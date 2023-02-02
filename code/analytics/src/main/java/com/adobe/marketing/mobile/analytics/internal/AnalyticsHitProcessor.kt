@@ -16,16 +16,14 @@ import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
 import com.adobe.marketing.mobile.ExtensionApi
-import com.adobe.marketing.mobile.services.DataEntity
-import com.adobe.marketing.mobile.services.HitProcessing
-import com.adobe.marketing.mobile.services.HitProcessingResult
-import com.adobe.marketing.mobile.services.HttpMethod
-import com.adobe.marketing.mobile.services.Log
-import com.adobe.marketing.mobile.services.NetworkRequest
-import com.adobe.marketing.mobile.services.Networking
-import com.adobe.marketing.mobile.services.ServiceProvider
+import com.adobe.marketing.mobile.services.*
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
+import com.adobe.marketing.mobile.util.StreamUtils
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
 
 internal class AnalyticsHitProcessor(
     private val analyticsState: AnalyticsState,
@@ -147,8 +145,10 @@ internal class AnalyticsHitProcessor(
                             AnalyticsConstants.EventDataKeys.Analytics.CONTENT_TYPE_HEADER
                         )
                     )
+                    val responseString = StreamUtils.readAsString(connection.inputStream)
                     val eventData: Map<String, Any?> = mapOf(
-                        AnalyticsConstants.EventDataKeys.Analytics.ANALYTICS_SERVER_RESPONSE to httpHeaders,
+                        AnalyticsConstants.EventDataKeys.Analytics.ANALYTICS_SERVER_RESPONSE to responseString,
+                        AnalyticsConstants.EventDataKeys.Analytics.HEADERS_RESPONSE to httpHeaders,
                         AnalyticsConstants.EventDataKeys.Analytics.HIT_HOST to url,
                         AnalyticsConstants.EventDataKeys.Analytics.HIT_URL to payload,
                         AnalyticsConstants.EventDataKeys.Analytics.REQUEST_EVENT_IDENTIFIER to eventIdentifier
