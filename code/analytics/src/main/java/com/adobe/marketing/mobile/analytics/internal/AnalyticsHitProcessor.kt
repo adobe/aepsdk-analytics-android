@@ -24,8 +24,10 @@ import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.services.NetworkRequest
 import com.adobe.marketing.mobile.services.Networking
 import com.adobe.marketing.mobile.services.ServiceProvider
+import com.adobe.marketing.mobile.util.StreamUtils
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
+import java.io.IOException
 
 internal class AnalyticsHitProcessor(
     private val analyticsState: AnalyticsState,
@@ -182,11 +184,13 @@ internal class AnalyticsHitProcessor(
                     processingResult.complete(false)
                 }
                 else -> {
+                    val errorString: String? = StreamUtils.readAsString(connection.errorStream)
                     Log.warning(
                         AnalyticsConstants.LOG_TAG,
                         CLASS_NAME,
-                        "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}"
+                        "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}: $errorString"
                     )
+                    try { connection.errorStream?.close() } catch (_: IOException) { }
                     processingResult.complete(true)
                 }
             }
