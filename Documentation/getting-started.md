@@ -68,7 +68,7 @@ Analytics extension has a dependency on the [Mobile Core and Identity extensions
        override fun onCreate() {
            super.onCreate()
            MobileCore.setApplication(this)
-           MobileCore.configureWithAppID("ENVIRONMENT_FILE_ID")
+           MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID)
 
            val extensions = listOf(Analytics.EXTENSION, Identity.EXTENSION)
            MobileCore.registerExtensions(extensions) {

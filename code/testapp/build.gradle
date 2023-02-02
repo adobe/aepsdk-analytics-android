@@ -47,10 +47,10 @@ dependencies {
 
     implementation project(":analytics")
 
-    implementation 'com.adobe.marketing.mobile:core:2.0.0'
-    implementation 'com.adobe.marketing.mobile:lifecycle:2.0.0'
-    implementation 'com.adobe.marketing.mobile:identity:2.0.0'
-    implementation 'com.adobe.marketing.mobile:assurance:2.0.0'
+    implementation 'com.adobe.marketing.mobile:core:2.+'
+    implementation 'com.adobe.marketing.mobile:lifecycle:2.+'
+    implementation 'com.adobe.marketing.mobile:identity:2.+'
+    implementation 'com.adobe.marketing.mobile:assurance:2.+'
 
 
 // 1.x -> 2.0 upgrade tests
