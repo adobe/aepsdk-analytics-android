@@ -18,7 +18,9 @@ import java.nio.charset.StandardCharsets
 /**
  * [AnalyticsProperties] class hosts the properties needed by [AnalyticsExtension] when processing events.
  */
-internal class AnalyticsProperties(private val dataStore: NamedCollection) {
+internal class AnalyticsProperties(
+    private val dataStore: NamedCollection
+) {
     companion object {
         val CHARSET: String = StandardCharsets.UTF_8.name()
     }
@@ -31,31 +33,31 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
     }
 
     internal var aid: String? = null
-        internal get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
+        get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
 
         @VisibleForTesting
-        internal set(aid) {
-            if (aid == null || aid.isEmpty()) {
+        internal set(aidValue) {
+            if (aidValue.isNullOrEmpty()) {
                 dataStore.remove(AnalyticsConstants.DataStoreKeys.AID_KEY)
             } else {
-                dataStore.setString(AnalyticsConstants.DataStoreKeys.AID_KEY, aid)
+                dataStore.setString(AnalyticsConstants.DataStoreKeys.AID_KEY, aidValue)
             }
-            field = aid
+            field = aidValue
         }
 
     internal var vid: String? = null
-        internal get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, null)
-        internal set(vid) {
-            if (vid == null || vid.isEmpty()) {
+        get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, null)
+        internal set(vidValue) {
+            if (vidValue.isNullOrEmpty()) {
                 dataStore.remove(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY)
             } else {
-                dataStore.setString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, vid)
+                dataStore.setString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, vidValue)
             }
-            field = vid
+            field = vidValue
         }
 
     internal var mostRecentHitTimeStampInSeconds: Long = 0L
-        internal get() = dataStore.getLong(
+        get() = dataStore.getLong(
             AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
             0L
         )

@@ -696,16 +696,16 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     private fun getSharedState(): Map<String, Any?> {
         val data = mutableMapOf<String, Any?>()
-        analyticsProperties.aid?.let {
+        analyticsProperties.aid?.let { aid ->
             data.put(
                 AnalyticsConstants.EventDataKeys.Analytics.ANALYTICS_ID,
-                analyticsProperties.aid
+                aid
             )
         }
-        analyticsProperties.vid?.let {
+        analyticsProperties.vid?.let { vid ->
             data.put(
                 AnalyticsConstants.EventDataKeys.Analytics.VISITOR_IDENTIFIER,
-                analyticsProperties.vid
+                vid
             )
         }
         return data
