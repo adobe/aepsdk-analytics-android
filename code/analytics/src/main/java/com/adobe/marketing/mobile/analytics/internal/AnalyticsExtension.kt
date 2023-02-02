@@ -926,20 +926,20 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             analyticsVars.putAll(analyticsState.analyticsIdVisitorParameters)
         }
 
+        // Customer perspective defaults to foreground.
+        analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_CUSTOMER_PERSPECTIVE_KEY] =
+            AnalyticsConstants.APP_STATE_FOREGROUND
         if (ServiceProvider.getInstance().appContextService != null) {
             val appState = ServiceProvider.getInstance().appContextService.appState
             if (appState == AppState.BACKGROUND) {
                 analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_CUSTOMER_PERSPECTIVE_KEY] =
                     AnalyticsConstants.APP_STATE_BACKGROUND
-            } else {
-                analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_CUSTOMER_PERSPECTIVE_KEY] =
-                    AnalyticsConstants.APP_STATE_FOREGROUND
             }
         } else {
-            Log.warning(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "processAnalyticsVars - Unable to access platform services to retrieve foreground/background state."
+                "processAnalyticsVars - Unable to access platform services to retrieve foreground/background state. Defaulting customer perspective to foreground."
             )
         }
 
