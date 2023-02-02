@@ -192,7 +192,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         analyticsDatabase.reset()
         analyticsProperties.reset()
         analyticsState.resetIdentities()
-        analyticsState.lastResetIdentitiesTimestamp = event.timestamp
+        analyticsState.lastResetIdentitiesTimestampSec = event.timestampInSeconds
         api.createSharedState(getSharedState(), event)
     }
 

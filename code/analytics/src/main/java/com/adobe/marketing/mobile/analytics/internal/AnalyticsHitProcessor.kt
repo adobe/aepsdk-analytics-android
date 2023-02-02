@@ -66,7 +66,7 @@ internal class AnalyticsHitProcessor(
             return
         }
 
-        if (timestamp < analyticsState.lastResetIdentitiesTimestamp) {
+        if (timestamp < analyticsState.lastResetIdentitiesTimestampSec) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
@@ -158,7 +158,7 @@ internal class AnalyticsHitProcessor(
 
                     // Dispatch response only if the hit was sent after the reset Identities was called.
                     // So that we only populate UUID if the hit was sent after reset in case where AAMForwarding is enabled.
-                    if (timestamp > analyticsState.lastResetIdentitiesTimestamp) {
+                    if (timestamp > analyticsState.lastResetIdentitiesTimestampSec) {
                         Log.debug(
                             AnalyticsConstants.LOG_TAG,
                             CLASS_NAME,
