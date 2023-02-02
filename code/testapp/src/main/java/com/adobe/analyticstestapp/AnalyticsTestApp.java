@@ -56,5 +56,18 @@ public class AnalyticsTestApp extends Application {
                 Log.e("AEPSDKInitError", adobeError.getErrorName());
             }
         });
+
+
+//        try {
+//            Analytics.registerExtension();
+//            Identity.registerExtension();
+//            Lifecycle.registerExtension();
+//            Assurance.registerExtension();
+//        } catch (Exception e) {
+//            Log.e("AEPSDKInitError", e.getLocalizedMessage());
+//        }
+//
+//        MobileCore.start(o -> MobileCore.configureWithAppID(APP_ID));
+
     }
 }
