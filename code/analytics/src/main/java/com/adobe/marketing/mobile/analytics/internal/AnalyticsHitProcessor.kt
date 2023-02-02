@@ -54,7 +54,7 @@ internal class AnalyticsHitProcessor(
         val analyticsHit = AnalyticsHit.from(entity)
         val eventIdentifier = analyticsHit.eventIdentifier
         var payload = analyticsHit.payload
-        var timestamp = analyticsHit.timestamp
+        var timestamp = analyticsHit.timestampSec
 
         if (payload.isEmpty()) {
             Log.debug(
