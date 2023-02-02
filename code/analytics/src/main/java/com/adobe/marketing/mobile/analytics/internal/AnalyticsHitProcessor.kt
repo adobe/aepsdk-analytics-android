@@ -195,9 +195,7 @@ internal class AnalyticsHitProcessor(
                     doneProcessingResult = true
                 }
             }
-            if (doneProcessingResult) {
-                connection.close()
-            }
+            connection.close()
             processingResult.complete(doneProcessingResult)
         }
     }
