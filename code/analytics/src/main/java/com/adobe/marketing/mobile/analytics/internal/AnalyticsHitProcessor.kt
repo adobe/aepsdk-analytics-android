@@ -16,17 +16,17 @@ import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
 import com.adobe.marketing.mobile.ExtensionApi
-import com.adobe.marketing.mobile.services.Log
-import com.adobe.marketing.mobile.services.ServiceProvider
 import com.adobe.marketing.mobile.services.DataEntity
-import com.adobe.marketing.mobile.services.HitProcessingResult
-import com.adobe.marketing.mobile.services.Networking
-import com.adobe.marketing.mobile.services.NetworkRequest
-import com.adobe.marketing.mobile.services.HttpMethod
 import com.adobe.marketing.mobile.services.HitProcessing
+import com.adobe.marketing.mobile.services.HitProcessingResult
+import com.adobe.marketing.mobile.services.HttpMethod
+import com.adobe.marketing.mobile.services.Log
+import com.adobe.marketing.mobile.services.NetworkRequest
+import com.adobe.marketing.mobile.services.Networking
+import com.adobe.marketing.mobile.services.ServiceProvider
+import com.adobe.marketing.mobile.util.StreamUtils
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
-import com.adobe.marketing.mobile.util.StreamUtils
 
 internal class AnalyticsHitProcessor(
     private val analyticsState: AnalyticsState,
@@ -135,7 +135,7 @@ internal class AnalyticsHitProcessor(
                     Log.debug(
                         AnalyticsConstants.LOG_TAG,
                         CLASS_NAME,
-                        "processHit - Analytics hit request with url $url and payload $payload sent successfully"
+                        "processHit - Analytics hit request with url ($url) and payload ($payload) sent successfully"
                     )
                     val httpHeaders = mapOf(
                         AnalyticsConstants.EventDataKeys.Analytics.ETAG_HEADER to connection.getResponsePropertyValue(
@@ -149,6 +149,10 @@ internal class AnalyticsHitProcessor(
                         )
                     )
                     val responseString = StreamUtils.readAsString(connection.inputStream)
+
+                    // close the connection as all the response has been read and cached
+                    connection.close()
+
                     val eventData: Map<String, Any?> = mapOf(
                         AnalyticsConstants.EventDataKeys.Analytics.ANALYTICS_SERVER_RESPONSE to responseString,
                         AnalyticsConstants.EventDataKeys.Analytics.HEADERS_RESPONSE to httpHeaders,

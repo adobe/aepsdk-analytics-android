@@ -180,7 +180,7 @@ class AnalyticsHitProcessorTests {
             ),
             event.eventData["headers"]
         )
-        assertEquals("testAnalyticsResponse" , event.eventData["analyticsserverresponse"])
+        assertEquals("testAnalyticsResponse", event.eventData["analyticsserverresponse"])
         assertEquals("id1", event.eventData["requestEventIdentifier"])
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)
         assertTrue((event.eventData["hitUrl"] as? String)?.startsWith(payload) == true)
@@ -240,7 +240,7 @@ class AnalyticsHitProcessorTests {
             ),
             event.eventData["headers"]
         )
-        assertEquals("testAnalyticsResponse" , event.eventData["analyticsserverresponse"])
+        assertEquals("testAnalyticsResponse", event.eventData["analyticsserverresponse"])
         assertEquals("id1", event.eventData["requestEventIdentifier"])
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)
         assertTrue((event.eventData["hitUrl"] as? String)?.startsWith(payload) == true)
@@ -379,7 +379,7 @@ class AnalyticsHitProcessorTests {
             event.eventData["headers"]
         )
 
-        assertEquals("testAnalyticsResponse" , event.eventData["analyticsserverresponse"])
+        assertEquals("testAnalyticsResponse", event.eventData["analyticsserverresponse"])
         assertEquals("id1", event.eventData["requestEventIdentifier"])
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)
         assertTrue((event.eventData["hitUrl"] as? String)?.startsWith(payload) == true)
