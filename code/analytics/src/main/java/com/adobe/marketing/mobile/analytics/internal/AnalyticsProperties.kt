@@ -23,7 +23,6 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
         val CHARSET: String = StandardCharsets.UTF_8.name()
     }
 
-
     fun reset() {
         mostRecentHitTimeStampInSeconds = 0L
         vid = null
@@ -33,6 +32,7 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
 
     internal var aid: String? = null
         internal get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
+
         @VisibleForTesting
         internal set(aid) {
             if (aid == null || aid.isEmpty()) {
