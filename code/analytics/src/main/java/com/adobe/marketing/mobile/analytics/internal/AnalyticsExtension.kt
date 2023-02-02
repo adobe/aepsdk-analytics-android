@@ -207,7 +207,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
         updateAnalyticsState(event, ANALYTICS_HARD_DEPENDENCIES + ANALYTICS_SOFT_DEPENDENCIES)
         val eventData = event.eventData ?: run {
-            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "handleGenericTrackEvent - event data is nil or empty.")
+            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "handleGenericTrackEvent - event data is null or empty.")
             return@handleGenericTrackEvent
         }
         handleTrackRequest(event, eventData)
@@ -398,7 +398,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             Log.warning(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "handleAnalyticsRequestContentEvent - Returning early, event data is nil or empty."
+                "handleAnalyticsRequestContentEvent - Returning early, event data is null or empty."
             )
             return
         }
@@ -739,7 +739,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     private fun handleTrackRequest(event: Event, data: Map<String, Any?>) {
         if (data.isEmpty()) {
-            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "track - event data is nil or empty.")
+            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "track - event data is null or empty.")
             return
         }
         if (data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION) ||

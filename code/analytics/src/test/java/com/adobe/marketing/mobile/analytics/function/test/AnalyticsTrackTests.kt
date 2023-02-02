@@ -576,7 +576,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "BoolValue" to true,
                     "CharValue" to 'c',
                     // Keys whose values are not String, Number or Character are dropped
-                    "Nil" to null,
+                    "Null" to null,
                     "ArrayValue" to emptyArray<Any>(),
                     "ObjValue" to Any(),
                     "DictValue" to emptyMap<Any, Any>()
