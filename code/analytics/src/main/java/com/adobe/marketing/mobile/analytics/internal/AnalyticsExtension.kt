@@ -215,7 +215,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     private fun handleRuleEngineResponse(event: Event) {
         val eventData = event.eventData ?: run {
-            Log.debug(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
                 "handleRuleEngineResponse - Event with id %s contained no data, ignoring.",
@@ -232,10 +232,10 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
 
         if (triggeredConsequence == null || triggeredConsequence.isEmpty()) {
-            Log.debug(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "handleRuleEngineResponse - Ignoring as missing consequence data for event %s.",
+                "handleRuleEngineResponse - Missing consequence data, ignoring event %s.",
                 event.uniqueIdentifier
             )
             return
@@ -248,20 +248,20 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
 
         if (StringUtils.isNullOrEmpty(consequenceType)) {
-            Log.debug(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "handleRuleEngineResponse - Ignoring as rule response has no consequence type for event %s.",
+                "handleRuleEngineResponse - No consequence type received, ignoring event %s.",
                 event.uniqueIdentifier
             )
             return
         }
 
         if (AnalyticsConstants.EventDataKeys.Analytics.RULES_CONSEQUENCE_TYPE_TRACK != consequenceType) {
-            Log.debug(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "handleRuleEngineResponse - Ignoring as consequence type is not Analytics for event %s.",
+                "handleRuleEngineResponse - Consequence type is not Analytics, ignoring event %s.",
                 event.uniqueIdentifier
             )
             return
@@ -274,10 +274,10 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
 
         if (StringUtils.isNullOrEmpty(consequenceId)) {
-            Log.debug(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "handleRuleEngineResponse - Ignoring as consequence id is missing for event %s.",
+                "handleRuleEngineResponse - Consequence id is missing, ignoring event  %s.",
                 event.uniqueIdentifier
             )
             return
