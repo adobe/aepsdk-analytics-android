@@ -44,7 +44,7 @@ internal class AnalyticsHitProcessor(
 
     private val version = AnalyticsVersionProvider.buildVersionString()
 
-    override fun retryInterval(dataENtity: DataEntity): Int {
+    override fun retryInterval(dataEntity: DataEntity): Int {
         return HIT_QUEUE_RETRY_TIME_SECONDS
     }
 
