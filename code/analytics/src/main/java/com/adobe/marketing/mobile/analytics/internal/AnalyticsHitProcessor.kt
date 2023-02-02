@@ -130,6 +130,7 @@ internal class AnalyticsHitProcessor(
                 processingResult.complete(false)
                 return@connectAsync
             }
+            var doneProcessingResult: Boolean
             when (connection.responseCode) {
                 200 -> {
                     Log.debug(
@@ -149,9 +150,6 @@ internal class AnalyticsHitProcessor(
                         )
                     )
                     val responseString = StreamUtils.readAsString(connection.inputStream)
-
-                    // close the connection as all the response has been read and cached
-                    connection.close()
 
                     val eventData: Map<String, Any?> = mapOf(
                         AnalyticsConstants.EventDataKeys.Analytics.ANALYTICS_SERVER_RESPONSE to responseString,
@@ -178,7 +176,7 @@ internal class AnalyticsHitProcessor(
                         )
                     }
                     lastHitTimestamp = timestamp
-                    processingResult.complete(true)
+                    doneProcessingResult = true
                 }
                 in arrayOf(408, 504, 503, -1) -> {
                     Log.warning(
@@ -186,7 +184,7 @@ internal class AnalyticsHitProcessor(
                         CLASS_NAME,
                         "processHit - Retrying Analytics hit, request with url $url failed with recoverable status code ${connection.responseCode}"
                     )
-                    processingResult.complete(false)
+                    doneProcessingResult = false
                 }
                 else -> {
                     Log.warning(
@@ -194,9 +192,13 @@ internal class AnalyticsHitProcessor(
                         CLASS_NAME,
                         "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}"
                     )
-                    processingResult.complete(true)
+                    doneProcessingResult = true
                 }
             }
+            if (doneProcessingResult) {
+                connection.close()
+            }
+            processingResult.complete(doneProcessingResult)
         }
     }
 
