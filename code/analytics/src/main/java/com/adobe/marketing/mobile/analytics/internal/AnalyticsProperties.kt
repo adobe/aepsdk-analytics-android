@@ -13,7 +13,6 @@ package com.adobe.marketing.mobile.analytics.internal
 
 import androidx.annotation.VisibleForTesting
 import com.adobe.marketing.mobile.services.NamedCollection
-import com.adobe.marketing.mobile.services.ServiceProvider
 import java.nio.charset.StandardCharsets
 
 /**
