@@ -13,16 +13,17 @@ package com.adobe.marketing.mobile.analytics.internal
 
 import androidx.annotation.VisibleForTesting
 import com.adobe.marketing.mobile.services.NamedCollection
+import com.adobe.marketing.mobile.services.ServiceProvider
 import java.nio.charset.StandardCharsets
 
 /**
  * [AnalyticsProperties] class hosts the properties needed by [AnalyticsExtension] when processing events.
  */
 internal class AnalyticsProperties(private val dataStore: NamedCollection) {
-
     companion object {
         val CHARSET: String = StandardCharsets.UTF_8.name()
     }
+
 
     fun reset() {
         mostRecentHitTimeStampInSeconds = 0L
@@ -31,7 +32,8 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
         dataStore.remove(AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS)
     }
 
-    internal var aid: String? = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
+    internal var aid: String? = null
+        internal get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
         @VisibleForTesting
         internal set(aid) {
             if (aid == null || aid.isEmpty()) {
@@ -42,8 +44,8 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
             field = aid
         }
 
-    internal var vid: String? =
-        dataStore.getString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, null)
+    internal var vid: String? = null
+        internal get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, null)
         internal set(vid) {
             if (vid == null || vid.isEmpty()) {
                 dataStore.remove(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY)
@@ -53,8 +55,8 @@ internal class AnalyticsProperties(private val dataStore: NamedCollection) {
             field = vid
         }
 
-    internal var mostRecentHitTimeStampInSeconds: Long =
-        dataStore.getLong(
+    internal var mostRecentHitTimeStampInSeconds: Long = 0L
+        internal get() = dataStore.getLong(
             AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
             0L
         )
