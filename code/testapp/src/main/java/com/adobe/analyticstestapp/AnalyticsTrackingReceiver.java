@@ -47,7 +47,7 @@ public class AnalyticsTrackingReceiver extends BroadcastReceiver {
 		MobileCore.registerExtensions(extensions, new AdobeCallbackWithError<Object>() {
 			@Override
 			public void call(Object o) {
-				MobileCore.configureWithAppID(AnalyticsTestApp.APP_ID);
+				MobileCore.configureWithAppID(AnalyticsTestApp.ENVIRONMENT_FILE_ID);
 			}
 
 			@Override
