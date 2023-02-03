@@ -14,11 +14,11 @@ package com.adobe.marketing.mobile.analytics.internal
 import com.adobe.marketing.mobile.services.DataEntity
 import org.json.JSONObject
 
-internal class AnalyticsHit(val payload: String, val timestamp: Long, val eventIdentifier: String) {
+internal class AnalyticsHit(val payload: String, val timestampSec: Long, val eventIdentifier: String) {
     internal fun toDataEntity(): DataEntity {
         val map = mapOf<String, Any>(
             PAYLOAD to payload,
-            TIMESTAMP to timestamp,
+            TIMESTAMP to timestampSec,
             EVENT_IDENTIFIER to eventIdentifier
         )
         val json = try {
