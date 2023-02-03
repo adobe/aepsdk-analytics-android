@@ -1,4 +1,4 @@
-# Analytics extension documentatioin
+# Analytics extension documentation
 
 ### Contents
 

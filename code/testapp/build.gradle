@@ -52,4 +52,3 @@ dependencies {
     implementation 'com.adobe.marketing.mobile:identity:2.+'
     implementation 'com.adobe.marketing.mobile:assurance:2.+'
 }
-
