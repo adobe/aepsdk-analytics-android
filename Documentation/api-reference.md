@@ -1,10 +1,12 @@
-# Analytics API Usage
+# Analytics API Reference
 
 ## Prerequisites
 
 Refer to the [Getting started guide](getting-started.md).
 
 ## API reference
+
+This document details all the APIs provided by the Analytics extension, along with the sample code snippets.
 
 - [clearQueue](#clearQueue)
 - [extensionVersion](#extensionVersion)
@@ -15,9 +17,6 @@ Refer to the [Getting started guide](getting-started.md).
 - [sendQueuedHits](#sendQueuedHits)
 - [setVisitorIdentifier](#setVisitorIdentifier)
 ------
-
-
-This document details all the APIs provided by Analytics extension, along with sample code snippets on how to properly use the APIs.
 
 ### clearQueue
 
@@ -106,7 +105,6 @@ MobileCore.registerExtensions(Arrays.asList(Analytics.EXTENSION, ...), new Adobe
 ##### Syntax
 ```kotlin
 val EXTENSION: Class<out Extension?> = AnalyticsExtension::class.java
-}
 ```
 
 ##### Example
@@ -221,7 +219,7 @@ Analytics.getTrackingIdentifier(object: AdobeCallbackWithError<String> {
 ### getVisitorIdentifier
 
 > **Note**
-Before use this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
+Before using this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
 
 This API gets a custom Analytics visitor identifier, which has been set previously using [setVisitorIdentifier](#setvisitoridentifier).
 
@@ -301,7 +299,7 @@ Analytics.sendQueuedHits()
 ### setVisitorIdentifier
 
 > **Note** 
-Before use this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
+Before using this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
 
 Sets a custom Analytics visitor identifier. For more information, see [Custom Visitor ID](https://experienceleague.adobe.com/docs/analytics/implementation/vars/config-vars/visitorid.html).
 
