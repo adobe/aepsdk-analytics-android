@@ -57,7 +57,7 @@ class AnalyticsHitProcessorTests {
 
         Mockito.reset(mockedExtensionApi)
         Mockito.reset(mockedAnalyticsState)
-        Mockito.`when`(mockedAnalyticsState.lastResetIdentitiesTimestamp).thenReturn(1234L)
+        Mockito.`when`(mockedAnalyticsState.lastResetIdentitiesTimestampSec).thenReturn(1234L)
         Mockito.`when`(mockedAnalyticsState.host).thenReturn("test.com")
         Mockito.`when`(mockedAnalyticsState.rsids).thenReturn("rsid")
         Mockito.`when`(mockedAnalyticsState.isAnalyticsConfigured).thenReturn(true)

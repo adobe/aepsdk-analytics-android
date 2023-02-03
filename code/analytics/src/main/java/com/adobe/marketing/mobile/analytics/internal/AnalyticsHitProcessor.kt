@@ -53,7 +53,7 @@ internal class AnalyticsHitProcessor(
         val analyticsHit = AnalyticsHit.from(entity)
         val eventIdentifier = analyticsHit.eventIdentifier
         var payload = analyticsHit.payload
-        var timestamp = analyticsHit.timestamp
+        var timestamp = analyticsHit.timestampSec
 
         if (payload.isEmpty()) {
             Log.debug(
@@ -65,7 +65,7 @@ internal class AnalyticsHitProcessor(
             return
         }
 
-        if (timestamp < analyticsState.lastResetIdentitiesTimestamp) {
+        if (timestamp < analyticsState.lastResetIdentitiesTimestampSec) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
@@ -161,7 +161,7 @@ internal class AnalyticsHitProcessor(
 
                     // Dispatch response only if the hit was sent after the reset Identities was called.
                     // So that we only populate UUID if the hit was sent after reset in case where AAMForwarding is enabled.
-                    if (timestamp > analyticsState.lastResetIdentitiesTimestamp) {
+                    if (timestamp > analyticsState.lastResetIdentitiesTimestampSec) {
                         Log.debug(
                             AnalyticsConstants.LOG_TAG,
                             CLASS_NAME,
@@ -187,10 +187,11 @@ internal class AnalyticsHitProcessor(
                     doneProcessingResult = false
                 }
                 else -> {
+                    val errorResponse: String? = StreamUtils.readAsString(connection.errorStream)
                     Log.warning(
                         AnalyticsConstants.LOG_TAG,
                         CLASS_NAME,
-                        "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}"
+                        "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}: $errorResponse"
                     )
                     doneProcessingResult = true
                 }

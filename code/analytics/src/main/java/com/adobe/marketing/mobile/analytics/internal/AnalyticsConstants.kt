@@ -24,11 +24,6 @@ internal object AnalyticsConstants {
     const val REORDER_QUEUE_NAME = "com.adobe.module.analyticsreorderqueue"
     const val DEPRECATED_1X_HIT_DATABASE_FILENAME = "ADBMobileDataCache.sqlite"
 
-    // ================================================================================
-    // String value constants - Data store names
-    // ================================================================================
-    const val ANALYTICS_DATA_STORAGE = "AnalyticsDataStorage"
-
     const val ANALYTICS_REQUEST_VISITOR_ID_KEY = "vid"
     const val ANALYTICS_REQUEST_CHARSET_KEY = "ce"
     const val ANALYTICS_REQUEST_FORMATTED_TIMESTAMP_KEY = "t"
@@ -76,7 +71,6 @@ internal object AnalyticsConstants {
         const val DEFAULT_LIFECYCLE_RESPONSE_WAIT_TIMEOUT = 1000L // ms
         const val DEFAULT_LAUNCH_DEEPLINK_DATA_WAIT_TIMEOUT = 500 // ms
         const val DEFAULT_ASSURANCE_SESSION_ENABLED = false
-        const val DEFAULT_LIFECYCLE_PAUSE_START_TIMEOUT = 1000 // ms
         const val DEFAULT_LIFECYCLE_SESSION_TIMEOUT = 300000 // ms
     }
 
@@ -170,7 +164,6 @@ internal object AnalyticsConstants {
             const val VISITOR_ID_BLOB = "blob"
             const val VISITOR_ID_LOCATION_HINT = "locationhint"
             const val VISITOR_IDS_LIST = "visitoridslist"
-            const val USER_IDENTIFIER = "vid"
             const val ADVERTISING_IDENTIFIER = "advertisingidentifier"
         }
 

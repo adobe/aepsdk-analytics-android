@@ -70,7 +70,7 @@ internal class AnalyticsDatabase(
 
     internal fun queue(
         payload: String,
-        timestamp: Long,
+        timestampSec: Long,
         eventIdentifier: String,
         isBackdateHit: Boolean
     ) {
@@ -79,7 +79,7 @@ internal class AnalyticsDatabase(
             CLASS_NAME,
             "queueHit - $payload isBackdateHit:$isBackdateHit"
         )
-        val hitData = AnalyticsHit(payload, timestamp, eventIdentifier).toDataEntity().data ?: run {
+        val hitData = AnalyticsHit(payload, timestampSec, eventIdentifier).toDataEntity().data ?: run {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
@@ -237,7 +237,7 @@ internal class AnalyticsDatabase(
         )
         val hitData = AnalyticsHit(
             payload,
-            analyticsHit.timestamp,
+            analyticsHit.timestampSec,
             analyticsHit.eventIdentifier
         ).toDataEntity().data
         return DataEntity(hitData)

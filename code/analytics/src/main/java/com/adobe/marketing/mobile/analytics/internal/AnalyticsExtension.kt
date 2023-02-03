@@ -192,7 +192,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         analyticsDatabase.reset()
         analyticsProperties.reset()
         analyticsState.resetIdentities()
-        analyticsState.lastResetIdentitiesTimestamp = event.timestamp
+        analyticsState.lastResetIdentitiesTimestampSec = event.timestampInSeconds
         api.createSharedState(getSharedState(), event)
     }
 
@@ -207,7 +207,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
         updateAnalyticsState(event, ANALYTICS_HARD_DEPENDENCIES + ANALYTICS_SOFT_DEPENDENCIES)
         val eventData = event.eventData ?: run {
-            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "track - event data is nil or empty.")
+            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "handleGenericTrackEvent - event data is null or empty.")
             return@handleGenericTrackEvent
         }
         handleTrackRequest(event, eventData)
@@ -215,10 +215,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     private fun handleRuleEngineResponse(event: Event) {
         val eventData = event.eventData ?: run {
-            Log.debug(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "hear - Ignoring Rules Engine Track response content event as event data is null."
+                "handleRuleEngineResponse - Event with id %s contained no data, ignoring.",
+                event.uniqueIdentifier
             )
             return@handleRuleEngineResponse
         }
@@ -231,10 +232,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
 
         if (triggeredConsequence == null || triggeredConsequence.isEmpty()) {
-            Log.warning(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "hear - Not a triggered rule. Return."
+                "handleRuleEngineResponse - Missing consequence data, ignoring event %s.",
+                event.uniqueIdentifier
             )
             return
         }
@@ -246,26 +248,46 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
 
         if (StringUtils.isNullOrEmpty(consequenceType)) {
-            Log.warning(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "hear - Triggered rule is not Analytics type. Ignoring Rules Engine Track response content event."
+                "handleRuleEngineResponse - No consequence type received, ignoring event %s.",
+                event.uniqueIdentifier
             )
             return
         }
 
         if (AnalyticsConstants.EventDataKeys.Analytics.RULES_CONSEQUENCE_TYPE_TRACK != consequenceType) {
-            Log.debug(
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "hear - Triggered rule is not a valid Analytics type. Cannot handle."
+                "handleRuleEngineResponse - Consequence type is not Analytics, ignoring event %s.",
+                event.uniqueIdentifier
             )
             return
         }
+
+        val consequenceId = DataReader.optString(
+            triggeredConsequence,
+            AnalyticsConstants.EventDataKeys.RuleEngine.RULES_RESPONSE_CONSEQUENCE_KEY_ID,
+            null
+        )
+
+        if (StringUtils.isNullOrEmpty(consequenceId)) {
+            Log.trace(
+                AnalyticsConstants.LOG_TAG,
+                CLASS_NAME,
+                "handleRuleEngineResponse - Consequence id is missing, ignoring event  %s.",
+                event.uniqueIdentifier
+            )
+            return
+        }
+
         Log.trace(
             AnalyticsConstants.LOG_TAG,
             CLASS_NAME,
-            "hear - Submitting Rules Engine Track response content event for processing."
+            "handleRuleEngineResponse - Submitting Rules Engine Track response content event (%s) for processing.",
+            event.uniqueIdentifier
         )
         updateAnalyticsState(event, ANALYTICS_HARD_DEPENDENCIES + ANALYTICS_SOFT_DEPENDENCIES)
         val consequenceDetail = DataReader.optTypedMap(
@@ -281,8 +303,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         updateAnalyticsState(event, ANALYTICS_HARD_DEPENDENCIES + ANALYTICS_SOFT_DEPENDENCIES)
         if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_OUT) {
             handleOptOut(event)
-        }
-        if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_IN) {
+        } else if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_IN) {
             analyticsDatabase.kick(false)
         }
         if (!sdkBootUpCompleted) {
@@ -314,7 +335,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                     Log.debug(
                         AnalyticsConstants.LOG_TAG,
                         CLASS_NAME,
-                        "handleLifecycleEvents - Exiting, Lifecycle timer is already running and this is a duplicate request"
+                        "handleGenericLifecycleEvents - Exiting, Lifecycle timer is already running and this is a duplicate request"
                     )
                     return
                 }
@@ -377,7 +398,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             Log.warning(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "handleAnalyticsRequestContentEvent - Returning early, event data is nil or empty."
+                "handleAnalyticsRequestContentEvent - Returning early, event data is null or empty."
             )
             return
         }
@@ -431,8 +452,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
 
         // if it is waiting for the acquisition data, then append the acquisition data to the waiting hit and kick db queue
-
-        // if it is waiting for the acquisition data, then append the acquisition data to the waiting hit and kick db queue
         if (analyticsTimer.isReferrerTimerRunning()) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
@@ -456,7 +475,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "trackAcquisition - Sending referrer data as seperate tracking hit"
+                "trackAcquisition - Sending referrer data as separate tracking hit"
             )
             val acquisitionData: MutableMap<String, Any> = HashMap()
             acquisitionData[AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION] =
@@ -485,17 +504,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
 
         // copy the event's data so we don't accidentally overwrite it for someone else consuming this event
-
-        // copy the event's data so we don't accidentally overwrite it for someone else consuming this event
         val tempLifecycleContextData: MutableMap<String, String> =
             HashMap(eventLifecycleContextData)
 
         // convert lifecycle event data keys into context data keys for AnalyticsExtension
-
-        // convert lifecycle event data keys into context data keys for AnalyticsExtension
         val lifecycleContextData: MutableMap<String, String> = HashMap()
-
-        // Removing them because they override current os and app id in the loop below.
 
         // Removing them because they override current os and app id in the loop below.
         val previousOsVersion = tempLifecycleContextData.remove(
@@ -514,9 +527,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
 
         lifecycleContextData.putAll(tempLifecycleContextData)
-
-        // if it is a install event, then need to block the analytics queue for the referrer timeout unless
-        // the acquisition data is received earlier.
 
         // if it is a install event, then need to block the analytics queue for the referrer timeout unless
         // the acquisition data is received earlier.
@@ -562,8 +572,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
 
         // track the lifecycle data
-
-        // track the lifecycle data
         if (analyticsTimer.isLifecycleTimerRunning()) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
@@ -587,7 +595,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "trackLifecycle - Sending lifecycle data as seperate tracking hit"
+                "trackLifecycle - Sending lifecycle data as separate tracking hit"
 
             )
             val lifecycleData: MutableMap<String, Any> = HashMap()
@@ -628,10 +636,10 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             sessionContextData
         lifecycleSessionData[AnalyticsConstants.EventDataKeys.Analytics.TRACK_INTERNAL] =
             true
-        val backdateTimestamp: Long = Math.max(
-            analyticsProperties.mostRecentHitTimeStampInSeconds,
-            previousSessionPauseTimestamp ?: 0
-        )
+        val backdateTimestamp: Long =
+            analyticsProperties.mostRecentHitTimeStampInSeconds.coerceAtLeast(
+                previousSessionPauseTimestamp ?: 0
+            )
         track(lifecycleSessionData, backdateTimestamp + 1, true, eventUniqueIdentifier)
     }
 
@@ -677,7 +685,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             Log.warning(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "WaitForAcquisitionData - Launch hit delay has expired without referrer data."
+                "waitForAcquisitionData - Launch hit delay has expired without referrer data."
             )
             analyticsDatabase.cancelWaitForAdditionalData(AnalyticsDatabase.DataType.REFERRER)
         }
@@ -731,7 +739,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     private fun handleTrackRequest(event: Event, data: Map<String, Any?>) {
         if (data.isEmpty()) {
-            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "track - event data is nil or empty.")
+            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "track - event data is null or empty.")
             return
         }
         if (data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION) ||
@@ -908,10 +916,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             AnalyticsProperties.CHARSET
         analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_FORMATTED_TIMESTAMP_KEY] =
             TimeZone.TIMESTAMP_TIMEZONE_OFFSET
-//        if (analyticsState.isOptIn) {
-//            analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_STRING_TIMESTAMP_KEY] =
-//                timestamp.toString()
-//        }
+
         if (analyticsState.isOfflineTrackingEnabled) {
             analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_STRING_TIMESTAMP_KEY] =
                 timestamp.toString()
@@ -920,22 +925,24 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         if (analyticsState.isVisitorIDServiceEnabled) {
             analyticsVars.putAll(analyticsState.analyticsIdVisitorParameters)
         }
-        if (ServiceProvider.getInstance().appContextService == null) {
-            Log.warning(
+
+        // Customer perspective defaults to foreground.
+        analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_CUSTOMER_PERSPECTIVE_KEY] =
+            AnalyticsConstants.APP_STATE_FOREGROUND
+        if (ServiceProvider.getInstance().appContextService != null) {
+            val appState = ServiceProvider.getInstance().appContextService.appState
+            if (appState == AppState.BACKGROUND) {
+                analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_CUSTOMER_PERSPECTIVE_KEY] =
+                    AnalyticsConstants.APP_STATE_BACKGROUND
+            }
+        } else {
+            Log.trace(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "processAnalyticsVars - Unable to access platform services. Platform services is null"
+                "processAnalyticsVars - Unable to access platform services to retrieve foreground/background state. Defaulting customer perspective to foreground."
             )
-            return HashMap()
         }
-        val appState = ServiceProvider.getInstance().appContextService.appState
-        if (appState == AppState.BACKGROUND) {
-            analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_CUSTOMER_PERSPECTIVE_KEY] =
-                AnalyticsConstants.APP_STATE_BACKGROUND
-        } else {
-            analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_CUSTOMER_PERSPECTIVE_KEY] =
-                AnalyticsConstants.APP_STATE_FOREGROUND
-        }
+
         return analyticsVars
     }
 
