@@ -51,12 +51,5 @@ dependencies {
     implementation 'com.adobe.marketing.mobile:lifecycle:2.+'
     implementation 'com.adobe.marketing.mobile:identity:2.+'
     implementation 'com.adobe.marketing.mobile:assurance:2.+'
-
-// 1.x -> 2.0 upgrade tests
-//    implementation 'com.adobe.marketing.mobile:lifecycle:1.+'
-//    implementation 'com.adobe.marketing.mobile:identity:1.+'
-//    implementation 'com.adobe.marketing.mobile:core:1.+'
-//    implementation 'com.adobe.marketing.mobile:analytics:1.+'
-//    implementation 'com.adobe.marketing.mobile:assurance:1.+'
-
 }
+

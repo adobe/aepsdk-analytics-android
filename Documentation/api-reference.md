@@ -28,12 +28,12 @@ Clears all hits from the tracking queue and removes them from the database.
 #### Java
 
 ##### Syntax
-```Java
+```java
 public static void clearQueue()
 ```
 
 ##### Example
-```Java
+```java
 
 Analytics.clearQueue();
 
@@ -41,12 +41,12 @@ Analytics.clearQueue();
 #### Kotlin
 
 ##### Syntax
-```Kotlin
+```kotlin
 fun clearQueue()
 ```
 
 ##### Example
-```Kotlin
+```kotlin
 
 Analytics.clearQueue()
 
@@ -61,12 +61,12 @@ The `extensionVersion()` API returns the version of the Analytics extension.
 #### Java
 
 ##### Syntax
-```Java
+```java
 public static String extensionVersion()
 ```
 
 ##### Example
-```Java
+```java
 String extensionVersion = Analytics.extensionVersion();
 ```
 
@@ -125,12 +125,12 @@ Retrieves the total number of Analytics hits in the tracking queue.
 #### Java
 
 ##### Syntax
-```Java
+```java
 public static void getQueueSize(@NonNull final AdobeCallback<Long> callback)
 ```
 
 ##### Example
-```Java
+```java
 Analytics.getQueueSize(new AdobeCallbackWithError<Long>() {
     @Override
     public void fail(AdobeError adobeError) {
@@ -168,19 +168,20 @@ Analytics.getQueueSize(object: AdobeCallbackWithError<Long> {
 
 ### getTrackingIdentifier
 
-> ℹ️ Before using this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
+> **Note**
+Before using this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
 
 Retrieves the Analytics tracking identifier. The identifier is only returned for existing users who had AID persisted and migrated from earlier versions of SDK. For new users, no AID is generated and should instead use [Experience Cloud ID](https://developer.adobe.com/client-sdks/documentation/mobile-core/identity/api-reference) to identify visitors.
 
 #### Java
 
 ##### Syntax
-```Java
+```java
 public static void getTrackingIdentifier(@NonNull final AdobeCallback<String> callback)
 ```
 
 ##### Example
-```Java
+```java
 Analytics.getTrackingIdentifier(new AdobeCallbackWithError<String>() {
     @Override
     public void fail(AdobeError adobeError) {
@@ -188,8 +189,8 @@ Analytics.getTrackingIdentifier(new AdobeCallbackWithError<String>() {
     }
 
     @Override
-    public void call(String s) {
-        // Handle the Experience Cloud ID
+    public void call(String aid) {
+        //Handle the tracking identifier (AID)
     }
 });
 ```
@@ -197,16 +198,16 @@ Analytics.getTrackingIdentifier(new AdobeCallbackWithError<String>() {
 #### Kotlin
 
 ##### Syntax
-```Kotlin
+```kotlin
 fun getTrackingIdentifier(callback: AdobeCallback<String?>)
 ```
 
 ##### Example
 
-```Kotlin
+```kotlin
 Analytics.getTrackingIdentifier(object: AdobeCallbackWithError<String> {
     override fun call(id: String?) {
-        // Handle the Experience Cloud ID
+        //Handle the tracking identifier (AID)
     }
 
     override fun fail(error: AdobeError?) {
@@ -219,19 +220,20 @@ Analytics.getTrackingIdentifier(object: AdobeCallbackWithError<String> {
 
 ### getVisitorIdentifier
 
-> Before use this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
+> **Note**
+Before use this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
 
 This API gets a custom Analytics visitor identifier, which has been set previously using [setVisitorIdentifier](#setvisitoridentifier).
 
 #### Java
 
 ##### Syntax
-```Java
+```java
 public static void getVisitorIdentifier(@NonNull final AdobeCallback<String> callback)
 ```
 
 ##### Example
-```Java
+```java
 Analytics.getVisitorIdentifier(new AdobeCallbackWithError<String>() {
     @Override
     public void fail(AdobeError adobeError) {
@@ -248,13 +250,13 @@ Analytics.getVisitorIdentifier(new AdobeCallbackWithError<String>() {
 #### Kotlin
 
 ##### Syntax
-```Kotlin
+```kotlin
  fun getVisitorIdentifier(callback: AdobeCallback<String?>) 
 ```
 ##### Example
-```Kotlin
+```kotlin
 Analytics.getVisitorIdentifier(object: AdobeCallbackWithError<String> {
-    override fun call(id: String?) {
+    override fun call(vid: String?) {
         // Handle the Visitor ID
     }
 
@@ -268,29 +270,29 @@ Analytics.getVisitorIdentifier(object: AdobeCallbackWithError<String> {
 
 ### sendQueuedHits
 
-Sends all queued hits in the offline queue to Analytics, regardless of the current hit batch settings.
+Sends all the queued hits in the offline queue to Analytics, regardless of the current hit batch settings.
 
 #### Java
 
 ##### Syntax
-```Java
+```java
 public static void sendQueuedHits()
 ```
 
 ##### Example
-```Java
+```java
 Analytics.sendQueuedHits();
 ```
 
 #### Kotlin
 
 ##### Syntax
-```Kotlin
+```kotlin
 fun sendQueuedHits()
 ```
 
 ##### Example
-```Kotlin
+```kotlin
 Analytics.sendQueuedHits()
 ```
 
@@ -298,30 +300,31 @@ Analytics.sendQueuedHits()
 
 ### setVisitorIdentifier
 
-> Before use this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
+> **Note** 
+Before use this API, see [Identify unique visitors](https://experienceleague.adobe.com/docs/analytics/components/metrics/unique-visitors.html).
 
 Sets a custom Analytics visitor identifier. For more information, see [Custom Visitor ID](https://experienceleague.adobe.com/docs/analytics/implementation/vars/config-vars/visitorid.html).
 
 #### Java
 
 ##### Syntax
-```Java
+```java
 public static void setVisitorIdentifier(@NonNull final String visitorID)
 ```
 
 ##### Example
-```Java
+```java
 Analytics.setVisitorIdentifier("vid_1");
 ```
 
 #### Kotlin
 
 ##### Syntax
-```Kotlin
+```kotlin
 fun setVisitorIdentifier(visitorID: String)
 ```
 
 ##### Example
-```Kotlin
+```kotlin
 Analytics.setVisitorIdentifier("vid_1")
 ```
