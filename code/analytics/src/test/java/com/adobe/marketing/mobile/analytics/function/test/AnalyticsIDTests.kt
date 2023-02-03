@@ -261,6 +261,36 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
         val countDownLatch = CountDownLatch(1)
         var analyticsSharedState: Map<String, Any> = emptyMap()
 
+        var setAid: String? = null
+        var setVid: String? = null
+
+        Mockito.`when`(mockedNameCollection.setString(any(), any()))
+            .thenAnswer { invocation ->
+                when (invocation.arguments[0] as? String) {
+                    "ADOBEMOBILE_STOREDDEFAULTS_AID" -> {
+                        setAid = invocation.arguments[1] as String
+                    }
+                    "ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER" -> {
+                        setVid = invocation.arguments[1] as String
+                    }
+                }
+            }
+
+        Mockito.`when`(mockedNameCollection.getString(any(), anyOrNull()))
+            .thenAnswer { invocation ->
+                when (invocation.arguments[0] as? String) {
+                    "ADOBEMOBILE_STOREDDEFAULTS_AID" -> {
+                        return@thenAnswer setAid
+                    }
+                    "ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER" -> {
+                        return@thenAnswer setVid
+                    }
+                    else -> {
+                        return@thenAnswer ""
+                    }
+                }
+            }
+
         Mockito.`when`(mockedExtensionApi.createSharedState(any(), anyOrNull()))
             .then { invocation ->
                 val data = invocation.arguments[0] as? Map<String, Any>
@@ -361,17 +391,44 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
     @Test(timeout = 10000)
     fun `vid and aid should be cleared after optedout`() {
+        var setAid: String? = "testaid"
+        var setVid: String? = "testvid"
+
+        Mockito.`when`(mockedNameCollection.setString(any(), any()))
+            .thenAnswer { invocation ->
+                when (invocation.arguments[0] as? String) {
+                    "ADOBEMOBILE_STOREDDEFAULTS_AID" -> {
+                        setAid = invocation.arguments[1] as String
+                    }
+                    "ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER" -> {
+                        setVid = invocation.arguments[1] as String
+                    }
+                }
+            }
+
         Mockito.`when`(mockedNameCollection.getString(any(), anyOrNull()))
             .thenAnswer { invocation ->
                 when (invocation.arguments[0] as? String) {
                     "ADOBEMOBILE_STOREDDEFAULTS_AID" -> {
-                        return@thenAnswer "testaid"
+                        return@thenAnswer setAid
                     }
                     "ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER" -> {
-                        return@thenAnswer "testvid"
+                        return@thenAnswer setVid
                     }
                     else -> {
                         return@thenAnswer ""
+                    }
+                }
+            }
+
+        Mockito.`when`(mockedNameCollection.remove(any()))
+            .thenAnswer { invocation ->
+                when (invocation.arguments[0] as? String) {
+                    "ADOBEMOBILE_STOREDDEFAULTS_AID" -> {
+                        setAid = null
+                    }
+                    "ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER" -> {
+                        setVid = null
                     }
                 }
             }
@@ -453,17 +510,44 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
     @Test(timeout = 10000)
     fun `vid and aid should be cleared after request reset event`() {
+        var setAid: String? = "testaid"
+        var setVid: String? = "testvid"
+
+        Mockito.`when`(mockedNameCollection.setString(any(), any()))
+            .thenAnswer { invocation ->
+                when (invocation.arguments[0] as? String) {
+                    "ADOBEMOBILE_STOREDDEFAULTS_AID" -> {
+                        setAid = invocation.arguments[1] as String
+                    }
+                    "ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER" -> {
+                        setVid = invocation.arguments[1] as String
+                    }
+                }
+            }
+
         Mockito.`when`(mockedNameCollection.getString(any(), anyOrNull()))
             .thenAnswer { invocation ->
                 when (invocation.arguments[0] as? String) {
                     "ADOBEMOBILE_STOREDDEFAULTS_AID" -> {
-                        return@thenAnswer "testaid"
+                        return@thenAnswer setAid
                     }
                     "ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER" -> {
-                        return@thenAnswer "testvid"
+                        return@thenAnswer setVid
                     }
                     else -> {
                         return@thenAnswer ""
+                    }
+                }
+            }
+
+        Mockito.`when`(mockedNameCollection.remove(any()))
+            .thenAnswer { invocation ->
+                when (invocation.arguments[0] as? String) {
+                    "ADOBEMOBILE_STOREDDEFAULTS_AID" -> {
+                        setAid = null
+                    }
+                    "ADOBEMOBILE_STOREDDEFAULTS_VISITOR_IDENTIFIER" -> {
+                        setVid = null
                     }
                 }
             }

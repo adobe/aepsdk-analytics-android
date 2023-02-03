@@ -24,6 +24,7 @@ import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.services.NetworkRequest
 import com.adobe.marketing.mobile.services.Networking
 import com.adobe.marketing.mobile.services.ServiceProvider
+import com.adobe.marketing.mobile.util.StreamUtils
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
 
@@ -44,7 +45,7 @@ internal class AnalyticsHitProcessor(
 
     private val version = AnalyticsVersionProvider.buildVersionString()
 
-    override fun retryInterval(dataENtity: DataEntity): Int {
+    override fun retryInterval(dataEntity: DataEntity): Int {
         return HIT_QUEUE_RETRY_TIME_SECONDS
     }
 
@@ -52,7 +53,7 @@ internal class AnalyticsHitProcessor(
         val analyticsHit = AnalyticsHit.from(entity)
         val eventIdentifier = analyticsHit.eventIdentifier
         var payload = analyticsHit.payload
-        var timestamp = analyticsHit.timestamp
+        var timestamp = analyticsHit.timestampSec
 
         if (payload.isEmpty()) {
             Log.debug(
@@ -64,7 +65,7 @@ internal class AnalyticsHitProcessor(
             return
         }
 
-        if (timestamp < analyticsState.lastResetIdentitiesTimestamp) {
+        if (timestamp < analyticsState.lastResetIdentitiesTimestampSec) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
@@ -129,12 +130,13 @@ internal class AnalyticsHitProcessor(
                 processingResult.complete(false)
                 return@connectAsync
             }
+            var doneProcessingResult: Boolean
             when (connection.responseCode) {
                 200 -> {
                     Log.debug(
                         AnalyticsConstants.LOG_TAG,
                         CLASS_NAME,
-                        "processHit - Analytics hit request with url $url and payload $payload sent successfully"
+                        "processHit - Analytics hit request with url ($url) and payload ($payload) sent successfully"
                     )
                     val httpHeaders = mapOf(
                         AnalyticsConstants.EventDataKeys.Analytics.ETAG_HEADER to connection.getResponsePropertyValue(
@@ -147,8 +149,11 @@ internal class AnalyticsHitProcessor(
                             AnalyticsConstants.EventDataKeys.Analytics.CONTENT_TYPE_HEADER
                         )
                     )
+                    val responseString = StreamUtils.readAsString(connection.inputStream)
+
                     val eventData: Map<String, Any?> = mapOf(
-                        AnalyticsConstants.EventDataKeys.Analytics.ANALYTICS_SERVER_RESPONSE to httpHeaders,
+                        AnalyticsConstants.EventDataKeys.Analytics.ANALYTICS_SERVER_RESPONSE to responseString,
+                        AnalyticsConstants.EventDataKeys.Analytics.HEADERS_RESPONSE to httpHeaders,
                         AnalyticsConstants.EventDataKeys.Analytics.HIT_HOST to url,
                         AnalyticsConstants.EventDataKeys.Analytics.HIT_URL to payload,
                         AnalyticsConstants.EventDataKeys.Analytics.REQUEST_EVENT_IDENTIFIER to eventIdentifier
@@ -156,7 +161,7 @@ internal class AnalyticsHitProcessor(
 
                     // Dispatch response only if the hit was sent after the reset Identities was called.
                     // So that we only populate UUID if the hit was sent after reset in case where AAMForwarding is enabled.
-                    if (timestamp > analyticsState.lastResetIdentitiesTimestamp) {
+                    if (timestamp > analyticsState.lastResetIdentitiesTimestampSec) {
                         Log.debug(
                             AnalyticsConstants.LOG_TAG,
                             CLASS_NAME,
@@ -171,7 +176,7 @@ internal class AnalyticsHitProcessor(
                         )
                     }
                     lastHitTimestamp = timestamp
-                    processingResult.complete(true)
+                    doneProcessingResult = true
                 }
                 in arrayOf(408, 504, 503, -1) -> {
                     Log.warning(
@@ -179,17 +184,20 @@ internal class AnalyticsHitProcessor(
                         CLASS_NAME,
                         "processHit - Retrying Analytics hit, request with url $url failed with recoverable status code ${connection.responseCode}"
                     )
-                    processingResult.complete(false)
+                    doneProcessingResult = false
                 }
                 else -> {
+                    val errorResponse: String? = StreamUtils.readAsString(connection.errorStream)
                     Log.warning(
                         AnalyticsConstants.LOG_TAG,
                         CLASS_NAME,
-                        "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}"
+                        "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}: $errorResponse"
                     )
-                    processingResult.complete(true)
+                    doneProcessingResult = true
                 }
             }
+            connection.close()
+            processingResult.complete(doneProcessingResult)
         }
     }
 

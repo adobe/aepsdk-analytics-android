@@ -28,7 +28,7 @@ internal class AnalyticsState {
     internal var host: String? = null
         private set
 
-    internal var lastResetIdentitiesTimestamp: Long = TimeUtils.getUnixTimeInSeconds()
+    internal var lastResetIdentitiesTimestampSec: Long = TimeUtils.getUnixTimeInSeconds()
 
     // ----------- Configuration properties -----------
     internal var isAnalyticsForwardingEnabled: Boolean =

@@ -21,9 +21,10 @@ internal class MockedHttpConnecting : HttpConnecting {
     private var rulesStream: InputStream? = null
     internal var responseCode = 300
     internal var responseProperties = mapOf<String, String>()
+    internal var inputStream = ("").byteInputStream()
 
     override fun getInputStream(): InputStream? {
-        return null
+        return inputStream
     }
 
     override fun getErrorStream(): InputStream? {

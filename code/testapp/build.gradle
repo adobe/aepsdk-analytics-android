@@ -47,24 +47,8 @@ dependencies {
 
     implementation project(":analytics")
 
-    implementation 'com.adobe.marketing.mobile:core:2.0.0-SNAPSHOT'
-//    implementation('com.adobe.marketing.mobile:analytics:2.0.0-SNAPSHOT'){
-//        transitive = false
-//    }
-    implementation('com.github.adobe.aepsdk-core-android:lifecycle:dev-v2.0.0-SNAPSHOT'){
-        transitive = false
-    }
-    implementation('com.github.adobe.aepsdk-core-android:identity:dev-v2.0.0-SNAPSHOT'){
-        transitive = false
-    }
-    implementation('com.github.adobe:aepsdk-assurance-android:2.0.0-alpha.1'){
-        transitive = false
-    }
-
-//    implementation 'com.adobe.marketing.mobile:lifecycle:1.+'
-//    implementation 'com.adobe.marketing.mobile:identity:1.+'
-//    implementation 'com.adobe.marketing.mobile:core:1.+'
-//    implementation 'com.adobe.marketing.mobile:analytics:1.+'
-//    implementation 'com.adobe.marketing.mobile:assurance:1.+'
-
+    implementation 'com.adobe.marketing.mobile:core:2.+'
+    implementation 'com.adobe.marketing.mobile:lifecycle:2.+'
+    implementation 'com.adobe.marketing.mobile:identity:2.+'
+    implementation 'com.adobe.marketing.mobile:assurance:2.+'
 }
