@@ -1,6 +1,6 @@
-# Adobe Analytics Android Extension
+# Getting Started with Adobe Analytics Android Extension
 
-The [`Analytics`](https://developer.adobe.com/client-sdks/documentation/adobe-analytics/) extension represents the Analytics Adobe Experience Platform SDK that is required for sending mobile interaction data from your app to Adobe Analytics.
+The [Adobe Experience Platform - Analytics Extension](https://developer.adobe.com/client-sdks/documentation/adobe-analytics) is required for sending  interaction data from the mobile application to Adobe Analytics.
 
 ## Configure the Analytics extension in Data Collection UI
 

@@ -1,4 +1,4 @@
-# Adobe Analytics Extension Documentation
+# Analytics extension documentatioin
 
 ### Contents
 
