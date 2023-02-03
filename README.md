@@ -1,4 +1,4 @@
-# Adobe Experience Platform - Analytics extension for Android
+# Adobe Experience Platform - Analytics Extension for Android
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.adobe.marketing.mobile/analytics.svg?logo=android&logoColor=white&label=analytics)](https://mvnrepository.com/artifact/com.adobe.marketing.mobile/analytics)
 

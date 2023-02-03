@@ -206,7 +206,7 @@ fun getTrackingIdentifier(callback: AdobeCallback<String?>)
 
 ```kotlin
 Analytics.getTrackingIdentifier(object: AdobeCallbackWithError<String> {
-    override fun call(id: String?) {
+    override fun call(aid: String?) {
         //Handle the tracking identifier (AID)
     }
 
@@ -241,7 +241,7 @@ Analytics.getVisitorIdentifier(new AdobeCallbackWithError<String>() {
     }
 
     @Override
-    public void call(String s) {
+    public void call(String vid) {
         // Handle the Visitor ID
     }
 });
