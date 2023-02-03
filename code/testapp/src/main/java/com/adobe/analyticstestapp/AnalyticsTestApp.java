@@ -24,7 +24,6 @@ import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class AnalyticsTestApp extends Application {
@@ -56,18 +55,5 @@ public class AnalyticsTestApp extends Application {
                 Log.e("AEPSDKInitError", adobeError.getErrorName());
             }
         });
-
-
-//        try {
-//            Analytics.registerExtension();
-//            Identity.registerExtension();
-//            Lifecycle.registerExtension();
-//            Assurance.registerExtension();
-//        } catch (Exception e) {
-//            Log.e("AEPSDKInitError", e.getLocalizedMessage());
-//        }
-//
-//        MobileCore.start(o -> MobileCore.configureWithAppID(APP_ID));
-
     }
 }
