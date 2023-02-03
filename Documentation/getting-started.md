@@ -1,10 +1,24 @@
-# Getting Started with Analytics SDK
+# Getting Started with Adobe Analytics Android Extension
 
-## Before starting
+The [Adobe Experience Platform - Analytics Extension](https://developer.adobe.com/client-sdks/documentation/adobe-analytics) is required for sending  interaction data from the mobile application to Adobe Analytics.
 
-Analytics extension has a dependency on the [Mobile Core and Identity extensions](https://github.com/adobe/aepsdk-core-android#readme) which must be installed to use the extension.
+## Configure the Analytics extension in Data Collection UI
+
+![Analytics Extension Configuration](./assets/mobile-analytics-configuration.png)
+
+1. Log into [Adobe Experience Platform Data Collection](https://experience.adobe.com/data-collection).
+2. From **Tags**, locate or search for your Tag mobile property.
+3. In your mobile property, select **Extensions** tab.
+4. On the Catalog tab, locate the Adobe Analytics extension, and select Install.
+5. Type the extension settings.
+6. Click **Save**.
+7. Follow the publishing process to update SDK configuration.
 
 ## Add Analytics extension to your app
+
+The Analytics extension depends on the Core and Identity extensions:
+* [Mobile Core](https://github.com/adobe/aepsdk-core-android)
+* [Identity](https://github.com/adobe/aepsdk-core-android)
 
 1. Installation via [Maven](https://maven.apache.org/) & [Gradle](https://gradle.org/) is the easiest and recommended way to get the Mobile SDK. Add a dependency on Analytics and Mobile Core to your mobile application. To ensure consistent builds, it is best to explicitly specify the dependency version and update them manually.
 
