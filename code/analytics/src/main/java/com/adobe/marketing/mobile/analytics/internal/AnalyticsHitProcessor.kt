@@ -187,10 +187,11 @@ internal class AnalyticsHitProcessor(
                     doneProcessingResult = false
                 }
                 else -> {
+                    val errorResponse: String? = StreamUtils.readAsString(connection.errorStream)
                     Log.warning(
                         AnalyticsConstants.LOG_TAG,
                         CLASS_NAME,
-                        "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}"
+                        "processHit - Dropping Analytics hit, request with url $url failed with error and unrecoverable status code ${connection.responseCode}: $errorResponse"
                     )
                     doneProcessingResult = true
                 }
