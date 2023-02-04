@@ -45,10 +45,28 @@ internal class AnalyticsHitProcessor(
 
     private val version = AnalyticsVersionProvider.buildVersionString()
 
+    /**
+     * Get the retry interval for the [dataEntity].
+     *
+     * @param dataEntity the [DataEntity] for which to retrieve the retry interval
+     * @return the retry interval in seconds
+     */
     override fun retryInterval(dataEntity: DataEntity): Int {
         return HIT_QUEUE_RETRY_TIME_SECONDS
     }
 
+    /**
+     * Process the Analytics hit by building the request object, making the network connection,
+     * and processing the network connection response.
+     *
+     * @param entity the [DataEntity] which contains the Analytics hit data to send
+     * @param processingResult a [HitProcessingResult] callback which is called once the [entity]
+     * processing is complete. [HitProcessingResult.complete] is passed true if the hit does not
+     * need to be retired, while false indicates the hit should be retried after a retry interval
+     * has passed.
+     *
+     * @see [retryInterval]
+     */
     override fun processHit(entity: DataEntity, processingResult: HitProcessingResult) {
         val analyticsHit = AnalyticsHit.from(entity)
         val eventIdentifier = analyticsHit.eventIdentifier
@@ -201,12 +219,25 @@ internal class AnalyticsHitProcessor(
         }
     }
 
+    /**
+     * Replaces the timestamp value in [payload] from [oldTs] to [newTs].
+     *
+     * @param payload the payload String to replace the timestamp
+     * @param oldTs the timestamp value in [payload] to replace
+     * @param newTs the new timestamp value to replace [oldTs] in [payload]
+     */
     private fun replaceTimestampInPayload(payload: String, oldTs: Long, newTs: Long): String {
         val oldTSString = "&ts=$oldTs"
         val newTSString = "&ts=$newTs"
         return payload.replaceFirst(oldTSString, newTSString)
     }
 
+    /**
+     * Build the Analytics hit URL.
+     *
+     * @param state the [AnalyticsState] for this hit
+     * @return a URL for use in Analytics hits or null if the URL could not be built
+     */
     private fun getAnalyticsBaseUrl(state: AnalyticsState): String? {
         if (!state.isAnalyticsConfigured) {
             return null
@@ -224,6 +255,13 @@ internal class AnalyticsHitProcessor(
         return baseUrl
     }
 
+    /**
+     * Get the Analytics response type used in the Analytics hit URL. The response type is based
+     * on the the configuration value of "analytics.aamForwardingEnabled".
+     *
+     * @param state the [AnalyticsState] for this hit
+     * @return the value "10" if AAM forwarding is configured to true, "0" otherwise.
+     */
     private fun getAnalyticsResponseType(state: AnalyticsState): String {
         return if (state.isAnalyticsForwardingEnabled) "10" else "0"
     }

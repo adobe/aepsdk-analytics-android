@@ -19,6 +19,40 @@ import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.services.PersistentHitQueue
 import com.adobe.marketing.mobile.services.ServiceProvider
 
+/**
+ * The Analytics hit database which queues and persists hits before processing.
+ *
+ * Analytics hit reordering
+ * If backDateSessionInfo and offlineTracking is enabled, we should send hit with previous session
+ * information / crash information before sending any hits for current session.
+ * (We get this information from `lifecycle.responseContent` event)
+ * Lifecycle information for current session should be attached to queued hit or as separate hit
+ * (If we have no queued hit) for every lifecycle session. (We get this information from
+ * `lifecycle.responseContent` event)
+ * Referrer information for current install/launch should be attached to queued hit or as separate
+ * hit (If we have no queued hit) (We get this information from `acquisition.responseContent` event)
+ *
+ * Given that Lifecycle, Acquisition and MobileServices extensions are optional we rely on timeouts
+ * to wait for each of the above events and reorder hits
+ * Any `genericTrack` request we receive before `genericLifecycle` event is processed and reported
+ * to backend. (If lifecycle extension is implemented, we recommend calling
+ * MobileCore.lifecycleStart() before any track calls.)
+ * After receiving `genericLifecycle` event, we wait
+ * `AnalyticsConstants.Default.LIFECYCLE_RESPONSE_WAIT_TIMEOUT` for `lifecycle.responseContent` event
+ * If we receive `lifecycle.responseContent` before timeout, we append lifecycle data to first
+ * waiting hit. It is sent as a separate hit if we don't have any waiting hit
+ * After receiving `lifecycle.responseContent` we wait for `acquisition.responseContent`. If it is
+ * install we wait for `analyticsState.launchHitDelay` and for launch we wait for
+ * `AnalyticsConstants.Default.LAUNCH_DEEPLINK_DATA_WAIT_TIMEOUT`
+ * If we receive `acquisition.responseContent` before timeout, we append lifecycle data to first
+ * waiting hit. It is sent as a separate hit if we don't have any waiting hit
+ * Any `genericTrack` request we receive when waiting for `lifecycle.responseContent` or
+ * `acquisition.responseContent` is placed in the reorder queue till we receive these events or
+ * until timeout
+ *
+ * @param processor the Analytics hit processor which processes the hits
+ * @param analyticsState the [AnalyticsState] holds current state data from dependent extensions
+ */
 internal class AnalyticsDatabase(
     private val processor: HitProcessing,
     private val analyticsState: AnalyticsState
@@ -47,6 +81,10 @@ internal class AnalyticsDatabase(
         moveHitsFromReorderQueue()
     }
 
+    /**
+     * Move hits from the "reorder" queue to the "main" queue.
+     * The "reorder" queue is empty after this operation.
+     */
     private fun moveHitsFromReorderQueue() {
         val count = reorderQueue.count()
         if (count <= 0) {
@@ -68,6 +106,16 @@ internal class AnalyticsDatabase(
         reorderQueue.clear()
     }
 
+    /**
+     * Queue hits to the appropriate queue. Hits are queued to the "main" queue unless they are
+     * waiting on additional data, then they are queued to the "reorder" queue. Backdated hits, however,
+     * are added to the "main" queue if waiting for additional data and dropped otherwise.
+     *
+     * @param payload the hit payload
+     * @param timestampSec the hit timestamp in seconds
+     * @param eventIdentifier the identifier of the triggering event
+     * @param isBackdateHit true if this is a backdated hit
+     */
     internal fun queue(
         payload: String,
         timestampSec: Long,
@@ -123,6 +171,12 @@ internal class AnalyticsDatabase(
         kick(false)
     }
 
+    /**
+     * Resume processing of the hit queue. If, however, Analytics is not configured or the privacy
+     * status is not opted in, then this operation is ignored.
+     *
+     * @param ignoreBatchLimit if true, ignores the current queue count and batch limit configuration
+     */
     fun kick(ignoreBatchLimit: Boolean) {
         Log.trace(
             AnalyticsConstants.LOG_TAG,
@@ -159,6 +213,10 @@ internal class AnalyticsDatabase(
         }
     }
 
+    /**
+     * Resets the database by suspending processing of the hit queue and clearing hits from both
+     * the "main" and "reorder" queues.
+     */
     fun reset() {
         hitQueue.suspend()
         mainQueue.clear()
@@ -168,6 +226,11 @@ internal class AnalyticsDatabase(
         waitingForReferrer = false
     }
 
+    /**
+     * Cancels the wait for additional data request for the given [DataType].
+     *
+     * @param dataType the [DataType] for which to cancel the wait for additional data request
+     */
     fun cancelWaitForAdditionalData(dataType: DataType) {
         Log.debug(
             AnalyticsConstants.LOG_TAG,
@@ -177,6 +240,11 @@ internal class AnalyticsDatabase(
         kickWithAdditionalData(dataType, null)
     }
 
+    /**
+     * Signals the database that additional data for currently queued hits is pending.
+     *
+     * @param dataType the [DataType] for which additional data is pending
+     */
     fun waitForAdditionalData(dataType: DataType) {
         Log.debug(
             AnalyticsConstants.LOG_TAG,
@@ -189,10 +257,24 @@ internal class AnalyticsDatabase(
         }
     }
 
+    /**
+     * Determines if any hits are waiting for additional data.
+     *
+     * @return true if any hits are waiting for additional data
+     */
     fun isHitWaiting(): Boolean {
         return reorderQueue.count() > 0
     }
 
+    /**
+     * Resume processing of the hit queue with additional data.
+     * Appends the given [data] to the first hit in the "reorder" queue and moves that hit
+     * to the "main" queue. Moves all other hits from the "reorder" queue to the "main" queue.
+     * Clears the "waiting for additional data" flag for the given [dataType].
+     *
+     * @param dataType the [DataType] (source) of the given [data]
+     * @param data the additional data to add to the waiting hit
+     */
     fun kickWithAdditionalData(dataType: DataType, data: Map<String, Any>?) {
         if (!waitingForAdditionalData()) {
             return
@@ -226,6 +308,13 @@ internal class AnalyticsDatabase(
         kick(false)
     }
 
+    /**
+     * Appends additional data to a hit.
+     *
+     * @param additionalData the data to append to the [DataEntity]
+     * @param dataEntity the [DataEntity] to append the data
+     * @return the given [dataEntity] with the appended [additionalData]
+     */
     private fun appendAdditionalData(
         additionalData: Map<String, Any>,
         dataEntity: DataEntity
@@ -243,10 +332,19 @@ internal class AnalyticsDatabase(
         return DataEntity(hitData)
     }
 
+    /**
+     * Determines whether a hit is waiting for additional data.
+     *
+     * @return true if a hit is waiting for additional data
+     */
     private fun waitingForAdditionalData(): Boolean {
         return waitingForReferrer || waitingForLifecycle
     }
 
+    /**
+     * Return the current queue size.
+     * The queue size is the count from both the "main" queue and "reorder" queue.
+     */
     internal fun getQueueSize(): Int {
         return mainQueue.count() + reorderQueue.count()
     }
