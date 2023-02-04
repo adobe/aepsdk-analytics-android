@@ -14,7 +14,21 @@ package com.adobe.marketing.mobile.analytics.internal
 import com.adobe.marketing.mobile.services.DataEntity
 import org.json.JSONObject
 
+/**
+ * Class representing an Analytics hit.
+ *
+ * @param payload the hit payload
+ * @param timestampSec timestamp of the hit in seconds
+ * @param eventIdentifier the identifier of the event which triggered the hit
+ */
 internal class AnalyticsHit(val payload: String, val timestampSec: Long, val eventIdentifier: String) {
+
+    /**
+     * Serializes this hit to a [DataEntity] for use in a [HitQueue].
+     * If the hit fails to serialize, then an [DataEntity] with empty data is returned.
+     *
+     * @return this hit serialized as a [DataEntity]
+     */
     internal fun toDataEntity(): DataEntity {
         val map = mapOf<String, Any>(
             PAYLOAD to payload,
@@ -35,6 +49,11 @@ internal class AnalyticsHit(val payload: String, val timestampSec: Long, val eve
         private const val EVENT_IDENTIFIER = "eventIdentifier"
         private const val EMPTY_JSON = ""
 
+        /**
+         * Deserializes a [DataEntity] to an [AnalyticsHit].
+         *
+         * @return an [AnalyticsHit] deserialized from a [DataEntity]
+         */
         internal fun from(dataEntity: DataEntity): AnalyticsHit {
             val json = dataEntity.data ?: EMPTY_JSON
             val jsonObject = try {

@@ -12,10 +12,12 @@
 package com.adobe.marketing.mobile;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Analytics {
@@ -243,11 +245,12 @@ public class Analytics {
     }
 
     /**
-     * Retrieves the visitor identifier
+     * Sets the visitor identifier. Clears the visitor identifier when passed null or an empty
+     * string.
      *
      * @param visitorID {@code String} new value for visitor identifier
      */
-    public static void setVisitorIdentifier(@NonNull final String visitorID) {
+    public static void setVisitorIdentifier(@Nullable final String visitorID) {
         Map<String, Object> eventDataMap = new HashMap<>();
         eventDataMap.put(VISITOR_IDENTIFIER, visitorID);
         MobileCore.dispatchEvent(

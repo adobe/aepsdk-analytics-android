@@ -58,7 +58,7 @@ internal class AnalyticsRequestSerializer {
             val requestString = StringBuilder(REQUEST_STRINGBUILDER_CAPACITY)
             requestString.append("ndh=1")
 
-            // append visitor ids if we have them
+            // append visitor ids if available
             if (state.isVisitorIDServiceEnabled && state.serializedVisitorIDsList != null) {
                 requestString.append(state.serializedVisitorIDsList)
             }
@@ -72,7 +72,7 @@ internal class AnalyticsRequestSerializer {
          * Creates a `Map<String, String>` having the VisitorIDs information (types, ids and authentication state), puts it
          * under "cid" key for the analytics request and serializes it.
          *
-         * @param visitorIDs the new `List<VisitorID>` that we want to process in the analytics format
+         * @param visitorIDs the new [VisitorID] List to process in the analytics format
          * @return null if the visitorIDs list is null
          */
         internal fun generateAnalyticsCustomerIdString(visitorIDs: List<VisitorID>?): String? {
