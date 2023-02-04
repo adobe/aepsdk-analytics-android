@@ -23,32 +23,33 @@ import com.adobe.marketing.mobile.services.ServiceProvider
  * The Analytics hit database which queues and persists hits before processing.
  *
  * Analytics hit reordering
- * If backDateSessionInfo and offlineTracking is enabled, we should send hit with previous session
- * information / crash information before sending any hits for current session.
- * (We get this information from `lifecycle.responseContent` event)
+ * If backDateSessionInfo and offlineTracking is enabled, sends hit with previous session
+ * information / close information before sending any hits for current session.
+ * (This information is retrieved from Lifecycle Response Content event)
  * Lifecycle information for current session should be attached to queued hit or as separate hit
- * (If we have no queued hit) for every lifecycle session. (We get this information from
- * `lifecycle.responseContent` event)
+ * (If no queued hit) for every lifecycle session. (This information is retrieved from
+ * Lifecycle Response Content event)
  * Referrer information for current install/launch should be attached to queued hit or as separate
- * hit (If we have no queued hit) (We get this information from `acquisition.responseContent` event)
+ * hit (If no queued hit) (This information from Acquisition Response Content event)
  *
- * Given that Lifecycle, Acquisition and MobileServices extensions are optional we rely on timeouts
- * to wait for each of the above events and reorder hits
- * Any `genericTrack` request we receive before `genericLifecycle` event is processed and reported
- * to backend. (If lifecycle extension is implemented, we recommend calling
+ * Given that Lifecycle, Acquisition and MobileServices extensions are optional, the database relies
+ * on timeouts to wait for each of the above events and reorder hits
+ * Any `genericTrack` request received before `genericLifecycle` event is processed and reported
+ * to backend. (If lifecycle extension is implemented, it is recommended to call
  * MobileCore.lifecycleStart() before any track calls.)
- * After receiving `genericLifecycle` event, we wait
- * `AnalyticsConstants.Default.LIFECYCLE_RESPONSE_WAIT_TIMEOUT` for `lifecycle.responseContent` event
- * If we receive `lifecycle.responseContent` before timeout, we append lifecycle data to first
- * waiting hit. It is sent as a separate hit if we don't have any waiting hit
- * After receiving `lifecycle.responseContent` we wait for `acquisition.responseContent`. If it is
- * install we wait for `analyticsState.launchHitDelay` and for launch we wait for
- * `AnalyticsConstants.Default.LAUNCH_DEEPLINK_DATA_WAIT_TIMEOUT`
- * If we receive `acquisition.responseContent` before timeout, we append lifecycle data to first
- * waiting hit. It is sent as a separate hit if we don't have any waiting hit
- * Any `genericTrack` request we receive when waiting for `lifecycle.responseContent` or
- * `acquisition.responseContent` is placed in the reorder queue till we receive these events or
- * until timeout
+ * After receiving `genericLifecycle` event, the database waits
+ * [AnalyticsConstants.Default.DEFAULT_LIFECYCLE_RESPONSE_WAIT_TIMEOUT] for the next Lifecycle Response Content event
+ * If a Lifecycle Response Content event is received before the timeout, lifecycle data is appended
+ * to the first waiting hit. It is sent as a separate hit if there isn't any waiting hit.
+ * After receiving Lifecycle Response Content event the database waits for an Acquisition Response
+ * Content event. If it is install the database waits for
+ * [AnalyticsConstants.Default.DEFAULT_LAUNCH_DEEPLINK_DATA_WAIT_TIMEOUT] and for launch the database
+ * waits for [AnalyticsConstants.Default.DEFAULT_LAUNCH_DEEPLINK_DATA_WAIT_TIMEOUT].
+ * If an Acquisition Response Content event is received before timeout, the lifecycle data is
+ * appended to the first waiting hit. It is sent as a separate hit if there is not any waiting hits.
+ * Any `genericTrack` request received when waiting for Lifecycle Response Content or
+ * Acquisition Response Content events is placed in the reorder queue till these events are received
+ * or until timeout
  *
  * @param processor the Analytics hit processor which processes the hits
  * @param analyticsState the [AnalyticsState] holds current state data from dependent extensions
@@ -148,7 +149,7 @@ internal class AnalyticsDatabase(
                 Log.debug(
                     AnalyticsConstants.LOG_TAG,
                     CLASS_NAME,
-                    "queueHit - Dropping backdate hit, as we have begun processing hits for current session"
+                    "queueHit - Dropping backdate hit, as processing has begun for this current session"
                 )
             }
         } else {
@@ -156,7 +157,7 @@ internal class AnalyticsDatabase(
                 Log.debug(
                     AnalyticsConstants.LOG_TAG,
                     CLASS_NAME,
-                    "queueHit - Queueing hit in reorder queue as we are waiting for additional data"
+                    "queueHit - Queueing hit in reorder queue as a previous hit is waiting for additional data"
                 )
                 reorderQueue.add(hit)
             } else {
