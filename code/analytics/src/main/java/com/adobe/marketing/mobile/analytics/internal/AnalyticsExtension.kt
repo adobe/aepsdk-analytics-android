@@ -555,7 +555,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
 
     /**
      * Processes Acquisition track events.
-     * If we are waiting for the acquisition data, then try to append it to a existing hit.
+     * If waiting for the acquisition data, then try to append it to a existing hit.
      * Otherwise, send a new hit for acquisition data, and cancel the acquisition timer to
      * mark that the acquisition data has been received and processed.
      *
@@ -610,7 +610,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
      * Processes Lifecycle track events.
      * Converts the lifecycle event in internal analytics action. If backdate session and offline
      * tracking are enabled, and previous session length is present in the contextData map,
-     * we send a separate hit with the previous session information and the rest of the keys as a
+     * send a separate hit with the previous session information and the rest of the keys as a
      * Lifecycle action hit. If ignored session is present, it will be sent as part of the
      * Lifecycle hit and no SessionInfo hit will be sent.
      *
@@ -631,7 +631,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             return@trackLifecycle
         }
 
-        // copy the event's data so we don't accidentally overwrite it for someone else consuming this event
+        // copy the event's data so it is not accidentally overwritten for other processors consuming this event
         val tempLifecycleContextData: MutableMap<String, String> =
             HashMap(eventLifecycleContextData)
 
@@ -1090,12 +1090,12 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                 stateName
         }
 
-        // add aid if we have it
+        // add aid if available
         analyticsProperties.aid?.let {
             analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_ANALYTICS_ID_KEY] = it
         }
 
-        // add visitor id if we have it
+        // add visitor id if available
         analyticsProperties.vid?.let {
             analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_VISITOR_ID_KEY] = it
         }
