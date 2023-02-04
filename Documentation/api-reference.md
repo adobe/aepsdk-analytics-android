@@ -321,7 +321,7 @@ Analytics.setVisitorIdentifier("vid_1");
 
 ##### Syntax
 ```kotlin
-fun setVisitorIdentifier(visitorID: String)
+fun setVisitorIdentifier(visitorID: String?)
 ```
 
 ##### Example
