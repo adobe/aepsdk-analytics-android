@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets
 
 /**
  * [AnalyticsProperties] class hosts the properties needed by [AnalyticsExtension] when processing events.
+ * @param dataStore the [NamedCollection] for persistently storing the Analytics properties.
  */
 internal class AnalyticsProperties(
     private val dataStore: NamedCollection
@@ -25,6 +26,11 @@ internal class AnalyticsProperties(
         val CHARSET: String = StandardCharsets.UTF_8.name()
     }
 
+    /**
+     * Resets these [AnalyticsProperties].
+     * Clears the AID and VID values, plus clears the most recent hit timestamp in memory and
+     * from the data store.
+     */
     fun reset() {
         mostRecentHitTimeStampInSeconds = 0L
         vid = null
@@ -32,6 +38,9 @@ internal class AnalyticsProperties(
         dataStore.remove(AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS)
     }
 
+    /**
+     * The Analytics Tracking Identifier
+     */
     internal var aid: String? = null
         get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.AID_KEY, null)
 
@@ -45,6 +54,9 @@ internal class AnalyticsProperties(
             field = aidValue
         }
 
+    /**
+     * The Analytics Visitor Identifier
+     */
     internal var vid: String? = null
         get() = dataStore.getString(AnalyticsConstants.DataStoreKeys.VISITOR_IDENTIFIER_KEY, null)
         internal set(vidValue) {
@@ -56,6 +68,11 @@ internal class AnalyticsProperties(
             field = vidValue
         }
 
+    /**
+     * The most recent hit timestamp which is the timestamp of the last processed track request.
+     * Used when calculating the timestamp for backdated hits.
+     * @return timestamp in seconds of the most recent hit or 0 if no timestamp was set
+     */
     internal var mostRecentHitTimeStampInSeconds: Long = 0L
         get() = dataStore.getLong(
             AnalyticsConstants.DataStoreKeys.MOST_RECENT_HIT_TIMESTAMP_SECONDS,
@@ -63,6 +80,13 @@ internal class AnalyticsProperties(
         )
         private set
 
+    /**
+     * Set the most recent hit timestamp which is the timestamp of the last processed track request.
+     * Sets the most recent hit timestamp only if the given [timestampInSeconds] is greater than
+     * the currently stored timestamp.
+     *
+     * @param timestampInSeconds timestamp to set
+     */
     internal fun setMostRecentHitTimeStamp(timestampInSeconds: Long) {
         if (mostRecentHitTimeStampInSeconds < timestampInSeconds) {
             dataStore.setLong(

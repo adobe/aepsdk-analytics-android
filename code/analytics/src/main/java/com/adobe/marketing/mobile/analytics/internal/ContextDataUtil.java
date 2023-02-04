@@ -56,10 +56,10 @@ class ContextDataUtil {
                 false, false, false, false, false, false, false, false, false, false, false, false,
                         false, false, false, false
             };
-    private static final Map<String, String> contextDataKeyWhiteList =
+    private static final Map<String, String> contextDataKeyAllowList =
             new HashMap<String, String>(256);
     private static final int MAX_LIMIT = 250;
-    private static int contextDataKeyWhiteListCount = 0;
+    private static int contextDataKeyAllowListCount = 0;
 
     private ContextDataUtil() {}
 
@@ -67,8 +67,8 @@ class ContextDataUtil {
      * Translates string based context data into a nested dictionary format for serializing to query
      * string. This method contains a recursive block.
      *
-     * @param data the data map that we want to process
-     * @return a new ContextData object containing the provided datas
+     * @param data the data map that to process
+     * @return a new ContextData object containing the provided data
      */
     public static ContextData translateContextData(final Map<String, String> data) {
         final ContextData tempContextData = new ContextData();
@@ -94,7 +94,7 @@ class ContextDataUtil {
     /**
      * Cleans all the keys in the map given as parameter; it will remove pairs that have a null key.
      *
-     * @param data The map that we want to process
+     * @param data The map that to process
      * @return a new cleaned-up map
      */
     public static Map<String, Object> cleanContextDataDictionary(final Map<String, String> data) {
@@ -121,7 +121,7 @@ class ContextDataUtil {
      * consecutively. V4 Note: this is one of the hottest functions in the library. this has been
      * optimized to create minimal memory footprint while avoiding re-cleaning "known-good" keys.
      *
-     * @param key that we want to process
+     * @param key context key to process
      * @return the sanitized key as described above or null if the key was null before or after
      *     processing it is invalid
      */
@@ -130,11 +130,11 @@ class ContextDataUtil {
             return null;
         }
 
-        // check to see if we've seen this key before
-        synchronized (contextDataKeyWhiteList) {
-            final String preCleanedKey = contextDataKeyWhiteList.get(key);
+        // check to see if this key was seen before
+        synchronized (contextDataKeyAllowList) {
+            final String preCleanedKey = contextDataKeyAllowList.get(key);
 
-            // we've seen and cleaned this key before, return it
+            // seen and cleaned this key before, return it
             if (preCleanedKey != null) {
                 return preCleanedKey;
             }
@@ -183,18 +183,18 @@ class ContextDataUtil {
         // create cleaned string
         cleanKey = new String(outPut, startIndex, totalLength, StandardCharsets.UTF_8);
 
-        // add the cleaned key to our whitelist
-        synchronized (contextDataKeyWhiteList) {
-            // check to see if we're nearing our whitelist limit
-            if (contextDataKeyWhiteListCount > MAX_LIMIT) {
-                // purge whitelist to avoid resizing hashmap or taking too much memory
-                contextDataKeyWhiteList.clear();
-                contextDataKeyWhiteListCount = 0;
+        // add the cleaned key to our allow list
+        synchronized (contextDataKeyAllowList) {
+            // check to see if nearing our allow list limit
+            if (contextDataKeyAllowListCount > MAX_LIMIT) {
+                // purge allow list to avoid resizing hashmap or taking too much memory
+                contextDataKeyAllowList.clear();
+                contextDataKeyAllowListCount = 0;
             }
 
             // add our item
-            contextDataKeyWhiteList.put(key, cleanKey);
-            contextDataKeyWhiteListCount++;
+            contextDataKeyAllowList.put(key, cleanKey);
+            contextDataKeyAllowListCount++;
         }
 
         return cleanKey;
@@ -204,12 +204,12 @@ class ContextDataUtil {
      * Serializes a map to key value pairs for url string. This method is recursive to handle the
      * nested data objects.
      *
-     * @param parameters the query parameters that we want to serialize
+     * @param parameters the query parameters to serialize
      * @param builder used for recoursivity
      */
     public static void serializeToQueryString(
             final Map<String, Object> parameters, final StringBuilder builder) {
-        // bail if we have nothing
+        // bail if nothing
         if (parameters == null) {
             return;
         }
@@ -250,7 +250,7 @@ class ContextDataUtil {
      * Creates a new String composed of the elements joined together separated by the given
      * delimiter
      *
-     * @param elements the list of elements that we want ot merge
+     * @param elements the list of elements to merge
      * @param delimiter the delimiter character
      * @return the string with the elements joined together
      */
@@ -276,7 +276,7 @@ class ContextDataUtil {
      * if that one exists and serialize it back to the initial format. Otherwise it returns the
      * initial url fragment
      *
-     * @param referrerData the map that we want to append to the initial url fragment
+     * @param referrerData the map to append to the initial url fragment
      * @param source the url fragment as string
      * @return the url fragment that has the given map merged inside the context data node
      */
@@ -384,8 +384,8 @@ class ContextDataUtil {
      * create a join string with the "," delimiter before encoding, otherwise it will use toString
      * method on other objects.
      *
-     * @param key the string value that we want to append to the builder
-     * @param value the object value that we want to encode and append to the builder
+     * @param key the string value to append to the builder
+     * @param value the object value to encode and append to the builder
      * @param builder it will contain the final result
      */
     private static void serializeKeyValuePair(
@@ -412,7 +412,7 @@ class ContextDataUtil {
     /**
      * Splits the context data string into key value pairs parameters and returns them as a map
      *
-     * @param contextDataString the context data url fragment that we want to deserialize
+     * @param contextDataString the context data url fragment to deserialize
      * @return context data as map
      */
     public static Map<String, String> deserializeContextDataKeyValuePairs(

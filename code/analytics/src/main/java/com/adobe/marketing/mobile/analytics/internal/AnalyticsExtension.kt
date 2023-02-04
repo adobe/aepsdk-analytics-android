@@ -26,11 +26,18 @@ import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.services.NamedCollection
 import com.adobe.marketing.mobile.services.ServiceProvider
 import com.adobe.marketing.mobile.util.DataReader
+import com.adobe.marketing.mobile.util.DataReaderException
 import com.adobe.marketing.mobile.util.SQLiteUtils
 import com.adobe.marketing.mobile.util.StringUtils
 import java.util.HashMap
 import java.util.concurrent.TimeUnit
 
+/**
+ * Class [AnalyticsExtension] is an implementation of [Extension] and is responsible
+ * for registering event listeners and processing events
+ * heard by those listeners. The extension is registered to the Mobile SDK by calling
+ * [MobileCore.registerExtensions].
+ */
 internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extensionApi) {
 
     companion object {
@@ -50,12 +57,12 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         ServiceProvider.getInstance().dataStoreService.getNamedCollection(AnalyticsConstants.DATASTORE_NAME)
     private val analyticsProperties = AnalyticsProperties(dataStore)
     private val analyticsState = AnalyticsState()
-
     private val analyticsDatabase =
         AnalyticsDatabase(AnalyticsHitProcessor(analyticsState, extensionApi), analyticsState)
     private val eventHandler = ExtensionEventListener { handleIncomingEvent(it) }
-    private var sdkBootUpCompleted = false
     private val analyticsTimer = AnalyticsTimer()
+
+    private var sdkBootUpCompleted = false
 
     override fun getName(): String {
         return AnalyticsConstants.EXTENSION_NAME
@@ -69,6 +76,23 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         return AnalyticsConstants.EXTENSION_VERSION
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The following listeners are registered during this extension's registration:
+     * <ul>
+     *     <li> EventType [EventType.RULES_ENGINE] and [EventSource EventSource.RESPONSE_CONTENT]</li>
+     *     <li> EventType [EventType.ANALYTICS] and [EventSource EventSource.REQUEST_CONTENT]</li>
+     *     <li> EventType [EventType.ANALYTICS] and [EventSource EventSource.REQUEST_IDENTITY]</li>
+     *     <li> EventType [EventType.CONFIGURATION] and [EventSource EventSource.RESPONSE_CONTENT]</li>
+     *     <li> EventType [EventType.GENERIC_LIFECYCLE] and [EventSource EventSource.REQUEST_CONTENT]</li>
+     *     <li> EventType [EventType.LIFECYCLE] and EventSource [EventSource.RESPONSE_CONTENT]</li>
+     *     <li> EventType [EventType.ACQUISITION] and EventSource [EventSource.RESPONSE_CONTENT]</li>
+     *     <li> EventType [EventType.GENERIC_TRACK] and EventSource [EventSource.REQUEST_CONTENT]</li>
+     *     <li> EventType [EventType.GENERIC_IDENTITY] and EventSource [EventSource.REQUEST_RESET]</li>
+     * </ul>
+     * </p>
+     */
     override fun onRegistered() {
         api.registerEventListener(
             EventType.RULES_ENGINE,
@@ -118,10 +142,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         deleteDeprecatedV5HitDatabase()
     }
 
-    private fun deleteDeprecatedV5HitDatabase() {
-        SQLiteUtils.deleteDBFromCacheDir(AnalyticsConstants.DEPRECATED_1X_HIT_DATABASE_FILENAME)
-    }
-
     override fun readyForEvent(event: Event): Boolean {
         val configurationStatus = api.getSharedState(
             AnalyticsConstants.EventDataKeys.Configuration.SHARED_STATE_NAME,
@@ -138,6 +158,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         return configurationStatus?.status == SharedStateStatus.SET && identityStatus?.status == SharedStateStatus.SET
     }
 
+    /**
+     * Generic handler for for all incoming events which routes each event to specific handlers.
+     *
+     * @param event the received event
+     */
     @VisibleForTesting
     internal fun handleIncomingEvent(event: Event) {
         when (event.type) {
@@ -175,6 +200,16 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
     }
 
+    /**
+     * Handler for Identity Request Reset events.
+     * Clears the identities held by this extension and shares a new state with the cleared properties.
+     *
+     * @param event the identity request reset event
+     *
+     * @see AnalyticsProperties.reset
+     * @see AnalyticsState.resetIdentities
+     * @see AnalyticsDatabase.reset
+     */
     private fun handleResetIdentitiesEvent(event: Event) {
         if (event.type != EventType.GENERIC_IDENTITY || event.source != EventSource.REQUEST_RESET) {
             Log.debug(
@@ -196,6 +231,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         api.createSharedState(getSharedState(), event)
     }
 
+    /**
+     * Handler for Generic Track Request Content events, dispatched by the public APIs.
+     *
+     * @param event the generic track request content event
+     */
     private fun handleGenericTrackEvent(event: Event) {
         if (event.type != EventType.GENERIC_TRACK || event.source != EventSource.REQUEST_CONTENT) {
             Log.debug(
@@ -213,6 +253,13 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         handleTrackRequest(event, eventData)
     }
 
+    /**
+     * Handler for Rules Engine Response Content events.
+     * Handles track consequences of type Analytics ("an") dispatched from the Rules Engine. All other
+     * Rules Engine events are ignored.
+     *
+     * @param event the rules engine response content event
+     */
     private fun handleRuleEngineResponse(event: Event) {
         val eventData = event.eventData ?: run {
             Log.trace(
@@ -299,6 +346,15 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         handleTrackRequest(event, consequenceDetail)
     }
 
+    /**
+     * Handler for Configuration Response Content events.
+     * Updates the [AnalyticsState] with the latest configuration.
+     * Handles privacy status changes by clearing identifiers if privacy is opted out, or kicks
+     * the database to resume processing if privacy is opted in.
+     * When called for the first time, finishes boot sequence by creating the initial shared state.
+     *
+     * @param event the configuration response content event
+     */
     private fun handleConfigurationResponseEvent(event: Event) {
         updateAnalyticsState(event, ANALYTICS_HARD_DEPENDENCIES + ANALYTICS_SOFT_DEPENDENCIES)
         if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_OUT) {
@@ -317,6 +373,12 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
     }
 
+    /**
+     * Handler for Lifecycle Response Content events.
+     * Handles response data from the Lifecycle extension by processing a track request.
+     *
+     * @param event the lifecycle response content event
+     */
     private fun handleLifecycleEvents(event: Event) {
         if (event.type != EventType.LIFECYCLE || event.source != EventSource.RESPONSE_CONTENT) {
             return
@@ -325,6 +387,14 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         trackLifecycle(event)
     }
 
+    /**
+     * Handler from Generic Lifecycle Request Content events.
+     * Handles public API events which request either a start or pause of Lifecycle activity. On
+     * start requests, start a timer to wait for the Lifecycle response data. On pause requests,
+     * stop the lifecycle timer if running.
+     *
+     * @param event the generic lifecycle request content event
+     */
     private fun handleGenericLifecycleEvents(event: Event) {
         if (event.type != EventType.GENERIC_LIFECYCLE || event.source != EventSource.REQUEST_CONTENT) {
             return
@@ -350,6 +420,9 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
     }
 
+    /**
+     * Start a timer to wait for lifecycle data after receiving a generic lifecycle request.
+     */
     private fun waitForLifecycleData() {
         Log.debug(
             AnalyticsConstants.LOG_TAG,
@@ -367,6 +440,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
     }
 
+    /**
+     * Handler for Acquisition Response Content events.
+     *
+     * @param event the acquisition response content event
+     */
     private fun handleAcquisitionEvent(event: Event) {
         if (event.type != EventType.ACQUISITION || event.source != EventSource.RESPONSE_CONTENT) {
             return
@@ -375,23 +453,48 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         trackAcquisitionData(event)
     }
 
+    /**
+     * Handler for Analytics Request Identity events.
+     * Handles public API requests to set the visitor identifier. If privacy is opted out, the
+     * request is ignored.
+     *
+     * @param event the analytics request identity event
+     */
     private fun handleAnalyticsRequestIdentityEvent(event: Event) {
-        val vid =
-            event.eventData?.get(AnalyticsConstants.EventDataKeys.Analytics.VISITOR_IDENTIFIER) as String?
-        vid?.let {
-            if (analyticsState.privacyStatus != MobilePrivacyStatus.OPT_OUT) {
-                analyticsProperties.vid = vid
-            } else {
-                Log.warning(
+        if (event.eventData?.containsKey(AnalyticsConstants.EventDataKeys.Analytics.VISITOR_IDENTIFIER) == true) {
+            if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_OUT) {
+                Log.debug(
                     AnalyticsConstants.LOG_TAG,
                     CLASS_NAME,
                     "handleAnalyticsRequestIdentityEvent - Privacy is opted out, ignoring the update visitor identifier request."
                 )
+                return
+            }
+
+            try {
+                analyticsProperties.vid = DataReader.getString(
+                    event.eventData,
+                    AnalyticsConstants.EventDataKeys.Analytics.VISITOR_IDENTIFIER
+                )
+            } catch (ex: DataReaderException) {
+                Log.debug(
+                    AnalyticsConstants.LOG_TAG,
+                    CLASS_NAME,
+                    "handleAnalyticsRequestIdentityEvent - Failed to parse the visitor identifier to string, ignoring the update visitor identifier request."
+                )
             }
         }
+
         publishAnalyticsId(event)
     }
 
+    /**
+     * Handler for Analytics Request Content events.
+     * The Analytics Request Content event can contain a clearQueue, getQueueSize, sendQueuedHits, or internal track event.
+     * If it is an internal track event, an internal track request will be queued containing the event's context data and action name.
+     *
+     * @param event the analytics request content event
+     */
     private fun handleAnalyticsRequestContentEvent(event: Event) {
         val eventData = event.eventData
         if (eventData?.isNotEmpty() != true) {
@@ -437,12 +540,27 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
     }
 
+    /**
+     * Determines if [eventData] contains flags signaling the data is either for a track state
+     * or track action request.
+     *
+     * @param eventData the tracking event data map
+     * @return true if the {@code eventData} is for a track state or track action request.
+     */
     private fun isTrackActionOrTrackStateEvent(eventData: Map<String, Any?>): Boolean {
         return eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.TRACK_STATE) ||
             eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION) ||
             eventData.containsKey(AnalyticsConstants.EventDataKeys.Analytics.CONTEXT_DATA)
     }
 
+    /**
+     * Processes Acquisition track events.
+     * If waiting for the acquisition data, then try to append it to a existing hit.
+     * Otherwise, send a new hit for acquisition data, and cancel the acquisition timer to
+     * mark that the acquisition data has been received and processed.
+     *
+     * @param event the Acquisition event
+     */
     private fun trackAcquisitionData(event: Event) {
         val acquisitionContextData: Map<String, String> = DataReader.optTypedMap(
             String::class.java,
@@ -488,6 +606,16 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
     }
 
+    /**
+     * Processes Lifecycle track events.
+     * Converts the lifecycle event in internal analytics action. If backdate session and offline
+     * tracking are enabled, and previous session length is present in the contextData map,
+     * send a separate hit with the previous session information and the rest of the keys as a
+     * Lifecycle action hit. If ignored session is present, it will be sent as part of the
+     * Lifecycle hit and no SessionInfo hit will be sent.
+     *
+     * @param event the Lifecycle event
+     */
     private fun trackLifecycle(event: Event) {
         val eventLifecycleContextData: Map<String, String?> = DataReader.optTypedMap(
             String::class.java,
@@ -503,7 +631,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             return@trackLifecycle
         }
 
-        // copy the event's data so we don't accidentally overwrite it for someone else consuming this event
+        // copy the event's data so it is not accidentally overwritten for other processors consuming this event
         val tempLifecycleContextData: MutableMap<String, String> =
             HashMap(eventLifecycleContextData)
 
@@ -609,6 +737,15 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
     }
 
+    /**
+     * Creates an internal analytics event with the previous lifecycle session info.
+     *
+     * @param previousSessionLength the length of the previous session
+     * @param previousSessionPauseTimestamp the timestamp when the previous session was paused
+     * @param previousOSVersion the OS version of the previous session
+     * @param previousAppIdVersion the application identifier of the previous session
+     * @param eventUniqueIdentifier the event identifier of the Lifecycle session event
+     */
     private fun backdateLifecycleSessionInfo(
         previousSessionLength: String?,
         previousSessionPauseTimestamp: Long?,
@@ -643,6 +780,13 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         track(lifecycleSessionData, backdateTimestamp + 1, true, eventUniqueIdentifier)
     }
 
+    /**
+     * Creates an internal analytics event with the previous lifecycle unknown close session info.
+     *
+     * @param previousOSVersion the OS version of the previous session
+     * @param previousAppIdVersion the application identifier of the previous session
+     * @param eventUniqueIdentifier the event identifier of the Lifecycle session event
+     */
     private fun backdateLifecycleCrash(
         previousOSVersion: String?,
         previousAppIdVersion: String?,
@@ -674,6 +818,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
     }
 
+    /**
+     * Start a timer to wait for acquisition data after receiving a lifecycle launch request.
+     *
+     * @param timeout time in milliseconds to wait for acquisition data
+     */
     private fun waitForAcquisitionData(timeout: Long) {
         Log.debug(
             AnalyticsConstants.LOG_TAG,
@@ -691,6 +840,12 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         }
     }
 
+    /**
+     * Process privacy opt-out by clearing stored identifiers and database hits. Creates shared
+     * state after clearing identifiers.
+     *
+     * @param event the privacy change triggering event
+     */
     private fun handleOptOut(event: Event) {
         Log.debug(
             AnalyticsConstants.LOG_TAG,
@@ -702,6 +857,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         api.createSharedState(getSharedState(), event)
     }
 
+    /**
+     * Compiles data to use when creating a shared state.
+     *
+     * @returns map containing state data
+     */
     private fun getSharedState(): Map<String, Any?> {
         val data = mutableMapOf<String, Any?>()
         analyticsProperties.aid?.let { aid ->
@@ -719,17 +879,54 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         return data
     }
 
+    /**
+     * Creates shared state with current identifiers and dispatches an analytics response identity
+     * event with current identifiers.
+     *
+     * @param event the event which triggered the analytics identity request
+     */
     private fun publishAnalyticsId(event: Event) {
         val data = getSharedState()
         api.createSharedState(data, event)
-        val responseEvent = Event.Builder(
+
+        // dispatch paired response event, usually used for getters
+        val pairedResponseEvent = Event.Builder(
             "TrackingIdentifierValue",
             EventType.ANALYTICS,
             EventSource.RESPONSE_IDENTITY
         ).setEventData(data).inResponseToEvent(event).build()
+        api.dispatch(pairedResponseEvent)
+        Log.trace(
+            AnalyticsConstants.LOG_TAG,
+            CLASS_NAME,
+            "Dispatching Analytics paired response identity event with eventdata: %s.",
+            data
+        )
+
+        // dispatch regular response event, usually listened by other extensions
+        val responseEvent = Event.Builder(
+            "TrackingIdentifierValue",
+            EventType.ANALYTICS,
+            EventSource.RESPONSE_IDENTITY
+        ).setEventData(data).build()
         api.dispatch(responseEvent)
+        Log.trace(
+            AnalyticsConstants.LOG_TAG,
+            CLASS_NAME,
+            "Dispatching Analytics unpaired response identity event with eventdata: %s.",
+            data
+        )
     }
 
+    /**
+     * Updates this instance of [AnalyticsState] with the shared state data for the extensions
+     * listed in [dependencies] at the version of the given {@code event}.
+     *
+     * @param event the triggering event
+     * @param dependencies list of extension names to retrieve state data
+     *
+     * @see AnalyticsState.update
+     */
     private fun updateAnalyticsState(event: Event, dependencies: List<String>) {
         val map = dependencies.associateWith { extensionName ->
             api.getSharedState(extensionName, event, true, SharedStateResolution.ANY)?.value
@@ -737,19 +934,31 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         analyticsState.update(map)
     }
 
+    /**
+     * Processes track requests by calling [track] if the given [data] contains
+     * track action or track state data.
+     *
+     * @param event event which observed the tracking request
+     * @param data analytics tracking data
+     */
     private fun handleTrackRequest(event: Event, data: Map<String, Any?>) {
         if (data.isEmpty()) {
-            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "track - event data is null or empty.")
+            Log.debug(AnalyticsConstants.LOG_TAG, CLASS_NAME, "handleTrackRequest - event data is null or empty.")
             return
         }
-        if (data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_ACTION) ||
-            data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.TRACK_STATE) ||
-            data.keys.contains(AnalyticsConstants.EventDataKeys.Analytics.CONTEXT_DATA)
-        ) {
+        if (isTrackActionOrTrackStateEvent(data)) {
             track(data, event.timestampInSeconds, false, event.uniqueIdentifier)
         }
     }
 
+    /**
+     * Track analytics requests.
+     *
+     * @param eventData map containing tracking data
+     * @param timeStampInSeconds timestamp, in seconds, of tracking event
+     * @param isBackdatedHit indicates whether the data corresponds to a backdated session
+     * @param eventUniqueIdentifier the identifier of the tracking event
+     */
     private fun track(
         eventData: Map<String, Any?>,
         timeStampInSeconds: Long,
@@ -789,11 +998,11 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
     }
 
     /**
-     * Creates the context data map from the `EventData` object and the current `AnalyticsState`.
+     * Creates the context data map from the [EventData] object and the current [AnalyticsState].
      *
      * @param state          [AnalyticsState] object representing the shared state of other dependent extensions
      * @param trackEventData [Map] object containing tracking data
-     * @return `Map<String, String>` contains the context data
+     * @return [Map<String, String>] contains the context data
      */
     private fun processAnalyticsContextData(
         timeStampInSeconds: Long,
@@ -854,12 +1063,12 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
     }
 
     /**
-     * Creates the vars map from the `EventData` object and the current `AnalyticsState`.
+     * Creates the vars map from the [EventData] object and the current [AnalyticsState].
      *
      * @param state     [AnalyticsState] object representing the shared state of other dependent extensions
      * @param trackData [Map] object containing tracking data
-     * @param timestamp the `long` value timestamp to use for tracking
-     * @return `Map<String, String>` contains the vars data
+     * @param timestamp the value timestamp to use for tracking
+     * @return [Map<String, String>] contains the vars data
      */
     private fun processAnalyticsVars(
         trackData: Map<String, Any?>,
@@ -903,12 +1112,12 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                 stateName
         }
 
-        // add aid if we have it
+        // add aid if available
         analyticsProperties.aid?.let {
             analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_ANALYTICS_ID_KEY] = it
         }
 
-        // add visitor id if we have it
+        // add visitor id if available
         analyticsProperties.vid?.let {
             analyticsVars[AnalyticsConstants.ANALYTICS_REQUEST_VISITOR_ID_KEY] = it
         }
@@ -946,6 +1155,16 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         return analyticsVars
     }
 
+    /**
+     * Deletes the Analytics version 1.x database files.
+     */
+    private fun deleteDeprecatedV5HitDatabase() {
+        SQLiteUtils.deleteDBFromCacheDir(AnalyticsConstants.DEPRECATED_1X_HIT_DATABASE_FILENAME)
+    }
+
+    /**
+     * Remove entries with values which cannot be converted to [String].
+     */
     private fun cleanContextData(eventData: Map<String, Any?>): Map<String, String> {
         return eventData.filterValues { it is String }.mapValues { it.value as String }
     }

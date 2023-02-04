@@ -19,6 +19,13 @@ internal object AnalyticsVersionProvider {
     private const val FALLBACK_VERSION = "unknown"
     private const val OPERATING_SYSTEM = "AND"
 
+    /**
+     * Builds a version string for use in Analytics network calls.
+     * The version string includes the [MobileCore] and [Analytics] versions,
+     * plus an operating system and wrapper type identifier.
+     *
+     * @return a version string for use in network calls
+     */
     internal fun buildVersionString(
         coreExtensionVersion: String = MobileCore.extensionVersion(),
         analyticsExtensionVersion: String = Analytics.extensionVersion()
@@ -32,6 +39,13 @@ internal object AnalyticsVersionProvider {
         }
     }
 
+    /**
+     * Get the Analytics version string for use in network calls.
+     *
+     * @param mobileCoreVersion the MobileCore version
+     * @param analyticsVersion the Analytics extension version
+     * @return a version string for use in network calls
+     */
     private fun getVersionString(mobileCoreVersion: String, analyticsVersion: String): String {
         var coreVersion = mobileCoreVersion
         var wrapperType = "N"
@@ -47,6 +61,13 @@ internal object AnalyticsVersionProvider {
         return OPERATING_SYSTEM + wrapperType + analyticsFormattedVersion + mobileCoreFormattedVersion
     }
 
+    /**
+     * Creates a zero padded representation from the provided extension version.
+     * For example, a version string of "2.0.12" is returned as "020012".
+     *
+     * @param versionString the version string to pad with zeros
+     * @return a [String] containing a zero padded representation of the provided version.
+     */
     private fun getFormattedVersion(versionString: String): String {
         var formattedVersionString = "000000"
         val versionInfo = versionString.split(".").toTypedArray()

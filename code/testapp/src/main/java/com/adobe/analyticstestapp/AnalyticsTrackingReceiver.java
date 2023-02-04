@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
 import com.adobe.marketing.mobile.Analytics;
@@ -55,16 +54,6 @@ public class AnalyticsTrackingReceiver extends BroadcastReceiver {
 				Log.e("AEPSDKInitError", adobeError.getErrorName());
 			}
 		});
-
-//		try {
-//			Analytics.registerExtension();
-//			Identity.registerExtension();
-//			Lifecycle.registerExtension();
-//			Assurance.registerExtension();
-//		} catch (Exception e) {
-//			Log.e("AEPSDKInitError", e.getLocalizedMessage());
-//		}
-//		MobileCore.start(o -> MobileCore.configureWithAppID(AnalyticsTestApp.APP_ID));
 
 		// Send Analytics ping
 		MobileCore.trackAction("ActionTriggeredByAlarm", null);
