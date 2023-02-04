@@ -722,12 +722,34 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
     private fun publishAnalyticsId(event: Event) {
         val data = getSharedState()
         api.createSharedState(data, event)
-        val responseEvent = Event.Builder(
+
+        // dispatch paired response event, usually used for getters
+        val pairedResponseEvent = Event.Builder(
             "TrackingIdentifierValue",
             EventType.ANALYTICS,
             EventSource.RESPONSE_IDENTITY
         ).setEventData(data).inResponseToEvent(event).build()
+        api.dispatch(pairedResponseEvent)
+        Log.trace(
+            AnalyticsConstants.LOG_TAG,
+            CLASS_NAME,
+            "Dispatching Analytics paired response identity event with eventdata: %s.",
+            data
+        )
+
+        // dispatch regular response event, usually listened by other extensions
+        val responseEvent = Event.Builder(
+            "TrackingIdentifierValue",
+            EventType.ANALYTICS,
+            EventSource.RESPONSE_IDENTITY
+        ).setEventData(data).build()
         api.dispatch(responseEvent)
+        Log.trace(
+            AnalyticsConstants.LOG_TAG,
+            CLASS_NAME,
+            "Dispatching Analytics unpaired response identity event with eventdata: %s.",
+            data
+        )
     }
 
     private fun updateAnalyticsState(event: Event, dependencies: List<String>) {
