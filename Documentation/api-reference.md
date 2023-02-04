@@ -303,11 +303,13 @@ Before using this API, see [Identify unique visitors](https://experienceleague.a
 
 Sets a custom Analytics visitor identifier. For more information, see [Custom Visitor ID](https://experienceleague.adobe.com/docs/analytics/implementation/vars/config-vars/visitorid.html).
 
+Setting `null` or an empty string clears the current visitor identifier.
+
 #### Java
 
 ##### Syntax
 ```java
-public static void setVisitorIdentifier(@NonNull final String visitorID)
+public static void setVisitorIdentifier(@Nullable final String visitorID)
 ```
 
 ##### Example
