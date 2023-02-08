@@ -14,6 +14,7 @@ package com.adobe.marketing.mobile.analytics.function.test
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
+import com.adobe.marketing.mobile.MobilePrivacyStatus
 import com.adobe.marketing.mobile.analytics.internal.TimeZoneHelper
 import com.adobe.marketing.mobile.analytics.internal.extractContextDataFrom
 import com.adobe.marketing.mobile.analytics.internal.extractQueryParamsFrom
@@ -44,16 +45,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             mapOf(
                 "mid" to "mid",
                 "blob" to "blob",
@@ -138,16 +130,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 countDownLatch.countDown()
             }
         }
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedin",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_IN)
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
             configuration,
             mapOf(
@@ -225,16 +208,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 data?.let { analyticsSharedState = it }
                 countDownLatch.countDown()
             }
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedout",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_OUT)
 
         val configurationResponseEvent = Event.Builder(
             "configuration event",
@@ -299,16 +273,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             mapOf(
                 "mid" to "mid",
                 "blob" to "blob",
@@ -348,16 +313,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 data?.let { analyticsSharedState = it }
                 countDownLatch.countDown()
             }
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedout",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_OUT)
 
         val configurationResponseEvent = Event.Builder(
             "configuration event",
@@ -450,16 +406,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 countDownLatch.countDown()
             }
 
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedin",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_IN)
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
             configuration,
             mapOf(
@@ -478,16 +425,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
         analyticsExtension.handleIncomingEvent(configurationResponseEvent)
         updateMockedSharedState(
             "com.adobe.module.configuration",
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedout",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            )
+            config(MobilePrivacyStatus.OPT_OUT)
         )
         analyticsExtension.handleIncomingEvent(
             Event.Builder(
@@ -569,16 +507,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 countDownLatch.countDown()
             }
 
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedin",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_IN)
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
             configuration,
             mapOf(
@@ -612,5 +541,18 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             analyticsSharedState1
         )
         assertTrue(analyticsSharedState2.isEmpty())
+    }
+
+    private fun config(privacyStatus: MobilePrivacyStatus): Map<String, Any> {
+        return mapOf(
+            "analytics.server" to "test.com",
+            "analytics.rsids" to "rsid",
+            "global.privacy" to privacyStatus.value,
+            "experienceCloud.org" to "orgid",
+            "analytics.batchLimit" to 0,
+            "analytics.offlineEnabled" to true,
+            "analytics.backdatePreviousSessionInfo" to true,
+            "analytics.launchHitDelay" to 1
+        )
     }
 }
