@@ -23,6 +23,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import java.net.URLDecoder
@@ -346,6 +348,29 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
     }
 
     @Test(timeout = 10000)
+    fun `vid and aid should not be shared again on config update with privacy optin`() {
+        val configuration = config(MobilePrivacyStatus.OPT_IN)
+        val analyticsExtension = initializeAnalyticsExtensionWithPreset(
+            configuration,
+            mapOf(
+                "mid" to "mid",
+                "blob" to "blob",
+                "locationhint" to "lochint"
+            )
+        )
+
+        val configurationResponseEvent = Event.Builder(
+            "first configuration event",
+            EventType.CONFIGURATION,
+            EventSource.RESPONSE_CONTENT
+        ).setEventData(configuration).build()
+
+        analyticsExtension.handleIncomingEvent(configurationResponseEvent)
+
+        verify(mockedExtensionApi, never()).createSharedState(any(), any())
+    }
+
+    @Test(timeout = 10000)
     fun `vid and aid should be cleared after optedout`() {
         var setAid: String? = "testaid"
         var setVid: String? = "testvid"
@@ -389,19 +414,14 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 }
             }
 
-        val countDownLatch = CountDownLatch(2)
+        val countDownLatch = CountDownLatch(1)
         var analyticsSharedState1: Map<String, Any> = emptyMap()
-        var analyticsSharedState2: Map<String, Any> = emptyMap()
 
         Mockito.`when`(mockedExtensionApi.createSharedState(any(), anyOrNull()))
             .then { invocation ->
                 val data = invocation.arguments[0] as? Map<String, Any>
                 data?.let {
-                    if (analyticsSharedState1.isEmpty()) {
-                        analyticsSharedState1 = it
-                    } else {
-                        analyticsSharedState2 = it
-                    }
+                    analyticsSharedState1 = it
                 }
                 countDownLatch.countDown()
             }
@@ -422,6 +442,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             EventSource.RESPONSE_CONTENT
         ).setEventData(configuration).build()
 
+        // test
         analyticsExtension.handleIncomingEvent(configurationResponseEvent)
         updateMockedSharedState(
             "com.adobe.module.configuration",
@@ -436,14 +457,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
         )
 
         countDownLatch.await()
-        assertEquals(
-            mapOf(
-                "aid" to "testaid",
-                "vid" to "testvid"
-            ),
-            analyticsSharedState1
-        )
-        assertTrue(analyticsSharedState2.isEmpty())
+        assertTrue(analyticsSharedState1.isEmpty())
     }
 
     @Test(timeout = 10000)
