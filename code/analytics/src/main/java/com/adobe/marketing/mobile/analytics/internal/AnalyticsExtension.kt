@@ -38,8 +38,29 @@ import java.util.concurrent.TimeUnit
  * heard by those listeners. The extension is registered to the Mobile SDK by calling
  * [MobileCore.registerExtensions].
  */
-internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extensionApi) {
+internal class AnalyticsExtension : Extension {
+    private val analyticsDatabase: AnalyticsDatabase
+    private val analyticsProperties: AnalyticsProperties
+    private val analyticsState: AnalyticsState = AnalyticsState()
+    private val dataStore: NamedCollection = ServiceProvider.getInstance().dataStoreService.getNamedCollection(AnalyticsConstants.DATASTORE_NAME)
 
+    private val eventHandler = ExtensionEventListener { handleIncomingEvent(it) }
+    private val analyticsTimer = AnalyticsTimer()
+
+    constructor(extensionApi: ExtensionApi) : this(extensionApi, null)
+
+    @VisibleForTesting
+    internal constructor(
+        extensionApi: ExtensionApi,
+        database: AnalyticsDatabase?
+    ) : super(extensionApi) {
+        analyticsProperties = AnalyticsProperties(dataStore)
+        analyticsDatabase = database
+            ?: AnalyticsDatabase(
+                AnalyticsHitProcessor(analyticsState, extensionApi),
+                analyticsState
+            )
+    }
     companion object {
         private const val CLASS_NAME = "AnalyticsExtension"
         private val ANALYTICS_HARD_DEPENDENCIES = listOf(
@@ -52,17 +73,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             AnalyticsConstants.EventDataKeys.Places.SHARED_STATE_NAME
         )
     }
-
-    private val dataStore: NamedCollection =
-        ServiceProvider.getInstance().dataStoreService.getNamedCollection(AnalyticsConstants.DATASTORE_NAME)
-    private val analyticsProperties = AnalyticsProperties(dataStore)
-    private val analyticsState = AnalyticsState()
-    private val analyticsDatabase =
-        AnalyticsDatabase(AnalyticsHitProcessor(analyticsState, extensionApi), analyticsState)
-    private val eventHandler = ExtensionEventListener { handleIncomingEvent(it) }
-    private val analyticsTimer = AnalyticsTimer()
-
-    private var sdkBootUpCompleted = false
 
     override fun getName(): String {
         return AnalyticsConstants.EXTENSION_NAME
@@ -140,6 +150,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             eventHandler
         )
         deleteDeprecatedV5HitDatabase()
+        boot()
     }
 
     override fun readyForEvent(event: Event): Boolean {
@@ -361,15 +372,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             handleOptOut(event)
         } else if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_IN) {
             analyticsDatabase.kick(false)
-        }
-        if (!sdkBootUpCompleted) {
-            Log.trace(
-                AnalyticsConstants.LOG_TAG,
-                CLASS_NAME,
-                "handleConfigurationResponseEvent - Publish analytics shared state on bootup."
-            )
-            sdkBootUpCompleted = true
-            publishAnalyticsId(event)
         }
     }
 
@@ -1160,6 +1162,19 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
      */
     private fun deleteDeprecatedV5HitDatabase() {
         SQLiteUtils.deleteDBFromCacheDir(AnalyticsConstants.DEPRECATED_1X_HIT_DATABASE_FILENAME)
+    }
+
+    /**
+     * Boots up the extension - shares initial shared state with previously stored data
+     */
+    private fun boot() {
+        val data = getSharedState()
+        api.createSharedState(data, null)
+        Log.trace(
+            AnalyticsConstants.LOG_TAG,
+            CLASS_NAME,
+            "Analytics boot-up complete, published initial shared state."
+        )
     }
 
     /**
