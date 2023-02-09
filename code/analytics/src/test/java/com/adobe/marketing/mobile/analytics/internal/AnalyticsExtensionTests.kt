@@ -80,13 +80,23 @@ class AnalyticsExtensionTests {
     }
 
     @Test
-    fun `onRegistered() should call createSharedState for version 0`() {
+    fun `onRegistered() when aid, vid should createSharedState with ids for version 0`() {
         `when`(mockNamedCollection.getString(any(), any())).thenReturn("test")
         ExtensionHelper.notifyRegistered(analytics)
 
         val expectedData = mutableMapOf<String, Any>()
         expectedData["aid"] = "test"
         expectedData["vid"] = "test"
+
+        verify(mockApi).createSharedState(eq(expectedData), eq(null))
+    }
+
+    @Test
+    fun `onRegistered() when no aid, vid should createSharedState with empty data for version 0`() {
+        `when`(mockNamedCollection.getString(any(), any())).thenReturn(null)
+        ExtensionHelper.notifyRegistered(analytics)
+
+        val expectedData = emptyMap<String, Any>()
 
         verify(mockApi).createSharedState(eq(expectedData), eq(null))
     }
