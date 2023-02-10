@@ -239,7 +239,7 @@ internal class AnalyticsExtension : Extension {
         analyticsProperties.reset()
         analyticsState.resetIdentities()
         analyticsState.lastResetIdentitiesTimestampSec = event.timestampInSeconds
-        api.createSharedState(getSharedState(), event)
+        api.createSharedState(getAnalyticsIds(), event)
     }
 
     /**
@@ -456,14 +456,19 @@ internal class AnalyticsExtension : Extension {
     }
 
     /**
-     * Handler for Analytics Request Identity events.
-     * Handles public API requests to set the visitor identifier. If privacy is opted out, the
-     * request is ignored.
+     * Handles Analytics Request Identity events for the following use-cases:
+     * <ul>
+     *     <li> VID updates - updates value in persistence and shares updated information. If privacy is opted out, the
+     * request is ignored. </li>
+     *     <li> Identity requests - shares current identity information. </li>
+     * </ul>
      *
      * @param event the analytics request identity event
      */
     private fun handleAnalyticsRequestIdentityEvent(event: Event) {
         if (event.eventData?.containsKey(AnalyticsConstants.EventDataKeys.Analytics.VISITOR_IDENTIFIER) == true) {
+            // update VID request
+
             if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_OUT) {
                 Log.debug(
                     AnalyticsConstants.LOG_TAG,
@@ -484,10 +489,16 @@ internal class AnalyticsExtension : Extension {
                     CLASS_NAME,
                     "handleAnalyticsRequestIdentityEvent - Failed to parse the visitor identifier to string, ignoring the update visitor identifier request."
                 )
+                return
             }
-        }
 
-        publishAnalyticsId(event)
+            val data = getAnalyticsIds()
+            api.createSharedState(data, event)
+            dispatchAnalyticsResponseIdentity(data, event)
+        } else {
+            // get AID/VID request
+            dispatchAnalyticsResponseIdentity(getAnalyticsIds(), event)
+        }
     }
 
     /**
@@ -856,15 +867,15 @@ internal class AnalyticsExtension : Extension {
         )
         analyticsDatabase.reset()
         analyticsProperties.reset()
-        api.createSharedState(getSharedState(), event)
+        api.createSharedState(getAnalyticsIds(), event)
     }
 
     /**
-     * Compiles data to use when creating a shared state.
+     * Compiles a map of internal Analytics ids to use when creating a shared state or dispatching events.
      *
-     * @returns map containing state data
+     * @returns map containing current state data
      */
-    private fun getSharedState(): Map<String, Any?> {
+    private fun getAnalyticsIds(): Map<String, Any?> {
         val data = mutableMapOf<String, Any?>()
         analyticsProperties.aid?.let { aid ->
             data.put(
@@ -882,15 +893,12 @@ internal class AnalyticsExtension : Extension {
     }
 
     /**
-     * Creates shared state with current identifiers and dispatches an analytics response identity
-     * event with current identifiers.
+     * Dispatches an analytics response identity event with provided data.
      *
+     * @param data current data to be dispatched
      * @param event the event which triggered the analytics identity request
      */
-    private fun publishAnalyticsId(event: Event) {
-        val data = getSharedState()
-        api.createSharedState(data, event)
-
+    private fun dispatchAnalyticsResponseIdentity(data: Map<String, Any?>, event: Event) {
         // dispatch paired response event, usually used for getters
         val pairedResponseEvent = Event.Builder(
             "TrackingIdentifierValue",
@@ -1168,7 +1176,7 @@ internal class AnalyticsExtension : Extension {
      * Boots up the extension - shares initial shared state with previously stored data
      */
     private fun boot() {
-        val data = getSharedState()
+        val data = getAnalyticsIds()
         api.createSharedState(data, null)
         Log.trace(
             AnalyticsConstants.LOG_TAG,
