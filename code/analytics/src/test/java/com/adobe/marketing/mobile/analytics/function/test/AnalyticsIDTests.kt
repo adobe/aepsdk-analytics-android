@@ -14,14 +14,17 @@ package com.adobe.marketing.mobile.analytics.function.test
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
+import com.adobe.marketing.mobile.MobilePrivacyStatus
+import com.adobe.marketing.mobile.analytics.internal.AnalyticsHit
 import com.adobe.marketing.mobile.analytics.internal.TimeZoneHelper
 import com.adobe.marketing.mobile.analytics.internal.extractContextDataFrom
 import com.adobe.marketing.mobile.analytics.internal.extractQueryParamsFrom
-import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import java.net.URLDecoder
@@ -30,30 +33,9 @@ import java.util.concurrent.CountDownLatch
 internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
     @Test(timeout = 10000)
-    fun `hit contains vid vars`() {
-        val countDownLatch = CountDownLatch(1)
-        var varMap: Map<String, Any> = emptyMap()
-        var contextDataMap: Map<String, Any> = emptyMap()
-        monitorNetwork { request ->
-            if (request.url.startsWith("https://test.com/b/ss/rsid/0/")) {
-                val body = URLDecoder.decode(String(request.body), "UTF-8")
-                varMap = extractQueryParamsFrom(body)
-                contextDataMap = extractContextDataFrom(body)
-                countDownLatch.countDown()
-            }
-        }
-
+    fun `handleGenericTrackEvent - hit contains vid vars`() {
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             mapOf(
                 "mid" to "mid",
                 "blob" to "blob",
@@ -77,7 +59,13 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
-        countDownLatch.await()
+        assertEquals(1, mockedMainDataQueue.count())
+
+        val hit = AnalyticsHit.from(mockedMainDataQueue.peek())
+        val body = URLDecoder.decode(hit.payload, "UTF-8")
+        val varMap: Map<String, Any> = extractQueryParamsFrom(body)
+        val contextDataMap: Map<String, Any> = extractContextDataFrom(body)
+
         val expectedVars: Map<String, String> = mapOf(
             "ndh" to "1",
             "ce" to "UTF-8",
@@ -96,13 +84,13 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             "k2" to "v2",
             "a.action" to "testActionName"
         )
-        Assert.assertTrue(expectedContextData == contextDataMap)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Test(timeout = 10000)
-    fun `hit contains vid and aid`() {
+    fun `handleGenericTrackEvent - hit contains vid and aid`() {
         Mockito.`when`(mockedNameCollection.getString(any(), anyOrNull()))
             .thenAnswer { invocation ->
                 when (invocation.arguments[0] as? String) {
@@ -118,36 +106,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 }
             }
 
-        val countDownLatch = CountDownLatch(2)
-        var analyticsSharedState: Map<String, Any> = emptyMap()
-
-        Mockito.`when`(mockedExtensionApi.createSharedState(any(), anyOrNull()))
-            .then { invocation ->
-                val data = invocation.arguments[0] as? Map<String, Any>
-                data?.let { analyticsSharedState = it }
-                countDownLatch.countDown()
-            }
-
-        var varMap: Map<String, Any> = emptyMap()
-        var contextDataMap: Map<String, Any> = emptyMap()
-        monitorNetwork { request ->
-            if (request.url.startsWith("https://test.com/b/ss/rsid/0/")) {
-                val body = URLDecoder.decode(String(request.body), "UTF-8")
-                varMap = extractQueryParamsFrom(body)
-                contextDataMap = extractContextDataFrom(body)
-                countDownLatch.countDown()
-            }
-        }
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedin",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_IN)
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
             configuration,
             mapOf(
@@ -156,14 +115,6 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 "locationhint" to "lochint"
             )
         )
-
-        val configurationResponseEvent = Event.Builder(
-            "configuration event",
-            EventType.CONFIGURATION,
-            EventSource.RESPONSE_CONTENT
-        ).setEventData(configuration).build()
-
-        analyticsExtension.handleIncomingEvent(configurationResponseEvent)
 
         val trackEvent = Event.Builder(
             "track event",
@@ -181,7 +132,13 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
-        countDownLatch.await()
+        assertEquals(1, mockedMainDataQueue.count())
+
+        val hit = AnalyticsHit.from(mockedMainDataQueue.peek())
+        val body = URLDecoder.decode(hit.payload, "UTF-8")
+        val varMap: Map<String, Any> = extractQueryParamsFrom(body)
+        val contextDataMap: Map<String, Any> = extractContextDataFrom(body)
+
         val expectedVars: Map<String, String> = mapOf(
             "ndh" to "1",
             "ce" to "UTF-8",
@@ -202,16 +159,9 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             "k2" to "v2",
             "a.action" to "testActionName"
         )
-        assertTrue(expectedContextData == contextDataMap)
+        assertEquals(expectedContextData, contextDataMap)
         assertEquals(expectedVars.size, varMap.size)
         assertEquals(expectedVars, varMap)
-        assertEquals(
-            mapOf(
-                "aid" to "testaid",
-                "vid" to "testvid"
-            ),
-            analyticsSharedState
-        )
     }
 
     @Test(timeout = 10000)
@@ -225,16 +175,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 data?.let { analyticsSharedState = it }
                 countDownLatch.countDown()
             }
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedout",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_OUT)
 
         val configurationResponseEvent = Event.Builder(
             "configuration event",
@@ -299,16 +240,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             mapOf(
                 "mid" to "mid",
                 "blob" to "blob",
@@ -338,8 +270,8 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
     }
 
     @Test(timeout = 10000)
-    fun `handleAnalyticsRequestIdentityEvent - shared state not should contain vid if optedout`() {
-        val countDownLatch = CountDownLatch(2)
+    fun `handleAnalyticsRequestIdentityEvent - shared state should not contain vid if optedout`() {
+        val countDownLatch = CountDownLatch(1)
         var analyticsSharedState: Map<String, Any> = emptyMap()
 
         Mockito.`when`(mockedExtensionApi.createSharedState(any(), anyOrNull()))
@@ -348,16 +280,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 data?.let { analyticsSharedState = it }
                 countDownLatch.countDown()
             }
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedout",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_OUT)
 
         val configurationResponseEvent = Event.Builder(
             "configuration event",
@@ -387,6 +310,29 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
 
         countDownLatch.await()
         assertTrue(analyticsSharedState.isEmpty())
+    }
+
+    @Test(timeout = 10000)
+    fun `vid and aid should not be shared again on config update with privacy optin`() {
+        val configuration = config(MobilePrivacyStatus.OPT_IN)
+        val analyticsExtension = initializeAnalyticsExtensionWithPreset(
+            configuration,
+            mapOf(
+                "mid" to "mid",
+                "blob" to "blob",
+                "locationhint" to "lochint"
+            )
+        )
+
+        val configurationResponseEvent = Event.Builder(
+            "first configuration event",
+            EventType.CONFIGURATION,
+            EventSource.RESPONSE_CONTENT
+        ).setEventData(configuration).build()
+
+        analyticsExtension.handleIncomingEvent(configurationResponseEvent)
+
+        verify(mockedExtensionApi, never()).createSharedState(any(), any())
     }
 
     @Test(timeout = 10000)
@@ -433,33 +379,19 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 }
             }
 
-        val countDownLatch = CountDownLatch(2)
+        val countDownLatch = CountDownLatch(1)
         var analyticsSharedState1: Map<String, Any> = emptyMap()
-        var analyticsSharedState2: Map<String, Any> = emptyMap()
 
         Mockito.`when`(mockedExtensionApi.createSharedState(any(), anyOrNull()))
             .then { invocation ->
                 val data = invocation.arguments[0] as? Map<String, Any>
                 data?.let {
-                    if (analyticsSharedState1.isEmpty()) {
-                        analyticsSharedState1 = it
-                    } else {
-                        analyticsSharedState2 = it
-                    }
+                    analyticsSharedState1 = it
                 }
                 countDownLatch.countDown()
             }
 
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedin",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_IN)
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
             configuration,
             mapOf(
@@ -475,19 +407,11 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
             EventSource.RESPONSE_CONTENT
         ).setEventData(configuration).build()
 
+        // test
         analyticsExtension.handleIncomingEvent(configurationResponseEvent)
         updateMockedSharedState(
             "com.adobe.module.configuration",
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedout",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            )
+            config(MobilePrivacyStatus.OPT_OUT)
         )
         analyticsExtension.handleIncomingEvent(
             Event.Builder(
@@ -498,14 +422,7 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
         )
 
         countDownLatch.await()
-        assertEquals(
-            mapOf(
-                "aid" to "testaid",
-                "vid" to "testvid"
-            ),
-            analyticsSharedState1
-        )
-        assertTrue(analyticsSharedState2.isEmpty())
+        assertTrue(analyticsSharedState1.isEmpty())
     }
 
     @Test(timeout = 10000)
@@ -552,33 +469,19 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
                 }
             }
 
-        val countDownLatch = CountDownLatch(2)
+        val countDownLatch = CountDownLatch(1)
         var analyticsSharedState1: Map<String, Any> = emptyMap()
-        var analyticsSharedState2: Map<String, Any> = emptyMap()
 
         Mockito.`when`(mockedExtensionApi.createSharedState(any(), anyOrNull()))
             .then { invocation ->
                 val data = invocation.arguments[0] as? Map<String, Any>
                 data?.let {
-                    if (analyticsSharedState1.isEmpty()) {
-                        analyticsSharedState1 = it
-                    } else {
-                        analyticsSharedState2 = it
-                    }
+                    analyticsSharedState1 = it
                 }
                 countDownLatch.countDown()
             }
 
-        val configuration = mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to "optedin",
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
+        val configuration = config(MobilePrivacyStatus.OPT_IN)
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
             configuration,
             mapOf(
@@ -604,13 +507,19 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
         )
 
         countDownLatch.await()
-        assertEquals(
-            mapOf(
-                "aid" to "testaid",
-                "vid" to "testvid"
-            ),
-            analyticsSharedState1
+        assertTrue(analyticsSharedState1.isEmpty())
+    }
+
+    private fun config(privacyStatus: MobilePrivacyStatus): Map<String, Any> {
+        return mapOf(
+            "analytics.server" to "test.com",
+            "analytics.rsids" to "rsid",
+            "global.privacy" to privacyStatus.value,
+            "experienceCloud.org" to "orgid",
+            "analytics.batchLimit" to 0,
+            "analytics.offlineEnabled" to true,
+            "analytics.backdatePreviousSessionInfo" to true,
+            "analytics.launchHitDelay" to 1
         )
-        assertTrue(analyticsSharedState2.isEmpty())
     }
 }
