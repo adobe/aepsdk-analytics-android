@@ -79,6 +79,12 @@ internal class AnalyticsState {
     internal fun update(dataMap: Map<String, Map<String, Any>?>) {
         for ((key, value) in dataMap) {
             if (value == null) {
+                Log.trace(
+                    AnalyticsConstants.LOG_TAG,
+                    LOG_TAG,
+                    "update - Unable to extract data for %s, it was null.",
+                    key
+                )
                 continue
             }
             when (key) {
@@ -106,15 +112,7 @@ internal class AnalyticsState {
      *
      * @param configuration the eventData map from Config's shared state
      */
-    private fun extractConfigurationInfo(configuration: Map<String, Any?>?) {
-        if (configuration == null) {
-            Log.trace(
-                AnalyticsConstants.LOG_TAG,
-                LOG_TAG,
-                "extractConfigurationInfo - Failed to extract configuration data as event data was null."
-            )
-            return
-        }
+    private fun extractConfigurationInfo(configuration: Map<String, Any?>) {
         host = DataReader.optString(
             configuration,
             AnalyticsConstants.EventDataKeys.Configuration.ANALYTICS_CONFIG_SERVER,
@@ -177,15 +175,7 @@ internal class AnalyticsState {
      *
      * @param identityInfo the eventData map from Identity's shared state
      */
-    private fun extractIdentityInfo(identityInfo: Map<String, Any?>?) {
-        if (identityInfo == null) {
-            Log.trace(
-                AnalyticsConstants.LOG_TAG,
-                LOG_TAG,
-                "extractIdentityInfo - Failed to extract identity data as event data was null."
-            )
-            return
-        }
+    private fun extractIdentityInfo(identityInfo: Map<String, Any?>) {
         marketingCloudId = DataReader.optString(
             identityInfo,
             AnalyticsConstants.EventDataKeys.Identity.VISITOR_ID_MID,
@@ -232,15 +222,7 @@ internal class AnalyticsState {
      *
      * @param placesInfo the eventData map from Places shared state
      */
-    private fun extractPlacesInfo(placesInfo: Map<String, Any?>?) {
-        if (placesInfo == null) {
-            Log.trace(
-                AnalyticsConstants.LOG_TAG,
-                LOG_TAG,
-                "extractPlacesInfo - Failed to extract places data (event data was null)."
-            )
-            return
-        }
+    private fun extractPlacesInfo(placesInfo: Map<String, Any?>) {
         val placesContextData = DataReader.optTypedMap(
             String::class.java,
             placesInfo,
@@ -264,15 +246,7 @@ internal class AnalyticsState {
      *
      * @param lifecycleData the eventData map from Lifecycle's shared state
      */
-    private fun extractLifecycleInfo(lifecycleData: Map<String, Any?>?) {
-        if (lifecycleData == null) {
-            Log.trace(
-                AnalyticsConstants.LOG_TAG,
-                LOG_TAG,
-                "extractLifecycleInfo - Failed to extract lifecycle data (event data was null)."
-            )
-            return
-        }
+    private fun extractLifecycleInfo(lifecycleData: Map<String, Any?>) {
         lifecycleSessionStartTimestamp = DataReader.optLong(
             lifecycleData,
             AnalyticsConstants.EventDataKeys.Lifecycle.SESSION_START_TIMESTAMP,
@@ -331,15 +305,7 @@ internal class AnalyticsState {
      *
      * @param assuranceInfo the eventData map from Assurance's shared state
      */
-    private fun extractAssuranceInfo(assuranceInfo: Map<String, Any?>?) {
-        if (assuranceInfo == null) {
-            Log.trace(
-                AnalyticsConstants.LOG_TAG,
-                LOG_TAG,
-                "extractAssuranceInfo - Failed to extract assurance data (event data was null)."
-            )
-            return
-        }
+    private fun extractAssuranceInfo(assuranceInfo: Map<String, Any?>) {
         val assuranceSessionId = DataReader.optString(
             assuranceInfo,
             AnalyticsConstants.EventDataKeys.Assurance.SESSION_ID,

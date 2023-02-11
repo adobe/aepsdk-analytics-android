@@ -271,7 +271,8 @@ internal class AnalyticsExtension : Extension {
      *
      * @param event the rules engine response content event
      */
-    private fun handleRuleEngineResponse(event: Event) {
+    @VisibleForTesting
+    internal fun handleRuleEngineResponse(event: Event) {
         val eventData = event.eventData ?: run {
             Log.trace(
                 AnalyticsConstants.LOG_TAG,

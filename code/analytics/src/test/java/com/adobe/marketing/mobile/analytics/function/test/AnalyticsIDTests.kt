@@ -626,25 +626,4 @@ internal class AnalyticsIDTests : AnalyticsFunctionalTestBase() {
         countDownLatch.await()
         assertTrue(analyticsSharedState1.isEmpty())
     }
-
-    private fun config(privacyStatus: MobilePrivacyStatus): Map<String, Any> {
-        return mapOf(
-            "analytics.server" to "test.com",
-            "analytics.rsids" to "rsid",
-            "global.privacy" to privacyStatus.value,
-            "experienceCloud.org" to "orgid",
-            "analytics.batchLimit" to 0,
-            "analytics.offlineEnabled" to true,
-            "analytics.backdatePreviousSessionInfo" to true,
-            "analytics.launchHitDelay" to 1
-        )
-    }
-
-    private fun defaultIdentity(): Map<String, Any> {
-        return mapOf(
-            "mid" to "mid",
-            "blob" to "blob",
-            "locationhint" to "lochint"
-        )
-    }
 }

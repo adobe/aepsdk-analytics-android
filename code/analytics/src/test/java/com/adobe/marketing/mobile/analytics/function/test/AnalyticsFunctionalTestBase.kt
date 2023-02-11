@@ -15,6 +15,7 @@ import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
 import com.adobe.marketing.mobile.ExtensionApi
+import com.adobe.marketing.mobile.MobilePrivacyStatus
 import com.adobe.marketing.mobile.SharedStateResult
 import com.adobe.marketing.mobile.SharedStateStatus
 import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension
@@ -151,6 +152,27 @@ internal open class AnalyticsFunctionalTestBase {
         }
         return AnalyticsExtension(
             mockedExtensionApi
+        )
+    }
+
+    protected fun config(privacyStatus: MobilePrivacyStatus): Map<String, Any> {
+        return mapOf(
+            "analytics.server" to "test.com",
+            "analytics.rsids" to "rsid",
+            "global.privacy" to privacyStatus.value,
+            "experienceCloud.org" to "orgid",
+            "analytics.batchLimit" to 0,
+            "analytics.offlineEnabled" to true,
+            "analytics.backdatePreviousSessionInfo" to true,
+            "analytics.launchHitDelay" to 1
+        )
+    }
+
+    protected fun defaultIdentity(): Map<String, Any> {
+        return mapOf(
+            "mid" to "mid",
+            "blob" to "blob",
+            "locationhint" to "lochint"
         )
     }
 }

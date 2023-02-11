@@ -50,11 +50,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
@@ -119,11 +115,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
@@ -190,11 +182,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
@@ -262,11 +250,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
@@ -329,11 +313,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
         updateMockedSharedState(
             "com.adobe.module.lifecycle",
@@ -413,11 +393,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
@@ -486,11 +462,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
@@ -556,11 +528,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
