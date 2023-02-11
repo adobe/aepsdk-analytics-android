@@ -14,11 +14,13 @@ package com.adobe.marketing.mobile.analytics.function.test
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
+import com.adobe.marketing.mobile.MobilePrivacyStatus
 import com.adobe.marketing.mobile.analytics.internal.TimeZoneHelper
 import com.adobe.marketing.mobile.analytics.internal.extractContextDataFrom
 import com.adobe.marketing.mobile.analytics.internal.extractContextDataKVPairFrom
 import com.adobe.marketing.mobile.analytics.internal.extractQueryParamsFrom
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Test
 import java.net.URLDecoder
@@ -40,24 +42,11 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             defaultIdentity()
         )
 
-        val trackEvent = Event.Builder(
-            "Generic track event",
-            EventType.GENERIC_TRACK,
-            EventSource.REQUEST_CONTENT
-        ).setEventData(
+        val trackEvent = trackEventWithData(
             mapOf(
                 "state" to "testState",
                 "contextdata" to mapOf(
@@ -65,7 +54,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "k2" to "v2"
                 )
             )
-        ).build()
+        )
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
@@ -105,24 +94,11 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             defaultIdentity()
         )
 
-        val trackEvent = Event.Builder(
-            "Generic track event",
-            EventType.GENERIC_TRACK,
-            EventSource.REQUEST_CONTENT
-        ).setEventData(
+        val trackEvent = trackEventWithData(
             mapOf(
                 "action" to "testAction",
                 "contextdata" to mapOf(
@@ -130,7 +106,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "k2" to "v2"
                 )
             )
-        ).build()
+        )
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
@@ -172,24 +148,11 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             defaultIdentity()
         )
 
-        val trackEvent = Event.Builder(
-            "Generic track event",
-            EventType.GENERIC_TRACK,
-            EventSource.REQUEST_CONTENT
-        ).setEventData(
+        val trackEvent = trackEventWithData(
             mapOf(
                 "action" to "testAction",
                 "trackinternal" to true,
@@ -198,7 +161,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "k2" to "v2"
                 )
             )
-        ).build()
+        )
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
@@ -240,31 +203,18 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             defaultIdentity()
         )
 
-        val trackEvent = Event.Builder(
-            "Generic track event",
-            EventType.GENERIC_TRACK,
-            EventSource.REQUEST_CONTENT
-        ).setEventData(
+        val trackEvent = trackEventWithData(
             mapOf(
                 "contextdata" to mapOf(
                     "k1" to "v1",
                     "k2" to "v2"
                 )
             )
-        ).build()
+        )
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
@@ -303,16 +253,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             defaultIdentity()
         )
         updateMockedSharedState(
@@ -325,11 +266,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                 )
             )
         )
-        val trackEvent = Event.Builder(
-            "Generic track event",
-            EventType.GENERIC_TRACK,
-            EventSource.REQUEST_CONTENT
-        ).setEventData(
+        val trackEvent = trackEventWithData(
             mapOf(
                 "contextdata" to mapOf(
                     "k1" to "v1",
@@ -339,7 +276,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "a.OSVersion" to "overwrittenOS"
                 )
             )
-        ).build()
+        )
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
@@ -383,24 +320,11 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             defaultIdentity()
         )
 
-        val trackEvent = Event.Builder(
-            "Generic track event",
-            EventType.GENERIC_TRACK,
-            EventSource.REQUEST_CONTENT
-        ).setEventData(
+        val trackEvent = trackEventWithData(
             mapOf(
                 "state" to "testState",
                 "action" to "testAction",
@@ -409,7 +333,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "k2" to "v2"
                 )
             )
-        ).build()
+        )
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
@@ -452,24 +376,11 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             defaultIdentity()
         )
 
-        val trackEvent = Event.Builder(
-            "Generic track event",
-            EventType.GENERIC_TRACK,
-            EventSource.REQUEST_CONTENT
-        ).setEventData(
+        val trackEvent = trackEventWithData(
             mapOf(
                 "state" to "~!@#\$%^&*()_.-+",
                 "action" to "网页",
@@ -479,7 +390,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "k1" to "网页"
                 )
             )
-        ).build()
+        )
 
         analyticsExtension.handleIncomingEvent(trackEvent)
 
@@ -518,24 +429,11 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         }
 
         val analyticsExtension = initializeAnalyticsExtensionWithPreset(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            ),
+            config(MobilePrivacyStatus.OPT_IN),
             defaultIdentity()
         )
 
-        val trackEvent = Event.Builder(
-            "Generic track event",
-            EventType.GENERIC_TRACK,
-            EventSource.REQUEST_CONTENT
-        ).setEventData(
+        val trackEvent = trackEventWithData(
             mapOf(
                 "contextdata" to mapOf(
                     "StringValue" to "v1",
@@ -550,7 +448,7 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
                     "DictValue" to emptyMap<Any, Any>()
                 )
             )
-        ).build()
+        )
         // TODO: the event data was set to null because of the above unsupported value types, like emptyArray.
 
         analyticsExtension.handleIncomingEvent(trackEvent)
@@ -573,5 +471,71 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         Assert.assertTrue(expectedContextData == contextDataMap)
         Assert.assertEquals(expectedVars.size, varMap.size)
         Assert.assertEquals(expectedVars, varMap)
+    }
+
+    @Test
+    fun `track request should be ignored when privacy opted out`() {
+        val analyticsExtension = initializeAnalyticsExtensionWithPreset(
+            config(MobilePrivacyStatus.OPT_OUT),
+            defaultIdentity()
+        )
+
+        val trackEvent = trackEventWithData(
+            mapOf(
+                "state" to "testState",
+                "contextdata" to mapOf(
+                    "k1" to "v1",
+                    "k2" to "v2"
+                )
+            )
+        )
+
+        analyticsExtension.handleIncomingEvent(trackEvent)
+
+        assertEquals(0, mockedMainDataQueue.count())
+    }
+
+    @Test
+    fun `track request should be queued when privacy unknown`() {
+        val analyticsExtension = initializeAnalyticsExtensionWithPreset(
+            config(MobilePrivacyStatus.UNKNOWN),
+            defaultIdentity()
+        )
+
+        val trackEvent = trackEventWithData(
+            mapOf(
+                "state" to "testState",
+                "contextdata" to mapOf(
+                    "k1" to "v1",
+                    "k2" to "v2"
+                )
+            )
+        )
+
+        analyticsExtension.handleIncomingEvent(trackEvent)
+
+        assertEquals(1, mockedMainDataQueue.count())
+    }
+
+    @Test
+    fun `track request should be ignored when no data`() {
+        val analyticsExtension = initializeAnalyticsExtensionWithPreset(
+            config(MobilePrivacyStatus.OPT_IN),
+            defaultIdentity()
+        )
+
+        val trackEvent = trackEventWithData(emptyMap())
+
+        analyticsExtension.handleIncomingEvent(trackEvent)
+
+        assertEquals(0, mockedMainDataQueue.count())
+    }
+
+    private fun trackEventWithData(data: Map<String, Any?>): Event {
+        return Event.Builder(
+            "Generic track event",
+            EventType.GENERIC_TRACK,
+            EventSource.REQUEST_CONTENT
+        ).setEventData(data).build()
     }
 }
