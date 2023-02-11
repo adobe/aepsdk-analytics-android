@@ -121,6 +121,20 @@ class AnalyticsStateTests {
     }
 
     @Test
+    fun testExtractLifecycleInfo_returnsDefaultValues_when_empty() {
+        val state = AnalyticsState()
+        state.update(
+            mapOf(
+                LIFECYCLE_SHARED_STATE to emptyMap()
+            )
+        )
+        assertTrue(state.defaultData.isEmpty())
+        assertNull(state.applicationID)
+        assertEquals(0, state.lifecycleSessionStartTimestamp)
+        assertEquals(0, state.lifecycleMaxSessionLength)
+    }
+
+    @Test
     fun testExtractPlacesInfo_happyFlow() {
         val state = AnalyticsState()
         state.update(
@@ -186,6 +200,38 @@ class AnalyticsStateTests {
         assertNull(state.blob)
         assertNull(state.locationHint)
         assertNull(state.serializedVisitorIDsList)
+    }
+
+    @Test
+    fun testExtractIdentityInfo_extractsCustomVisitorIds() {
+        val state = AnalyticsState()
+        val customIds = arrayListOf<Map<String, Any?>>()
+        customIds.add(
+            mapOf(
+                "ID" to "id1",
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "id_type1",
+                "STATE" to 1
+            ) // authenticated
+        )
+        customIds.add(
+            mapOf(
+                "ID" to "id2",
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "id_type2",
+                "STATE" to 2
+            ) // logged out
+        )
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to "testMID",
+                    "visitoridslist" to customIds
+                )
+            )
+        )
+        assertEquals("testMID", state.marketingCloudId)
+        assertEquals("&cid.&id_type1.&as=1&id=id1&.id_type1&id_type2.&as=2&id=id2&.id_type2&.cid", state.serializedVisitorIDsList)
     }
 
     @Test

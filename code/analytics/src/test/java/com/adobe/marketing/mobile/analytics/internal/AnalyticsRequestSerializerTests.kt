@@ -11,7 +11,6 @@
 
 package com.adobe.marketing.mobile.analytics.internal
 
-import com.adobe.marketing.mobile.VisitorID
 import org.junit.Assert
 import org.junit.Test
 import java.util.*
@@ -23,37 +22,37 @@ class AnalyticsRequestSerializerTests {
 
     @Test
     fun testGenerateAnalyticsCustomerIdString_happyFlow() {
-        val visitorIDList: MutableList<VisitorID> = ArrayList()
+        val visitorIDList: MutableList<MutableMap<String, Any?>> = ArrayList()
         visitorIDList.add(
-            VisitorID(
-                "d_cid_ic",
-                "loginidhash",
-                "97717",
-                VisitorID.AuthenticationState.UNKNOWN
+            mutableMapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "loginidhash",
+                "ID" to "97717",
+                "STATE" to 0 // unknown
             )
         )
         visitorIDList.add(
-            VisitorID(
-                "d_cid_ic",
-                "xboxlivehash",
-                "1629158955",
-                VisitorID.AuthenticationState.AUTHENTICATED
+            mutableMapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "xboxlivehash",
+                "ID" to "1629158955",
+                "STATE" to 1 // authenticated
             )
         )
         visitorIDList.add(
-            VisitorID(
-                "d_cid_ic",
-                "psnidhash",
-                "1144032295",
-                VisitorID.AuthenticationState.LOGGED_OUT
+            mutableMapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "psnidhash",
+                "ID" to "1144032295",
+                "STATE" to 2 // logged out
             )
         )
         visitorIDList.add(
-            VisitorID(
-                "d_cid",
-                "pushid",
-                "testPushId",
-                VisitorID.AuthenticationState.AUTHENTICATED
+            mutableMapOf(
+                "ID_ORIGIN" to "d_cid",
+                "ID_TYPE" to "pushid",
+                "ID" to "testPushId",
+                "STATE" to 1 // authenticated
             )
         )
         val expectedString =

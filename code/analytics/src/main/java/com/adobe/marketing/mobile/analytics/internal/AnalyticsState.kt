@@ -12,7 +12,6 @@
 package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.MobilePrivacyStatus
-import com.adobe.marketing.mobile.internal.util.VisitorIDSerializer
 import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.util.DataReader
 import com.adobe.marketing.mobile.util.DataReaderException
@@ -198,12 +197,11 @@ internal class AnalyticsState {
         )
         if (identityInfo.containsKey(AnalyticsConstants.EventDataKeys.Identity.VISITOR_IDS_LIST)) {
             try {
-                val list = DataReader.getTypedList(
-                    Map::class.java,
+                val visitorIdsList = DataReader.getTypedListOfMap(
+                    Object::class.java,
                     identityInfo,
                     AnalyticsConstants.EventDataKeys.Identity.VISITOR_IDS_LIST
                 )
-                val visitorIdsList = VisitorIDSerializer.convertToVisitorIds(list)
                 serializedVisitorIDsList =
                     AnalyticsRequestSerializer.generateAnalyticsCustomerIdString(visitorIdsList)
             } catch (ex: DataReaderException) {

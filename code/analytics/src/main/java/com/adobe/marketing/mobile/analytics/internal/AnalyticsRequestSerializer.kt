@@ -11,7 +11,7 @@
 
 package com.adobe.marketing.mobile.analytics.internal
 
-import com.adobe.marketing.mobile.VisitorID
+import com.adobe.marketing.mobile.util.DataReader
 
 /**
  * The @{link AnalyticsRequestSerializer} class is to help build the POST body for analytics request
@@ -69,21 +69,27 @@ internal class AnalyticsRequestSerializer {
         }
 
         /**
-         * Creates a `Map<String, String>` having the VisitorIDs information (types, ids and authentication state), puts it
+         * Creates a `Map<String, String>` having the custom visitor id information (types, ids and authentication state), puts it
          * under "cid" key for the analytics request and serializes it.
          *
-         * @param visitorIDs the new [VisitorID] List to process in the analytics format
+         * @param visitorIDs the new custom visitor ids list to process in the analytics format
          * @return null if the visitorIDs list is null
          */
-        internal fun generateAnalyticsCustomerIdString(visitorIDs: List<VisitorID>?): String? {
+        internal fun generateAnalyticsCustomerIdString(visitorIDs: List<Map<String, Any?>>?): String? {
             if (visitorIDs == null) {
                 return null
             }
             val visitorIdMap = HashMap<String, String>()
             for (visitorID in visitorIDs) {
-                visitorIdMap[serializeIdentifierKeyForAnalyticsID(visitorID.idType)] = visitorID.id
-                visitorIdMap[serializeAuthenticationKeyForAnalyticsID(visitorID.idType)] =
-                    visitorID.authenticationState.value.toString()
+                val idType: String = DataReader.optString(
+                    visitorID,
+                    AnalyticsConstants.EventDataKeys.Identity.VisitorID.ID_TYPE,
+                    null
+                ) ?: continue
+                visitorIdMap[serializeIdentifierKeyForAnalyticsID(idType)] = DataReader.optString(visitorID, AnalyticsConstants.EventDataKeys.Identity.VisitorID.ID, null)
+
+                visitorIdMap[serializeAuthenticationKeyForAnalyticsID(idType)] =
+                    DataReader.optInt(visitorID, AnalyticsConstants.EventDataKeys.Identity.VisitorID.STATE, 0).toString()
             }
             val translatedIds = HashMap<String, Any>()
             translatedIds["cid"] = ContextDataUtil.translateContextData(visitorIdMap)
