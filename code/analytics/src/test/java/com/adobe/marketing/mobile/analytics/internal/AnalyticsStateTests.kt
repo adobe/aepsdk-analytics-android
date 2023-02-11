@@ -146,7 +146,6 @@ class AnalyticsStateTests {
                         "regionid" to "sampleRegionId",
                         "regionname" to "sampleRegionName"
                     )
-
                 )
             )
         )
@@ -165,6 +164,50 @@ class AnalyticsStateTests {
         state.update(
             mapOf(
                 PLACES_SHARED_STATE to null
+            )
+        )
+        assertTrue(state.defaultData.isEmpty())
+    }
+
+    @Test
+    fun testExtractPlacesInfo_returnsDefaultValuesAndDoesNotCrash_when_invalidType() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "someotherpoihere" to mapOf(
+                        "unexpectedformat" to true
+                    )
+                )
+            )
+        )
+        assertTrue(state.defaultData.isEmpty())
+    }
+
+    @Test
+    fun testExtractPlacesInfo_shouldNotIncludeNullValues() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "currentpoi" to mapOf(
+                        "regionid" to null,
+                        "regionname" to null
+                    )
+                )
+            )
+        )
+        assertTrue(state.defaultData.isEmpty())
+    }
+
+    @Test
+    fun testExtractPlacesInfo_shouldNotIncludeEmptyValues() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "currentpoi" to mapOf(
+                        "regionid" to "",
+                        "regionname" to ""
+                    )
+                )
             )
         )
         assertTrue(state.defaultData.isEmpty())
@@ -380,6 +423,34 @@ class AnalyticsStateTests {
             )
         )
         assertEquals(emptyMap<String, Any>(), state.analyticsIdVisitorParameters)
+    }
+
+    @Test
+    fun testGetAnalyticsIdVisitorParameters_shouldNotIncludeNullValues_butMid() {
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to "mid",
+                    "blob" to null,
+                    "locationhint" to null
+                )
+            )
+        )
+        assertEquals(mapOf("mid" to "mid"), state.analyticsIdVisitorParameters)
+    }
+
+    @Test
+    fun testGetAnalyticsIdVisitorParameters_shouldNotIncludeEmptyValues_butMid() {
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to "mid",
+                    "blob" to "",
+                    "locationhint" to ""
+                )
+            )
+        )
+        assertEquals(mapOf("mid" to "mid"), state.analyticsIdVisitorParameters)
     }
 
     @Test
