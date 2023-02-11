@@ -19,14 +19,16 @@ import com.adobe.marketing.mobile.analytics.internal.TimeZoneHelper
 import com.adobe.marketing.mobile.analytics.internal.extractContextDataFrom
 import com.adobe.marketing.mobile.analytics.internal.extractContextDataKVPairFrom
 import com.adobe.marketing.mobile.analytics.internal.extractQueryParamsFrom
-import org.junit.Assert
+import com.adobe.marketing.mobile.services.AppState
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Test
+import org.mockito.Mockito.`when`
 import java.net.URLDecoder
 import java.util.concurrent.CountDownLatch
 
 internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
+
     @Test(timeout = 10000)
     fun `track state`() {
         val countDownLatch = CountDownLatch(1)
@@ -74,9 +76,9 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "k1" to "v1",
             "k2" to "v2"
         )
-        Assert.assertTrue(expectedContextData == contextDataMap)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Test(timeout = 10000)
@@ -128,9 +130,9 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "k2" to "v2",
             "a.action" to "testAction"
         )
-        Assert.assertTrue(expectedContextData == contextDataMap)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Test(timeout = 10000)
@@ -183,9 +185,9 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "k2" to "v2",
             "a.internalaction" to "testAction"
         )
-        Assert.assertTrue(expectedContextData == contextDataMap)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Test(timeout = 10000)
@@ -233,9 +235,9 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "k1" to "v1",
             "k2" to "v2"
         )
-        Assert.assertTrue(expectedContextData == contextDataMap)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Test(timeout = 10000)
@@ -300,9 +302,9 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "a.DeviceName" to "overwrittenDevice",
             "a.OSVersion" to "overwrittenOS"
         )
-        Assert.assertTrue(expectedContextData == contextDataMap)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Test(timeout = 10000)
@@ -356,9 +358,9 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "k2" to "v2",
             "a.action" to "testAction"
         )
-        Assert.assertTrue(expectedContextData == contextDataMap)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Test(timeout = 10000)
@@ -408,9 +410,9 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
             "ts" to trackEvent.timestampInSeconds.toString()
         )
-        Assert.assertTrue("&a.&action=网页&.a&k1=网页&_=~!@#\$%^&*()_.-+" == contextDataKVPair)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals("&a.&action=网页&.a&k1=网页&_=~!@#\$%^&*()_.-+", contextDataKVPair)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Ignore
@@ -468,9 +470,9 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
             "k1" to "v1",
             "k2" to "v2"
         )
-        Assert.assertTrue(expectedContextData == contextDataMap)
-        Assert.assertEquals(expectedVars.size, varMap.size)
-        Assert.assertEquals(expectedVars, varMap)
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     @Test
@@ -529,6 +531,60 @@ internal class AnalyticsTrackTests : AnalyticsFunctionalTestBase() {
         analyticsExtension.handleIncomingEvent(trackEvent)
 
         assertEquals(0, mockedMainDataQueue.count())
+    }
+
+    @Test
+    fun `track request should add cp=background when app state is background`() {
+        `when`(mockedAppContextService.appState).thenReturn(AppState.BACKGROUND)
+
+        val countDownLatch = CountDownLatch(1)
+        var varMap: Map<String, Any> = emptyMap()
+        var contextDataMap: Map<String, Any> = emptyMap()
+        monitorNetwork { request ->
+            if (request.url.startsWith("https://test.com/b/ss/rsid/0/")) {
+                val body = URLDecoder.decode(String(request.body), "UTF-8")
+                varMap = extractQueryParamsFrom(body)
+                contextDataMap = extractContextDataFrom(body)
+                countDownLatch.countDown()
+            }
+        }
+
+        val analyticsExtension = initializeAnalyticsExtensionWithPreset(
+            config(MobilePrivacyStatus.OPT_IN),
+            defaultIdentity()
+        )
+
+        val trackEvent = trackEventWithData(
+            mapOf(
+                "state" to "testState",
+                "contextdata" to mapOf(
+                    "k1" to "v1",
+                    "k2" to "v2"
+                )
+            )
+        )
+
+        analyticsExtension.handleIncomingEvent(trackEvent)
+
+        countDownLatch.await()
+        val expectedVars: Map<String, String> = mapOf(
+            "ndh" to "1",
+            "ce" to "UTF-8",
+            "cp" to "background",
+            "pageName" to "testState",
+            "mid" to "mid",
+            "aamb" to "blob",
+            "aamlh" to "lochint",
+            "t" to TimeZoneHelper.TIMESTAMP_TIMEZONE_OFFSET,
+            "ts" to trackEvent.timestampInSeconds.toString()
+        )
+        val expectedContextData: Map<String, String> = mapOf(
+            "k1" to "v1",
+            "k2" to "v2"
+        )
+        assertEquals(expectedContextData, contextDataMap)
+        assertEquals(expectedVars.size, varMap.size)
+        assertEquals(expectedVars, varMap)
     }
 
     private fun trackEventWithData(data: Map<String, Any?>): Event {
