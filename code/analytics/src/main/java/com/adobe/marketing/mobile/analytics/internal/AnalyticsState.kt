@@ -23,7 +23,7 @@ import java.util.HashMap
  * The [AnalyticsState] class will encapsulate the analytics config properties used across the analytics handlers,
  * which are retrieved from SharedState.
  */
-internal class AnalyticsState {
+class AnalyticsState {
     internal var host: String? = null
         private set
 
@@ -75,7 +75,7 @@ internal class AnalyticsState {
     internal var lifecycleSessionStartTimestamp: Long = 0
         private set
 
-    internal fun update(dataMap: Map<String, Map<String, Any>?>) {
+    internal fun update(dataMap: Map<String, Map<String, Any?>?>) {
         for ((key, value) in dataMap) {
             if (value == null) {
                 Log.trace(

@@ -221,7 +221,8 @@ internal class AnalyticsExtension : Extension {
      * @see AnalyticsState.resetIdentities
      * @see AnalyticsDatabase.reset
      */
-    private fun handleResetIdentitiesEvent(event: Event) {
+    @VisibleForTesting
+    internal fun handleResetIdentitiesEvent(event: Event) {
         if (event.type != EventType.GENERIC_IDENTITY || event.source != EventSource.REQUEST_RESET) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
@@ -398,7 +399,8 @@ internal class AnalyticsExtension : Extension {
      *
      * @param event the generic lifecycle request content event
      */
-    private fun handleGenericLifecycleEvents(event: Event) {
+    @VisibleForTesting
+    internal fun handleGenericLifecycleEvents(event: Event) {
         if (event.type != EventType.GENERIC_LIFECYCLE || event.source != EventSource.REQUEST_CONTENT) {
             return
         }

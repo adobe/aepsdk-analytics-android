@@ -46,6 +46,7 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.anyOrNull
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 class AnalyticsExtensionTests {
@@ -302,6 +303,21 @@ class AnalyticsExtensionTests {
     }
 
     @Test
+    fun `handleRuleEngineResponse() should ignore events with consequence type different than an`() {
+        val eventData: Map<String, Any> = mapOf(
+            "triggeredconsequence" to mapOf(
+                "id" to "id",
+                "type" to "pb"
+            )
+        )
+        val event = Event.Builder("rules test", EventType.RULES_ENGINE, EventSource.RESPONSE_CONTENT).setEventData(eventData).build()
+        analytics.handleRuleEngineResponse(event)
+
+        verifyNoInteractions(mockDatabase)
+        verifyNoInteractions(mockApi)
+    }
+
+    @Test
     fun `handleRuleEngineResponse() should ignore events with null or empty consequence id`() {
         val eventData: Map<String, Any> = mapOf(
             "triggeredconsequence" to mapOf(
@@ -355,5 +371,57 @@ class AnalyticsExtensionTests {
 
         verify(mockDatabase).queue(anyString(), anyLong(), anyString(), anyBoolean())
         verify(mockApi, times(5)).getSharedState(anyString(), any(Event::class.java), anyBoolean(), any(SharedStateResolution::class.java)) // hard + soft dependencies
+    }
+
+    @Test
+    fun `handleGenericLifecycleEvents() should ignore non lifecycle request content events`() {
+        val event1 = Event.Builder("invalid lifecycle start test 1", "incorrectType", EventSource.REQUEST_CONTENT).build()
+        analytics.handleGenericLifecycleEvents(event1)
+
+        val event2 = Event.Builder("invalid lifecycle start test 2", EventType.GENERIC_LIFECYCLE, "incorrectSource").build()
+        analytics.handleGenericLifecycleEvents(event2)
+
+        verifyNoInteractions(mockDatabase)
+    }
+
+    @Test
+    fun `handleGenericLifecycleEvents() should ignore lifecycle request content events that don't contain the start key`() {
+        val eventData = mapOf<String, Any>(
+            "action" to "unknown"
+        )
+        val event = Event.Builder("invalid test lifecycle start", EventType.GENERIC_LIFECYCLE, EventSource.REQUEST_CONTENT).setEventData(eventData).build()
+        analytics.handleGenericLifecycleEvents(event)
+
+        verifyNoInteractions(mockDatabase)
+    }
+
+    @Test
+    fun `handleGenericLifecycleEvents() should handle lifecycle request content events for start action`() {
+        val eventData = mapOf<String, Any>(
+            "action" to "start"
+        )
+        val event = Event.Builder("invalid test lifecycle start", EventType.GENERIC_LIFECYCLE, EventSource.REQUEST_CONTENT).setEventData(eventData).build()
+        analytics.handleGenericLifecycleEvents(event)
+
+        verify(mockDatabase, times(2)).cancelWaitForAdditionalData(anyOrNull())
+    }
+
+    @Test
+    fun `handleResetIdentitiesEvent() should ignore unknown type or source events`() {
+        val event1 = Event.Builder("invalid reset test 1", "incorrectType", EventSource.REQUEST_RESET).build()
+        analytics.handleResetIdentitiesEvent(event1)
+
+        val event2 = Event.Builder("invalid reset test 2", EventType.GENERIC_IDENTITY, "incorrectSource").build()
+        analytics.handleResetIdentitiesEvent(event2)
+
+        verifyNoInteractions(mockDatabase)
+    }
+
+    @Test
+    fun `handleResetIdentitiesEvent() should handle identity request reset`() {
+        val event1 = Event.Builder("test reset", EventType.GENERIC_IDENTITY, EventSource.REQUEST_RESET).build()
+        analytics.handleResetIdentitiesEvent(event1)
+
+        verify(mockDatabase).reset()
     }
 }
