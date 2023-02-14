@@ -11,7 +11,6 @@
 
 package com.adobe.marketing.mobile.analytics.internal
 
-import com.adobe.marketing.mobile.VisitorID
 import org.junit.Assert
 import org.junit.Test
 import java.util.*
@@ -23,37 +22,37 @@ class AnalyticsRequestSerializerTests {
 
     @Test
     fun testGenerateAnalyticsCustomerIdString_happyFlow() {
-        val visitorIDList: MutableList<VisitorID> = ArrayList()
+        val visitorIDList: MutableList<Map<String, Any?>> = ArrayList()
         visitorIDList.add(
-            VisitorID(
-                "d_cid_ic",
-                "loginidhash",
-                "97717",
-                VisitorID.AuthenticationState.UNKNOWN
+            mapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "loginidhash",
+                "ID" to "97717",
+                "STATE" to 0 // unknown
             )
         )
         visitorIDList.add(
-            VisitorID(
-                "d_cid_ic",
-                "xboxlivehash",
-                "1629158955",
-                VisitorID.AuthenticationState.AUTHENTICATED
+            mapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "xboxlivehash",
+                "ID" to "1629158955",
+                "STATE" to 1 // authenticated
             )
         )
         visitorIDList.add(
-            VisitorID(
-                "d_cid_ic",
-                "psnidhash",
-                "1144032295",
-                VisitorID.AuthenticationState.LOGGED_OUT
+            mapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "psnidhash",
+                "ID" to "1144032295",
+                "STATE" to 2 // logged out
             )
         )
         visitorIDList.add(
-            VisitorID(
-                "d_cid",
-                "pushid",
-                "testPushId",
-                VisitorID.AuthenticationState.AUTHENTICATED
+            mapOf(
+                "ID_ORIGIN" to "d_cid",
+                "ID_TYPE" to "pushid",
+                "ID" to "testPushId",
+                "STATE" to 1 // authenticated
             )
         )
         val expectedString =
@@ -148,6 +147,99 @@ class AnalyticsRequestSerializerTests {
         Assert.assertTrue(result.contains("&.c"))
         Assert.assertTrue(result.contains("&testKey1=val1"))
         Assert.assertTrue(result.contains("&testKey2=val2"))
+    }
+
+    @Test
+    fun testBuildRequestWhenIncompleteVisitorIds_skipsIdsWithMissingIDType() {
+        val visitorIDList: MutableList<Map<String, Any?>> = ArrayList()
+        visitorIDList.add(
+            mapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "loginidhash",
+                "ID" to "97717",
+                "STATE" to 0 // unknown
+            )
+        )
+        visitorIDList.add(
+            mapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to null,
+                "ID" to "11111",
+                "STATE" to 0 // unknown
+            )
+        )
+        analyticsState.update(
+            mapOf(
+                "com.adobe.module.identity" to mapOf(
+                    "mid" to "testMID",
+                    "visitoridslist" to visitorIDList
+                ),
+                "com.adobe.module.configuration" to mapOf(
+                    "analytics.server" to "analyticsServer",
+                    "experienceCloud.org" to "marketingServer"
+                )
+            )
+        )
+        val result: String = AnalyticsRequestSerializer.buildRequest(
+            analyticsState,
+            HashMap(
+                mapOf(
+                    "testKey1" to "val1",
+                    "testKey2" to "val2"
+                )
+            ),
+            null
+        )
+        val assertMessage: String = String.format("Result was: %s", result)
+        Assert.assertTrue(assertMessage, result.contains("ndh=1"))
+        Assert.assertTrue(assertMessage, result.contains("&c."))
+        Assert.assertTrue(assertMessage, result.contains("&.c"))
+        Assert.assertTrue(assertMessage, result.contains("&testKey1=val1"))
+        Assert.assertTrue(assertMessage, result.contains("&testKey2=val2"))
+        Assert.assertTrue(assertMessage, result.contains("&cid.&loginidhash.&as=0&id=97717&.loginidhash&"))
+        Assert.assertFalse(assertMessage, result.contains("&id=11111&as=0&"))
+    }
+
+    @Test
+    fun testBuildRequestWhenVisitorIdServiceNotEnabled_skipsSerializedIds() {
+        // Note: this test increases coverage for the safety checks we have, but this scenario is not
+        // expected in a prod workflow: missing orgid in config, but contains visitorids list
+        val visitorIDList: MutableList<Map<String, Any?>> = ArrayList()
+        visitorIDList.add(
+            mapOf(
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "loginidhash",
+                "ID" to "97717",
+                "STATE" to 0 // unknown
+            )
+        )
+        analyticsState.update(
+            mapOf(
+                "com.adobe.module.identity" to mapOf(
+                    "mid" to "testMID",
+                    "visitoridslist" to visitorIDList
+                ),
+                "com.adobe.module.configuration" to mapOf(
+                    "analytics.server" to "analyticsServer"
+                )
+            )
+        )
+        val result: String = AnalyticsRequestSerializer.buildRequest(
+            analyticsState,
+            HashMap(
+                mapOf(
+                    "testKey1" to "val1",
+                    "testKey2" to "val2"
+                )
+            ),
+            null
+        )
+        Assert.assertTrue(result.contains("ndh=1"))
+        Assert.assertTrue(result.contains("&c."))
+        Assert.assertTrue(result.contains("&.c"))
+        Assert.assertTrue(result.contains("&testKey1=val1"))
+        Assert.assertTrue(result.contains("&testKey2=val2"))
+        Assert.assertFalse(result.contains("&cid.&loginidhash"))
     }
 
     @Test

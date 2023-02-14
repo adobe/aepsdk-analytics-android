@@ -165,6 +165,12 @@ internal object AnalyticsConstants {
             const val VISITOR_ID_LOCATION_HINT = "locationhint"
             const val VISITOR_IDS_LIST = "visitoridslist"
             const val ADVERTISING_IDENTIFIER = "advertisingidentifier"
+
+            internal object VisitorID {
+                const val ID = "ID"
+                const val ID_TYPE = "ID_TYPE"
+                const val STATE = "STATE"
+            }
         }
 
         internal object Lifecycle {
