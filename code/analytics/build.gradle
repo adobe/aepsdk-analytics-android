@@ -49,6 +49,12 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+        languageVersion = "1.4"
+        apiVersion = "1.4"
+    }
+
 }
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
