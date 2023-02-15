@@ -16,6 +16,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 class AnalyticsStateTests {
@@ -29,9 +30,15 @@ class AnalyticsStateTests {
         private const val ASSURANCE_SHARED_STATE = "com.adobe.assurance"
     }
 
+    private lateinit var state: AnalyticsState
+
+    @Before
+    fun setup() {
+        state = AnalyticsState()
+    }
+
     @Test
     fun testExtractConfigurationInfo_happyFlow() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 CONFIG_SHARED_STATE to mapOf(
@@ -58,7 +65,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testExtractConfigurationInfo_returnsDefaultValues_when_null() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 CONFIG_SHARED_STATE to null
@@ -76,7 +82,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testExtractLifecycleInfo_happyFlow() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 LIFECYCLE_SHARED_STATE to mapOf(
@@ -108,7 +113,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testExtractLifecycleInfo_returnsDefaultValues_when_null() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 LIFECYCLE_SHARED_STATE to null
@@ -121,8 +125,20 @@ class AnalyticsStateTests {
     }
 
     @Test
+    fun testExtractLifecycleInfo_returnsDefaultValues_when_empty() {
+        state.update(
+            mapOf(
+                LIFECYCLE_SHARED_STATE to emptyMap()
+            )
+        )
+        assertTrue(state.defaultData.isEmpty())
+        assertNull(state.applicationID)
+        assertEquals(0, state.lifecycleSessionStartTimestamp)
+        assertEquals(0, state.lifecycleMaxSessionLength)
+    }
+
+    @Test
     fun testExtractPlacesInfo_happyFlow() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 PLACES_SHARED_STATE to mapOf(
@@ -130,7 +146,6 @@ class AnalyticsStateTests {
                         "regionid" to "sampleRegionId",
                         "regionname" to "sampleRegionName"
                     )
-
                 )
             )
         )
@@ -146,7 +161,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testExtractPlacesInfo_returnsDefaultValues_when_empty() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 PLACES_SHARED_STATE to null
@@ -156,8 +170,51 @@ class AnalyticsStateTests {
     }
 
     @Test
+    fun testExtractPlacesInfo_returnsDefaultValuesAndDoesNotCrash_when_invalidType() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "someotherpoihere" to mapOf(
+                        "unexpectedformat" to true
+                    )
+                )
+            )
+        )
+        assertTrue(state.defaultData.isEmpty())
+    }
+
+    @Test
+    fun testExtractPlacesInfo_shouldNotIncludeNullValues() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "currentpoi" to mapOf(
+                        "regionid" to null,
+                        "regionname" to null
+                    )
+                )
+            )
+        )
+        assertTrue(state.defaultData.isEmpty())
+    }
+
+    @Test
+    fun testExtractPlacesInfo_shouldNotIncludeEmptyValues() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "currentpoi" to mapOf(
+                        "regionid" to "",
+                        "regionname" to ""
+                    )
+                )
+            )
+        )
+        assertTrue(state.defaultData.isEmpty())
+    }
+
+    @Test
     fun testExtractIdentityInfo_happyFlow() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 IDENTITY_SHARED_STATE to mapOf(
@@ -176,7 +233,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testExtractIdentityInfo_returnsDefaultValues_when_null() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 IDENTITY_SHARED_STATE to null
@@ -189,8 +245,54 @@ class AnalyticsStateTests {
     }
 
     @Test
+    fun testExtractIdentityInfo_extractsCustomVisitorIds() {
+        val customIds = arrayListOf<Map<String, Any?>>()
+        customIds.add(
+            mapOf(
+                "ID" to "id1",
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "id_type1",
+                "STATE" to 1
+            ) // authenticated
+        )
+        customIds.add(
+            mapOf(
+                "ID" to "id2",
+                "ID_ORIGIN" to "d_cid_ic",
+                "ID_TYPE" to "id_type2",
+                "STATE" to 2
+            ) // logged out
+        )
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to "testMID",
+                    "visitoridslist" to customIds
+                )
+            )
+        )
+        assertEquals("testMID", state.marketingCloudId)
+        assertEquals("&cid.&id_type1.&as=1&id=id1&.id_type1&id_type2.&as=2&id=id2&.id_type2&.cid", state.serializedVisitorIDsList)
+    }
+
+    @Test
+    fun testExtractIdentityInfo_shouldNotCrash_whenInvalidVisitorIDsList() {
+        val customIds = arrayListOf<String>()
+        customIds.add("invalidids")
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to "testMID",
+                    "visitoridslist" to customIds
+                )
+            )
+        )
+        assertEquals("testMID", state.marketingCloudId)
+        assertNull(state.serializedVisitorIDsList)
+    }
+
+    @Test
     fun testExtractAssuranceInfo_returnsDefaultValues_happyFlow() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 ASSURANCE_SHARED_STATE to mapOf(
@@ -202,8 +304,31 @@ class AnalyticsStateTests {
     }
 
     @Test
+    fun testExtractAssuranceInfo_isAssuranceSessionActiveReturnsFalse_when_AssuranceIdEmpty() {
+        state.update(
+            mapOf(
+                ASSURANCE_SHARED_STATE to mapOf(
+                    "sessionid" to ""
+                )
+            )
+        )
+        assertFalse(state.isAssuranceSessionActive)
+    }
+
+    @Test
+    fun testExtractAssuranceInfo_isAssuranceSessionActiveReturnsFalse_when_AssuranceIdNull() {
+        state.update(
+            mapOf(
+                ASSURANCE_SHARED_STATE to mapOf(
+                    "sessionid" to null
+                )
+            )
+        )
+        assertFalse(state.isAssuranceSessionActive)
+    }
+
+    @Test
     fun testExtractAssuranceInfo_returnsDefaultValues_when_null() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 ASSURANCE_SHARED_STATE to null
@@ -214,7 +339,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testIsAnalyticsConfiguredHappyFlow() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 CONFIG_SHARED_STATE to mapOf(
@@ -228,7 +352,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testIsAnalyticsConfiguredReturnsFalseWhenNoServerIds() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 CONFIG_SHARED_STATE to mapOf(
@@ -242,7 +365,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testIsAnalyticsConfiguredReturnsFalseWhenNoRsids() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 CONFIG_SHARED_STATE to mapOf(
@@ -256,7 +378,6 @@ class AnalyticsStateTests {
 
     @Test
     fun testGetAnalyticsIdVisitorParameters() {
-        val state = AnalyticsState()
         state.update(
             mapOf(
                 IDENTITY_SHARED_STATE to mapOf(
@@ -277,8 +398,63 @@ class AnalyticsStateTests {
     }
 
     @Test
+    fun testGetAnalyticsIdVisitorParameters_shouldNotIncludeNullValues() {
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to null,
+                    "blob" to null,
+                    "locationhint" to null
+                )
+            )
+        )
+        assertEquals(emptyMap<String, Any>(), state.analyticsIdVisitorParameters)
+    }
+
+    @Test
+    fun testGetAnalyticsIdVisitorParameters_shouldNotIncludeEmptyValues() {
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to "",
+                    "blob" to "",
+                    "locationhint" to ""
+                )
+            )
+        )
+        assertEquals(emptyMap<String, Any>(), state.analyticsIdVisitorParameters)
+    }
+
+    @Test
+    fun testGetAnalyticsIdVisitorParameters_shouldNotIncludeNullValues_butMid() {
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to "mid",
+                    "blob" to null,
+                    "locationhint" to null
+                )
+            )
+        )
+        assertEquals(mapOf("mid" to "mid"), state.analyticsIdVisitorParameters)
+    }
+
+    @Test
+    fun testGetAnalyticsIdVisitorParameters_shouldNotIncludeEmptyValues_butMid() {
+        state.update(
+            mapOf(
+                IDENTITY_SHARED_STATE to mapOf(
+                    "mid" to "mid",
+                    "blob" to "",
+                    "locationhint" to ""
+                )
+            )
+        )
+        assertEquals(mapOf("mid" to "mid"), state.analyticsIdVisitorParameters)
+    }
+
+    @Test
     fun testGetAnalyticsIdVisitorParametersWhenVisitorDataIsAbsent() {
-        val state = AnalyticsState()
         assertTrue(state.analyticsIdVisitorParameters.isEmpty())
     }
 }

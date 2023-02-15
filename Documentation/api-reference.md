@@ -39,11 +39,6 @@ Analytics.clearQueue();
 ```
 #### Kotlin
 
-##### Syntax
-```kotlin
-fun clearQueue()
-```
-
 ##### Example
 ```kotlin
 
@@ -71,10 +66,6 @@ String extensionVersion = Analytics.extensionVersion();
 
 #### Kotlin
 
-##### Syntax
-```kotlin
-fun extensionVersion(): String
-```
 ##### Example
 ```kotlin
 val extensionVersion = Analytics.extensionVersion();
@@ -101,11 +92,6 @@ MobileCore.registerExtensions(Arrays.asList(Analytics.EXTENSION, ...), new Adobe
 ```
 
 #### Kotlin
-
-##### Syntax
-```kotlin
-val EXTENSION: Class<out Extension?> = AnalyticsExtension::class.java
-```
 
 ##### Example
 ```kotlin
@@ -143,11 +129,6 @@ Analytics.getQueueSize(new AdobeCallbackWithError<Long>() {
 ```
 
 #### Kotlin
-
-##### Syntax
-```kotlin
- fun getQueueSize(callback: AdobeCallback<Long?>)
-```
 
 ##### Example
 ```kotlin
@@ -194,11 +175,6 @@ Analytics.getTrackingIdentifier(new AdobeCallbackWithError<String>() {
 ```
 
 #### Kotlin
-
-##### Syntax
-```kotlin
-fun getTrackingIdentifier(callback: AdobeCallback<String?>)
-```
 
 ##### Example
 
@@ -247,10 +223,6 @@ Analytics.getVisitorIdentifier(new AdobeCallbackWithError<String>() {
 
 #### Kotlin
 
-##### Syntax
-```kotlin
- fun getVisitorIdentifier(callback: AdobeCallback<String?>) 
-```
 ##### Example
 ```kotlin
 Analytics.getVisitorIdentifier(object: AdobeCallbackWithError<String> {
@@ -284,11 +256,6 @@ Analytics.sendQueuedHits();
 
 #### Kotlin
 
-##### Syntax
-```kotlin
-fun sendQueuedHits()
-```
-
 ##### Example
 ```kotlin
 Analytics.sendQueuedHits()
@@ -318,11 +285,6 @@ Analytics.setVisitorIdentifier("vid_1");
 ```
 
 #### Kotlin
-
-##### Syntax
-```kotlin
-fun setVisitorIdentifier(visitorID: String?)
-```
 
 ##### Example
 ```kotlin
