@@ -33,14 +33,14 @@
 
 
     <Button
-        android:id="@+id/setIdentifier"
+        android:id="@+id/setVid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="56dp"
         android:layout_marginLeft="60dp"
         android:layout_marginTop="24dp"
-        android:onClick="setIdentifier"
-        android:text="Set Identifier"
+        android:onClick="setVisitorIdentifier"
+        android:text="Set VID"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/trackState" />
 
@@ -51,10 +51,10 @@
         android:layout_marginStart="56dp"
         android:layout_marginLeft="60dp"
         android:layout_marginTop="24dp"
-        android:onClick="trackQueue"
+        android:onClick="getQueueSize"
         android:text="Get Queue Size"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/setIdentifier" />
+        app:layout_constraintTop_toBottomOf="@+id/setVid" />
 
     <Button
         android:id="@+id/sendQueue"
@@ -151,6 +151,18 @@
         android:text="Get AID"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/getVid" />
+
+    <Button
+        android:id="@+id/syncCustomIdentifiers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginTop="24dp"
+        android:onClick="syncCustomIdentifiers"
+        android:text="Sync Custom IDs"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/clearQueue" />
 
     <Button
         android:id="@+id/buttonConfig"
