@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+	private static final String TAG = "MainActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,16 +57,8 @@ public class MainActivity extends AppCompatActivity {
 		MobileCore.trackState("mystate", additionalContextData);
 	}
 
-	public void setIdentifier(View view) {
-		Analytics.setVisitorIdentifier("test_identifier");
-	}
-
-	public void trackQueue(View view) {
-		Analytics.getQueueSize(new AdobeCallback<Long>() {
-			@Override
-			public void call(final Long queueSize) {
-			}
-		});
+	public void getQueueSize(View view) {
+		Analytics.getQueueSize(queueSize -> { Log.i(TAG, "getQueueSize: " + queueSize); });
 	}
 
 	public void sendQueueHit(View view) {
@@ -92,22 +85,23 @@ public class MainActivity extends AppCompatActivity {
 		MobileCore.resetIdentities();
 	}
 
+	public void setVisitorIdentifier(View view) {
+		Analytics.setVisitorIdentifier("test_identifier");
+	}
+
 	public void getVisitorIdentifier(View view) {
-		Analytics.getVisitorIdentifier(new AdobeCallback<String>() {
-			@Override
-			public void call(String s) {
-				Log.i("Main", "getVisitorIdentifier (VID): " + s);
-			}
-		});
+		Analytics.getVisitorIdentifier(s -> Log.i(TAG, "getVisitorIdentifier (VID): " + s));
 	}
 
 	public void getTrackingIdentifier(View view) {
-		Analytics.getTrackingIdentifier(new AdobeCallback<String>() {
-			@Override
-			public void call(String s) {
-				Log.i("Main", "getTrackingIdentifier (AID): " + s);
-			}
-		});
+		Analytics.getTrackingIdentifier(s -> Log.i(TAG, "getTrackingIdentifier (AID): " + s));
+	}
+
+	public void syncCustomIdentifiers(View view) {
+		Map<String, String> customIds = new HashMap<>();
+		customIds.put("id1", "test1");
+		customIds.put("id2", "test2");
+		Identity.syncIdentifiers(customIds, VisitorID.AuthenticationState.AUTHENTICATED);
 	}
 
 	public void openConfigurationPage(View view) {
