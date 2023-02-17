@@ -38,11 +38,7 @@ internal class ConsequenceRuleTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 0
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val eventData: Map<String, Any> = mapOf(

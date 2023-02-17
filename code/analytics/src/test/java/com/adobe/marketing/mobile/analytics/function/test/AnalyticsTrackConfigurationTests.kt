@@ -14,6 +14,7 @@ package com.adobe.marketing.mobile.analytics.function.test
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
+import com.adobe.marketing.mobile.MobilePrivacyStatus
 import com.adobe.marketing.mobile.analytics.internal.TimeZoneHelper
 import com.adobe.marketing.mobile.analytics.internal.extractContextDataFrom
 import com.adobe.marketing.mobile.analytics.internal.extractQueryParamsFrom
@@ -77,11 +78,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent1 = Event.Builder(
@@ -120,16 +117,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
 
         updateMockedSharedState(
             "com.adobe.module.configuration",
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedout",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            )
+            config(MobilePrivacyStatus.OPT_OUT)
         )
         analyticsExtension.handleIncomingEvent(
             Event.Builder(
@@ -177,11 +165,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
@@ -202,16 +186,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
 
         updateMockedSharedState(
             "com.adobe.module.configuration",
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            )
+            config(MobilePrivacyStatus.OPT_IN)
         )
         analyticsExtension.handleIncomingEvent(
             Event.Builder(
@@ -269,11 +244,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent1 = Event.Builder(
@@ -294,16 +265,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
 
         updateMockedSharedState(
             "com.adobe.module.configuration",
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 0,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            )
+            config(MobilePrivacyStatus.OPT_IN)
         )
         analyticsExtension.handleIncomingEvent(
             Event.Builder(
@@ -374,11 +336,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(
@@ -438,11 +396,7 @@ internal class AnalyticsTrackConfigurationTests : AnalyticsFunctionalTestBase() 
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val trackEvent = Event.Builder(

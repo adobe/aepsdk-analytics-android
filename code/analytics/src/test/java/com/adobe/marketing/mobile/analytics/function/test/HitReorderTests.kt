@@ -49,11 +49,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
         val lifecycleStartEvent = Event.Builder(
             "lifecycle start",
@@ -310,11 +306,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
         val trackEvent = Event.Builder(
             "track event",

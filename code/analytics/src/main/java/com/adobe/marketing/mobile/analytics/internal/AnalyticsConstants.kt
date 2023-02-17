@@ -18,7 +18,7 @@ internal object AnalyticsConstants {
 
     const val EXTENSION_NAME = "com.adobe.module.analytics"
     const val FRIENDLY_NAME = "Analytics"
-    const val EXTENSION_VERSION = "2.0.0"
+    const val EXTENSION_VERSION = "2.0.1"
     const val DATASTORE_NAME = "AnalyticsDataStorage"
     const val DATA_QUEUE_NAME = EXTENSION_NAME
     const val REORDER_QUEUE_NAME = "com.adobe.module.analyticsreorderqueue"
@@ -165,6 +165,12 @@ internal object AnalyticsConstants {
             const val VISITOR_ID_LOCATION_HINT = "locationhint"
             const val VISITOR_IDS_LIST = "visitoridslist"
             const val ADVERTISING_IDENTIFIER = "advertisingidentifier"
+
+            internal object VisitorID {
+                const val ID = "ID"
+                const val ID_TYPE = "ID_TYPE"
+                const val STATE = "STATE"
+            }
         }
 
         internal object Lifecycle {

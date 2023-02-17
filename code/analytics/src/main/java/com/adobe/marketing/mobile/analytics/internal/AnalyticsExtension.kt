@@ -38,8 +38,29 @@ import java.util.concurrent.TimeUnit
  * heard by those listeners. The extension is registered to the Mobile SDK by calling
  * [MobileCore.registerExtensions].
  */
-internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extensionApi) {
+internal class AnalyticsExtension : Extension {
+    private val analyticsDatabase: AnalyticsDatabase
+    private val analyticsProperties: AnalyticsProperties
+    private val analyticsState: AnalyticsState = AnalyticsState()
+    private val dataStore: NamedCollection = ServiceProvider.getInstance().dataStoreService.getNamedCollection(AnalyticsConstants.DATASTORE_NAME)
 
+    private val eventHandler = ExtensionEventListener { handleIncomingEvent(it) }
+    private val analyticsTimer = AnalyticsTimer()
+
+    constructor(extensionApi: ExtensionApi) : this(extensionApi, null)
+
+    @VisibleForTesting
+    internal constructor(
+        extensionApi: ExtensionApi,
+        database: AnalyticsDatabase?
+    ) : super(extensionApi) {
+        analyticsProperties = AnalyticsProperties(dataStore)
+        analyticsDatabase = database
+            ?: AnalyticsDatabase(
+                AnalyticsHitProcessor(analyticsState, extensionApi),
+                analyticsState
+            )
+    }
     companion object {
         private const val CLASS_NAME = "AnalyticsExtension"
         private val ANALYTICS_HARD_DEPENDENCIES = listOf(
@@ -52,17 +73,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             AnalyticsConstants.EventDataKeys.Places.SHARED_STATE_NAME
         )
     }
-
-    private val dataStore: NamedCollection =
-        ServiceProvider.getInstance().dataStoreService.getNamedCollection(AnalyticsConstants.DATASTORE_NAME)
-    private val analyticsProperties = AnalyticsProperties(dataStore)
-    private val analyticsState = AnalyticsState()
-    private val analyticsDatabase =
-        AnalyticsDatabase(AnalyticsHitProcessor(analyticsState, extensionApi), analyticsState)
-    private val eventHandler = ExtensionEventListener { handleIncomingEvent(it) }
-    private val analyticsTimer = AnalyticsTimer()
-
-    private var sdkBootUpCompleted = false
 
     override fun getName(): String {
         return AnalyticsConstants.EXTENSION_NAME
@@ -140,6 +150,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
             eventHandler
         )
         deleteDeprecatedV5HitDatabase()
+        boot()
     }
 
     override fun readyForEvent(event: Event): Boolean {
@@ -210,7 +221,8 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
      * @see AnalyticsState.resetIdentities
      * @see AnalyticsDatabase.reset
      */
-    private fun handleResetIdentitiesEvent(event: Event) {
+    @VisibleForTesting
+    internal fun handleResetIdentitiesEvent(event: Event) {
         if (event.type != EventType.GENERIC_IDENTITY || event.source != EventSource.REQUEST_RESET) {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
@@ -228,7 +240,7 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         analyticsProperties.reset()
         analyticsState.resetIdentities()
         analyticsState.lastResetIdentitiesTimestampSec = event.timestampInSeconds
-        api.createSharedState(getSharedState(), event)
+        api.createSharedState(getAnalyticsIds(), event)
     }
 
     /**
@@ -260,7 +272,8 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
      *
      * @param event the rules engine response content event
      */
-    private fun handleRuleEngineResponse(event: Event) {
+    @VisibleForTesting
+    internal fun handleRuleEngineResponse(event: Event) {
         val eventData = event.eventData ?: run {
             Log.trace(
                 AnalyticsConstants.LOG_TAG,
@@ -362,15 +375,6 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         } else if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_IN) {
             analyticsDatabase.kick(false)
         }
-        if (!sdkBootUpCompleted) {
-            Log.trace(
-                AnalyticsConstants.LOG_TAG,
-                CLASS_NAME,
-                "handleConfigurationResponseEvent - Publish analytics shared state on bootup."
-            )
-            sdkBootUpCompleted = true
-            publishAnalyticsId(event)
-        }
     }
 
     /**
@@ -395,7 +399,8 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
      *
      * @param event the generic lifecycle request content event
      */
-    private fun handleGenericLifecycleEvents(event: Event) {
+    @VisibleForTesting
+    internal fun handleGenericLifecycleEvents(event: Event) {
         if (event.type != EventType.GENERIC_LIFECYCLE || event.source != EventSource.REQUEST_CONTENT) {
             return
         }
@@ -454,14 +459,19 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
     }
 
     /**
-     * Handler for Analytics Request Identity events.
-     * Handles public API requests to set the visitor identifier. If privacy is opted out, the
-     * request is ignored.
+     * Handles Analytics Request Identity events for the following use-cases:
+     * <ul>
+     *     <li> VID updates - updates value in persistence and shares updated information. If privacy is opted out, the
+     * request is ignored. </li>
+     *     <li> Identity requests - shares current identity information. </li>
+     * </ul>
      *
      * @param event the analytics request identity event
      */
     private fun handleAnalyticsRequestIdentityEvent(event: Event) {
         if (event.eventData?.containsKey(AnalyticsConstants.EventDataKeys.Analytics.VISITOR_IDENTIFIER) == true) {
+            // update VID request
+
             if (analyticsState.privacyStatus == MobilePrivacyStatus.OPT_OUT) {
                 Log.debug(
                     AnalyticsConstants.LOG_TAG,
@@ -482,10 +492,16 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
                     CLASS_NAME,
                     "handleAnalyticsRequestIdentityEvent - Failed to parse the visitor identifier to string, ignoring the update visitor identifier request."
                 )
+                return
             }
-        }
 
-        publishAnalyticsId(event)
+            val data = getAnalyticsIds()
+            api.createSharedState(data, event)
+            dispatchAnalyticsResponseIdentity(data, event)
+        } else {
+            // get AID/VID request
+            dispatchAnalyticsResponseIdentity(getAnalyticsIds(), event)
+        }
     }
 
     /**
@@ -854,15 +870,15 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
         )
         analyticsDatabase.reset()
         analyticsProperties.reset()
-        api.createSharedState(getSharedState(), event)
+        api.createSharedState(getAnalyticsIds(), event)
     }
 
     /**
-     * Compiles data to use when creating a shared state.
+     * Compiles a map of internal Analytics ids to use when creating a shared state or dispatching events.
      *
-     * @returns map containing state data
+     * @returns map containing current state data
      */
-    private fun getSharedState(): Map<String, Any?> {
+    private fun getAnalyticsIds(): Map<String, Any?> {
         val data = mutableMapOf<String, Any?>()
         analyticsProperties.aid?.let { aid ->
             data.put(
@@ -880,15 +896,12 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
     }
 
     /**
-     * Creates shared state with current identifiers and dispatches an analytics response identity
-     * event with current identifiers.
+     * Dispatches an analytics response identity event with provided data.
      *
+     * @param data current data to be dispatched
      * @param event the event which triggered the analytics identity request
      */
-    private fun publishAnalyticsId(event: Event) {
-        val data = getSharedState()
-        api.createSharedState(data, event)
-
+    private fun dispatchAnalyticsResponseIdentity(data: Map<String, Any?>, event: Event) {
         // dispatch paired response event, usually used for getters
         val pairedResponseEvent = Event.Builder(
             "TrackingIdentifierValue",
@@ -1160,6 +1173,19 @@ internal class AnalyticsExtension(extensionApi: ExtensionApi) : Extension(extens
      */
     private fun deleteDeprecatedV5HitDatabase() {
         SQLiteUtils.deleteDBFromCacheDir(AnalyticsConstants.DEPRECATED_1X_HIT_DATABASE_FILENAME)
+    }
+
+    /**
+     * Boots up the extension - shares initial shared state with previously stored data
+     */
+    private fun boot() {
+        val data = getAnalyticsIds()
+        api.createSharedState(data, null)
+        Log.trace(
+            AnalyticsConstants.LOG_TAG,
+            CLASS_NAME,
+            "Analytics boot-up complete, published initial shared state."
+        )
     }
 
     /**

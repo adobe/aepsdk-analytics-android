@@ -48,11 +48,7 @@ internal class AnalyticsTrackPlacesTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         updateMockedSharedState(
@@ -131,11 +127,7 @@ internal class AnalyticsTrackPlacesTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 1
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         updateMockedSharedState(

@@ -53,11 +53,7 @@ internal class AnalyticsQueueTests : AnalyticsFunctionalTestBase() {
                 "analytics.launchHitDelay" to 5,
                 "analytics.batchLimit" to 5
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val event1 = Event.Builder(
@@ -133,11 +129,7 @@ internal class AnalyticsQueueTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 5
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val event1 = Event.Builder(
@@ -190,11 +182,7 @@ internal class AnalyticsQueueTests : AnalyticsFunctionalTestBase() {
                 "analytics.backdatePreviousSessionInfo" to true,
                 "analytics.launchHitDelay" to 5
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val event1 = Event.Builder(
@@ -262,11 +250,7 @@ internal class AnalyticsQueueTests : AnalyticsFunctionalTestBase() {
                 "analytics.launchHitDelay" to 5,
                 "analytics.batchLimit" to 2
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val event1 = Event.Builder(
@@ -326,11 +310,7 @@ internal class AnalyticsQueueTests : AnalyticsFunctionalTestBase() {
                 "analytics.launchHitDelay" to 1,
                 "analytics.batchLimit" to 5
             ),
-            mapOf(
-                "mid" to "mid",
-                "blob" to "blob",
-                "locationhint" to "lochint"
-            )
+            defaultIdentity()
         )
 
         val event1 = Event.Builder(

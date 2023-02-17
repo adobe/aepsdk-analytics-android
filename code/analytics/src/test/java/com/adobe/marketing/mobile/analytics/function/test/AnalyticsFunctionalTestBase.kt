@@ -15,12 +15,15 @@ import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.EventSource
 import com.adobe.marketing.mobile.EventType
 import com.adobe.marketing.mobile.ExtensionApi
+import com.adobe.marketing.mobile.MobilePrivacyStatus
 import com.adobe.marketing.mobile.SharedStateResult
 import com.adobe.marketing.mobile.SharedStateStatus
 import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension
 import com.adobe.marketing.mobile.analytics.internal.MemoryDataQueue
 import com.adobe.marketing.mobile.analytics.internal.MockedHttpConnecting
 import com.adobe.marketing.mobile.analytics.internal.NetworkMonitor
+import com.adobe.marketing.mobile.services.AppContextService
+import com.adobe.marketing.mobile.services.AppState
 import com.adobe.marketing.mobile.services.DataQueue
 import com.adobe.marketing.mobile.services.DataQueuing
 import com.adobe.marketing.mobile.services.DataStoring
@@ -34,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.anyOrNull
 
@@ -62,6 +66,9 @@ internal open class AnalyticsFunctionalTestBase {
 
     @Mock
     protected lateinit var mockedNameCollection: NamedCollection
+
+    @Mock
+    protected lateinit var mockedAppContextService: AppContextService
 
     private val mockedSharedState: MutableMap<String, Map<String, Any>> = mutableMapOf()
 
@@ -107,6 +114,15 @@ internal open class AnalyticsFunctionalTestBase {
                 }
             }
         )
+
+        `when`(mockedAppContextService.appState).thenReturn(AppState.FOREGROUND)
+        val appContextField =
+            ServiceProvider.getInstance().javaClass.getDeclaredField("overrideAppContextService")
+        appContextField.isAccessible = true
+        appContextField.set(
+            serviceProvider,
+            mockedAppContextService
+        )
     }
 
     fun monitorNetwork(networkMonitor: NetworkMonitor) {
@@ -137,7 +153,7 @@ internal open class AnalyticsFunctionalTestBase {
     ): AnalyticsExtension {
         configuration?.let { mockedSharedState["com.adobe.module.configuration"] = it }
         identity?.let { mockedSharedState["com.adobe.module.identity"] = it }
-        Mockito.`when`(
+        `when`(
             mockedExtensionApi.getSharedState(
                 ArgumentMatchers.any(),
                 ArgumentMatchers.any(),
@@ -151,6 +167,27 @@ internal open class AnalyticsFunctionalTestBase {
         }
         return AnalyticsExtension(
             mockedExtensionApi
+        )
+    }
+
+    protected fun config(privacyStatus: MobilePrivacyStatus): Map<String, Any> {
+        return mapOf(
+            "analytics.server" to "test.com",
+            "analytics.rsids" to "rsid",
+            "global.privacy" to privacyStatus.value,
+            "experienceCloud.org" to "orgid",
+            "analytics.batchLimit" to 0,
+            "analytics.offlineEnabled" to true,
+            "analytics.backdatePreviousSessionInfo" to true,
+            "analytics.launchHitDelay" to 1
+        )
+    }
+
+    protected fun defaultIdentity(): Map<String, Any> {
+        return mapOf(
+            "mid" to "mid",
+            "blob" to "blob",
+            "locationhint" to "lochint"
         )
     }
 }
