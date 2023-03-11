@@ -231,6 +231,8 @@ internal object AnalyticsConstants {
             const val EXTENSION_NAME = "com.adobe.assurance"
             const val SHARED_STATE_NAME = "com.adobe.assurance"
             const val SESSION_ID = "sessionid"
+            const val REQUEST_HEADER_KEY_AEP_VALIDATION_TOKEN = "X-Adobe-AEP-Validation-Token";
+            const val INTEGRATION_ID = "integrationid"
         }
     }
 

@@ -12,10 +12,8 @@
 package com.adobe.marketing.mobile.analytics.internal
 
 import androidx.annotation.VisibleForTesting
-import com.adobe.marketing.mobile.Event
-import com.adobe.marketing.mobile.EventSource
-import com.adobe.marketing.mobile.EventType
-import com.adobe.marketing.mobile.ExtensionApi
+import com.adobe.marketing.mobile.*
+import com.adobe.marketing.mobile.analytics.internal.AnalyticsConstants.EventDataKeys.Analytics
 import com.adobe.marketing.mobile.services.DataEntity
 import com.adobe.marketing.mobile.services.HitProcessing
 import com.adobe.marketing.mobile.services.HitProcessingResult
@@ -24,6 +22,7 @@ import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.services.NetworkRequest
 import com.adobe.marketing.mobile.services.Networking
 import com.adobe.marketing.mobile.services.ServiceProvider
+import com.adobe.marketing.mobile.util.DataReader
 import com.adobe.marketing.mobile.util.StreamUtils
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
@@ -123,12 +122,30 @@ internal class AnalyticsHitProcessor(
             return@processHit
         }
 
-        if (analyticsState.isAssuranceSessionActive) {
-            payload += AnalyticsConstants.ANALYTICS_REQUEST_DEBUG_API_PAYLOAD
-        }
-        val header = mapOf(
+        var header = mapOf(
             AnalyticsConstants.EventDataKeys.Analytics.CONTENT_TYPE_HEADER to CONTENT_TYPE_URL_ENCODED
         )
+
+        if (analyticsState.isAssuranceSessionActive) {
+            // get latest Assurance shared state
+            var assuranceStateResult = extensionApi.getSharedState(
+                AnalyticsConstants.EventDataKeys.Assurance.EXTENSION_NAME, null, false, SharedStateResolution.LAST_SET
+            )
+
+            if (assuranceStateResult != null) {
+                if (assuranceStateResult.getStatus() == SharedStateStatus.SET) {
+
+                    var assuranceIntegrationId = DataReader.optString(
+                        assuranceStateResult?.value,
+                        AnalyticsConstants.EventDataKeys.Assurance.INTEGRATION_ID,
+                        null
+                    )
+
+                    header = header.plus(AnalyticsConstants.EventDataKeys.Assurance.REQUEST_HEADER_KEY_AEP_VALIDATION_TOKEN to assuranceIntegrationId)
+                }
+            }
+        }
+
         val networkRequest = NetworkRequest(
             url,
             HttpMethod.POST,
