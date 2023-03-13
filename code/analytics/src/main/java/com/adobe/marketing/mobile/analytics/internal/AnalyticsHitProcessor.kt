@@ -127,7 +127,6 @@ internal class AnalyticsHitProcessor(
         )
 
         if (analyticsState.isAssuranceSessionActive) {
-            // get latest Assurance shared state
             var assuranceStateResult = extensionApi.getSharedState(
                 AnalyticsConstants.EventDataKeys.Assurance.EXTENSION_NAME, null, false, SharedStateResolution.LAST_SET
             )
@@ -136,7 +135,7 @@ internal class AnalyticsHitProcessor(
                 if (assuranceStateResult.getStatus() == SharedStateStatus.SET) {
 
                     var assuranceIntegrationId = DataReader.optString(
-                        assuranceStateResult?.value,
+                        assuranceStateResult.value,
                         AnalyticsConstants.EventDataKeys.Assurance.INTEGRATION_ID,
                         null
                     )
