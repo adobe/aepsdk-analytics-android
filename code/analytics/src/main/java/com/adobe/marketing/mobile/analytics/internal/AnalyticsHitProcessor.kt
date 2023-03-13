@@ -12,8 +12,12 @@
 package com.adobe.marketing.mobile.analytics.internal
 
 import androidx.annotation.VisibleForTesting
-import com.adobe.marketing.mobile.*
-import com.adobe.marketing.mobile.analytics.internal.AnalyticsConstants.EventDataKeys.Analytics
+import com.adobe.marketing.mobile.Event
+import com.adobe.marketing.mobile.EventSource
+import com.adobe.marketing.mobile.EventType
+import com.adobe.marketing.mobile.ExtensionApi
+import com.adobe.marketing.mobile.SharedStateResolution
+import com.adobe.marketing.mobile.SharedStateStatus
 import com.adobe.marketing.mobile.services.DataEntity
 import com.adobe.marketing.mobile.services.HitProcessing
 import com.adobe.marketing.mobile.services.HitProcessingResult
@@ -128,12 +132,14 @@ internal class AnalyticsHitProcessor(
 
         if (analyticsState.isAssuranceSessionActive) {
             var assuranceStateResult = extensionApi.getSharedState(
-                AnalyticsConstants.EventDataKeys.Assurance.EXTENSION_NAME, null, false, SharedStateResolution.LAST_SET
+                AnalyticsConstants.EventDataKeys.Assurance.EXTENSION_NAME,
+                null,
+                false,
+                SharedStateResolution.LAST_SET
             )
 
             if (assuranceStateResult != null) {
                 if (assuranceStateResult.getStatus() == SharedStateStatus.SET) {
-
                     var assuranceIntegrationId = DataReader.optString(
                         assuranceStateResult.value,
                         AnalyticsConstants.EventDataKeys.Assurance.INTEGRATION_ID,
