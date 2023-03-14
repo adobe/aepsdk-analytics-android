@@ -28,6 +28,7 @@ import com.adobe.marketing.mobile.services.Networking
 import com.adobe.marketing.mobile.services.ServiceProvider
 import com.adobe.marketing.mobile.util.DataReader
 import com.adobe.marketing.mobile.util.StreamUtils
+import com.adobe.marketing.mobile.util.StringUtils
 import com.adobe.marketing.mobile.util.TimeUtils
 import com.adobe.marketing.mobile.util.UrlUtils
 
@@ -131,21 +132,21 @@ internal class AnalyticsHitProcessor(
         )
 
         if (analyticsState.isAssuranceSessionActive) {
-            var assuranceStateResult = extensionApi.getSharedState(
+            val assuranceStateResult = extensionApi.getSharedState(
                 AnalyticsConstants.EventDataKeys.Assurance.EXTENSION_NAME,
                 null,
                 false,
                 SharedStateResolution.LAST_SET
             )
 
-            if (assuranceStateResult != null) {
-                if (assuranceStateResult.getStatus() == SharedStateStatus.SET) {
-                    var assuranceIntegrationId = DataReader.optString(
-                        assuranceStateResult.value,
-                        AnalyticsConstants.EventDataKeys.Assurance.INTEGRATION_ID,
-                        null
-                    )
+            if (assuranceStateResult != null && assuranceStateResult.status == SharedStateStatus.SET) {
+                val assuranceIntegrationId = DataReader.optString(
+                    assuranceStateResult.value,
+                    AnalyticsConstants.EventDataKeys.Assurance.INTEGRATION_ID,
+                    null
+                )
 
+                if (!StringUtils.isNullOrEmpty(assuranceIntegrationId)) {
                     header = header.plus(AnalyticsConstants.EventDataKeys.Assurance.REQUEST_HEADER_KEY_AEP_VALIDATION_TOKEN to assuranceIntegrationId)
                 }
             }

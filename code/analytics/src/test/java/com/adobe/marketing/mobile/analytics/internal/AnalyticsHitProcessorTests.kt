@@ -13,6 +13,9 @@ package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.ExtensionApi
+import com.adobe.marketing.mobile.SharedStateResolution
+import com.adobe.marketing.mobile.SharedStateResult
+import com.adobe.marketing.mobile.SharedStateStatus
 import com.adobe.marketing.mobile.services.DataEntity
 import com.adobe.marketing.mobile.services.NetworkRequest
 import com.adobe.marketing.mobile.services.Networking
@@ -47,7 +50,7 @@ class AnalyticsHitProcessorTests {
     @Mock
     private lateinit var mockedAnalyticsState: AnalyticsState
 
-    private val mockedSharedState: MutableMap<String, Map<String, Any>> = mutableMapOf()
+    private val mockedSharedState: MutableMap<String, Any> = mutableMapOf()
 
     @Before
     fun setup() {
@@ -63,12 +66,11 @@ class AnalyticsHitProcessorTests {
         Mockito.`when`(mockedAnalyticsState.host).thenReturn("test.com")
         Mockito.`when`(mockedAnalyticsState.rsids).thenReturn("rsid")
         Mockito.`when`(mockedAnalyticsState.isAnalyticsConfigured).thenReturn(true)
-
-        updateMockedSharedState("com.adobe.assurance", mapOf("sessionid" to "session_id"))
     }
 
-    private fun updateMockedSharedState(extensionNam: String, data: Map<String, Any>) {
-        mockedSharedState[extensionNam] = data
+    private fun updateMockedSharedState(extensionName: String, data: Map<String, Any>) {
+        mockedSharedState[extensionName] = data
+        mockedExtensionApi.createSharedState(mockedSharedState, null)
     }
 
     private fun initAnalyticsHitProcessor(): AnalyticsHitProcessor {
@@ -347,8 +349,21 @@ class AnalyticsHitProcessorTests {
 
     @Test
     fun `network success - assurance enabled`() {
+        // Set up mock Assurance Shared State
+        val mockAssuranceSharedStateData = mapOf("integrationid" to "testIntegrationId")
+        val mockAssuranceSharedStateResult = SharedStateResult(SharedStateStatus.SET, mockAssuranceSharedStateData)
+        Mockito.`when`(
+            mockedExtensionApi.getSharedState(
+                Mockito.eq("com.adobe.assurance"),
+                Mockito.eq(null),
+                Mockito.eq(false),
+                Mockito.eq(SharedStateResolution.LAST_SET)
+            )
+        ).thenReturn(mockAssuranceSharedStateResult)
         Mockito.`when`(mockedAnalyticsState.isAssuranceSessionActive).thenReturn(true)
+        updateMockedSharedState("com.adobe.assurance", mapOf("integrationid" to "testIntegrationId"))
 
+        Thread.sleep(500L)
         val countDownLatch = CountDownLatch(2)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
         val payload =
@@ -380,7 +395,8 @@ class AnalyticsHitProcessorTests {
         countDownLatch.await()
         assertNotNull(networkRequest)
         assertTrue(networkRequest!!.headers.contains("Content-Type"))
-        // assertTrue(networkRequest!!.headers.contains("X-Adobe-AEP-Validation-Token"))
+        assertTrue(networkRequest!!.headers.contains("X-Adobe-AEP-Validation-Token"))
+
         val eventCaptor = ArgumentCaptor.forClass(
             Event::class.java
         )
