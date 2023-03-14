@@ -47,6 +47,8 @@ class AnalyticsHitProcessorTests {
     @Mock
     private lateinit var mockedAnalyticsState: AnalyticsState
 
+    private val mockedSharedState: MutableMap<String, Map<String, Any>> = mutableMapOf()
+
     @Before
     fun setup() {
         mockedHttpConnecting = MockedHttpConnecting()
@@ -61,7 +63,12 @@ class AnalyticsHitProcessorTests {
         Mockito.`when`(mockedAnalyticsState.host).thenReturn("test.com")
         Mockito.`when`(mockedAnalyticsState.rsids).thenReturn("rsid")
         Mockito.`when`(mockedAnalyticsState.isAnalyticsConfigured).thenReturn(true)
-//        Mockito.`when`(mockedAnalyticsState.isAssuranceSessionActive).thenReturn(false)
+
+        updateMockedSharedState("com.adobe.assurance", mapOf("sessionid" to "session_id"))
+    }
+
+    private fun updateMockedSharedState(extensionNam: String, data: Map<String, Any>) {
+        mockedSharedState[extensionNam] = data
     }
 
     private fun initAnalyticsHitProcessor(): AnalyticsHitProcessor {
@@ -96,7 +103,7 @@ class AnalyticsHitProcessorTests {
     fun `network failure - recoverable error`() {
         val countDownLatch = CountDownLatch(2)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit("payload1", TimeUtils.getUnixTimeInSeconds(), "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
         // 408, 504, 503, -1
@@ -105,19 +112,20 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
             countDownLatch.countDown()
         }
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertFalse(it)
             countDownLatch.countDown()
         }
         countDownLatch.await()
         assertNotNull(networkRequest)
+        countDownLatch.await()
     }
 
     @Test
     fun `network failure - 404 error`() {
         val countDownLatch = CountDownLatch(2)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit("payload1", TimeUtils.getUnixTimeInSeconds(), "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
         // 408, 504, 503, -1
@@ -126,7 +134,7 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
             countDownLatch.countDown()
         }
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
@@ -141,7 +149,7 @@ class AnalyticsHitProcessorTests {
         val payload =
             "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
         val timestamp = TimeUtils.getUnixTimeInSeconds()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit(payload, timestamp, "id1").toDataEntity()
         mockedHttpConnecting.responseCode = 200
         mockedHttpConnecting.responseProperties = mapOf(
@@ -150,7 +158,9 @@ class AnalyticsHitProcessorTests {
             "Content-Type" to "xyz"
         )
         mockedHttpConnecting.inputStream = ("testAnalyticsResponse").byteInputStream()
+        var networkRequest: NetworkRequest? = null
         networkMonitor = { request ->
+            networkRequest = request
             assertTrue(request.url.contains("test.com"))
             assertTrue(String(request.body).contains(payload))
             countDownLatch.countDown()
@@ -158,11 +168,15 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
         countDownLatch.await()
+        assertNotNull(networkRequest)
+        assertTrue(networkRequest!!.headers.contains("Content-Type"))
+        assertFalse(networkRequest!!.headers.contains("X-Adobe-AEP-Validation-Token"))
+
         val eventCaptor = ArgumentCaptor.forClass(
             Event::class.java
         )
@@ -201,7 +215,7 @@ class AnalyticsHitProcessorTests {
         analyticsHitProcessor.setLastHitTimestamp(
             timestamp + 10
         )
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit(payload, timestamp, "id1").toDataEntity()
         mockedHttpConnecting.responseCode = 200
         mockedHttpConnecting.responseProperties = mapOf(
@@ -218,7 +232,7 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(timestamp + 10, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
@@ -255,14 +269,14 @@ class AnalyticsHitProcessorTests {
         val countDownLatch = CountDownLatch(1)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
         val currentTimestamp = TimeUtils.getUnixTimeInSeconds()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit("payload", currentTimestamp - 65, "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
         networkMonitor = { request ->
             networkRequest = request
         }
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
@@ -349,8 +363,11 @@ class AnalyticsHitProcessorTests {
             "Server" to "abc.com",
             "Content-Type" to "xyz"
         )
+
         mockedHttpConnecting.inputStream = ("testAnalyticsResponse").byteInputStream()
+        var networkRequest: NetworkRequest? = null
         networkMonitor = { request ->
+            networkRequest = request
             assertTrue(request.url.contains("test.com"))
             assertTrue(String(request.body).contains(payload))
             countDownLatch.countDown()
@@ -361,6 +378,9 @@ class AnalyticsHitProcessorTests {
             countDownLatch.countDown()
         }
         countDownLatch.await()
+        assertNotNull(networkRequest)
+        assertTrue(networkRequest!!.headers.contains("Content-Type"))
+        // assertTrue(networkRequest!!.headers.contains("X-Adobe-AEP-Validation-Token"))
         val eventCaptor = ArgumentCaptor.forClass(
             Event::class.java
         )
@@ -383,6 +403,5 @@ class AnalyticsHitProcessorTests {
         assertEquals("id1", event.eventData["requestEventIdentifier"])
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)
         assertTrue((event.eventData["hitUrl"] as? String)?.startsWith(payload) == true)
-        assertTrue((event.eventData["hitUrl"] as? String)?.endsWith("&p.&debug=true&.p") == true)
     }
 }

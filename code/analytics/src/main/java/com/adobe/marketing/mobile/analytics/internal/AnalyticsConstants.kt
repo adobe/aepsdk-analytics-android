@@ -35,7 +35,6 @@ internal object AnalyticsConstants {
     const val ANALYTICS_REQUEST_ACTION_NAME_KEY = "pev2"
     const val ANALYTICS_REQUEST_ANALYTICS_ID_KEY = "aid"
     const val ANALYTICS_REQUEST_PRIVACY_MODE_KEY = "a.privacy.mode"
-    const val ANALYTICS_REQUEST_DEBUG_API_PAYLOAD = "&p.&debug=true&.p"
 
     const val ANALYTICS_PARAMETER_KEY_MID = "mid"
     const val ANALYTICS_PARAMETER_KEY_LOCATION_HINT = "aamlh"
