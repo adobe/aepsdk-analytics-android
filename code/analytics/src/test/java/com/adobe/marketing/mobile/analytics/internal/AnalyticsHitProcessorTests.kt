@@ -50,8 +50,6 @@ class AnalyticsHitProcessorTests {
     @Mock
     private lateinit var mockedAnalyticsState: AnalyticsState
 
-    private val mockedSharedState: MutableMap<String, Any> = mutableMapOf()
-
     @Before
     fun setup() {
         mockedHttpConnecting = MockedHttpConnecting()
@@ -66,11 +64,6 @@ class AnalyticsHitProcessorTests {
         Mockito.`when`(mockedAnalyticsState.host).thenReturn("test.com")
         Mockito.`when`(mockedAnalyticsState.rsids).thenReturn("rsid")
         Mockito.`when`(mockedAnalyticsState.isAnalyticsConfigured).thenReturn(true)
-    }
-
-    private fun updateMockedSharedState(extensionName: String, data: Map<String, Any>) {
-        mockedSharedState[extensionName] = data
-        mockedExtensionApi.createSharedState(mockedSharedState, null)
     }
 
     private fun initAnalyticsHitProcessor(): AnalyticsHitProcessor {
@@ -348,7 +341,7 @@ class AnalyticsHitProcessorTests {
     }
 
     @Test
-    fun `network success - assurance enabled`() {
+    fun `network success - assurance enabled and sharedstate available`() {
         // Set up mock Assurance Shared State
         val mockAssuranceSharedStateData = mapOf("integrationid" to "testIntegrationId")
         val mockAssuranceSharedStateResult = SharedStateResult(SharedStateStatus.SET, mockAssuranceSharedStateData)
@@ -361,9 +354,7 @@ class AnalyticsHitProcessorTests {
             )
         ).thenReturn(mockAssuranceSharedStateResult)
         Mockito.`when`(mockedAnalyticsState.isAssuranceSessionActive).thenReturn(true)
-        updateMockedSharedState("com.adobe.assurance", mapOf("integrationid" to "testIntegrationId"))
 
-        Thread.sleep(500L)
         val countDownLatch = CountDownLatch(2)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
         val payload =
@@ -419,5 +410,148 @@ class AnalyticsHitProcessorTests {
         assertEquals("id1", event.eventData["requestEventIdentifier"])
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)
         assertTrue((event.eventData["hitUrl"] as? String)?.startsWith(payload) == true)
+    }
+
+    @Test
+    fun `network success - assurance enabled, but no integrationid in sharedstate`() {
+        val mockAssuranceSharedStateResult = SharedStateResult(SharedStateStatus.SET, null)
+        Mockito.`when`(
+            mockedExtensionApi.getSharedState(
+                Mockito.eq("com.adobe.assurance"),
+                Mockito.eq(null),
+                Mockito.eq(false),
+                Mockito.eq(SharedStateResolution.LAST_SET)
+            )
+        ).thenReturn(mockAssuranceSharedStateResult)
+        Mockito.`when`(mockedAnalyticsState.isAssuranceSessionActive).thenReturn(true)
+
+        val countDownLatch = CountDownLatch(2)
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        val payload =
+            "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
+        val timestamp = TimeUtils.getUnixTimeInSeconds()
+
+        val dataEntity =
+            AnalyticsHit(payload, timestamp, "id1").toDataEntity()
+        mockedHttpConnecting.responseCode = 200
+        mockedHttpConnecting.responseProperties = mapOf(
+            "ETag" to "eTag",
+            "Server" to "abc.com",
+            "Content-Type" to "xyz"
+        )
+
+        mockedHttpConnecting.inputStream = ("testAnalyticsResponse").byteInputStream()
+        var networkRequest: NetworkRequest? = null
+        networkMonitor = { request ->
+            networkRequest = request
+            assertTrue(request.url.contains("test.com"))
+            assertTrue(String(request.body).contains(payload))
+            countDownLatch.countDown()
+        }
+
+        analyticsHitProcessor.processHit(dataEntity) {
+            assertTrue(it)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
+        assertNotNull(networkRequest)
+        assertTrue(networkRequest!!.headers.contains("Content-Type"))
+        assertFalse(networkRequest!!.headers.contains("X-Adobe-AEP-Validation-Token"))
+    }
+
+    @Test
+    fun `network success - assurance enabled, but integrationid in sharedstate is null`() {
+        val mockAssuranceSharedStateData = mapOf("integrationid" to null)
+        val mockAssuranceSharedStateResult = SharedStateResult(SharedStateStatus.SET, mockAssuranceSharedStateData)
+        Mockito.`when`(
+            mockedExtensionApi.getSharedState(
+                Mockito.eq("com.adobe.assurance"),
+                Mockito.eq(null),
+                Mockito.eq(false),
+                Mockito.eq(SharedStateResolution.LAST_SET)
+            )
+        ).thenReturn(mockAssuranceSharedStateResult)
+        Mockito.`when`(mockedAnalyticsState.isAssuranceSessionActive).thenReturn(true)
+
+        val countDownLatch = CountDownLatch(2)
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        val payload =
+            "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
+        val timestamp = TimeUtils.getUnixTimeInSeconds()
+
+        val dataEntity =
+            AnalyticsHit(payload, timestamp, "id1").toDataEntity()
+        mockedHttpConnecting.responseCode = 200
+        mockedHttpConnecting.responseProperties = mapOf(
+            "ETag" to "eTag",
+            "Server" to "abc.com",
+            "Content-Type" to "xyz"
+        )
+
+        mockedHttpConnecting.inputStream = ("testAnalyticsResponse").byteInputStream()
+        var networkRequest: NetworkRequest? = null
+        networkMonitor = { request ->
+            networkRequest = request
+            assertTrue(request.url.contains("test.com"))
+            assertTrue(String(request.body).contains(payload))
+            countDownLatch.countDown()
+        }
+
+        analyticsHitProcessor.processHit(dataEntity) {
+            assertTrue(it)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
+        assertNotNull(networkRequest)
+        assertTrue(networkRequest!!.headers.contains("Content-Type"))
+        assertFalse(networkRequest!!.headers.contains("X-Adobe-AEP-Validation-Token"))
+    }
+
+    @Test
+    fun `network success - assurance enabled, but integrationid status in sharedstate is pending`() {
+        val mockAssuranceSharedStateData = mapOf("integrationid" to "testIntegrationId")
+        val mockAssuranceSharedStateResult = SharedStateResult(SharedStateStatus.PENDING, mockAssuranceSharedStateData)
+        Mockito.`when`(
+            mockedExtensionApi.getSharedState(
+                Mockito.eq("com.adobe.assurance"),
+                Mockito.eq(null),
+                Mockito.eq(false),
+                Mockito.eq(SharedStateResolution.LAST_SET)
+            )
+        ).thenReturn(mockAssuranceSharedStateResult)
+        Mockito.`when`(mockedAnalyticsState.isAssuranceSessionActive).thenReturn(true)
+
+        val countDownLatch = CountDownLatch(2)
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        val payload =
+            "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
+        val timestamp = TimeUtils.getUnixTimeInSeconds()
+
+        val dataEntity =
+            AnalyticsHit(payload, timestamp, "id1").toDataEntity()
+        mockedHttpConnecting.responseCode = 200
+        mockedHttpConnecting.responseProperties = mapOf(
+            "ETag" to "eTag",
+            "Server" to "abc.com",
+            "Content-Type" to "xyz"
+        )
+
+        mockedHttpConnecting.inputStream = ("testAnalyticsResponse").byteInputStream()
+        var networkRequest: NetworkRequest? = null
+        networkMonitor = { request ->
+            networkRequest = request
+            assertTrue(request.url.contains("test.com"))
+            assertTrue(String(request.body).contains(payload))
+            countDownLatch.countDown()
+        }
+
+        analyticsHitProcessor.processHit(dataEntity) {
+            assertTrue(it)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
+        assertNotNull(networkRequest)
+        assertTrue(networkRequest!!.headers.contains("Content-Type"))
+        assertFalse(networkRequest!!.headers.contains("X-Adobe-AEP-Validation-Token"))
     }
 }
