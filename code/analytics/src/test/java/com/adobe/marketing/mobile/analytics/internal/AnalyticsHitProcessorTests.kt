@@ -84,8 +84,8 @@ class AnalyticsHitProcessorTests {
         networkMonitor = { request ->
             networkRequest = request
         }
-        analyticsHitProcessor.processHit(badDataEntity) {
-            assertTrue(it)
+        analyticsHitProcessor.processHit(badDataEntity) { processingComplete ->
+            assertTrue(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -106,8 +106,8 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
             countDownLatch.countDown()
         }
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertFalse(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertFalse(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -127,8 +127,8 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
             countDownLatch.countDown()
         }
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertTrue(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertTrue(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -159,8 +159,8 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertTrue(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertTrue(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -219,8 +219,8 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(timestamp + 10, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertTrue(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertTrue(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -263,8 +263,8 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
         }
 
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertTrue(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertTrue(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -288,8 +288,8 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
         }
 
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertFalse(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertFalse(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -325,8 +325,8 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertFalse(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertFalse(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -357,8 +357,8 @@ class AnalyticsHitProcessorTests {
             countDownLatch.countDown()
         }
 
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertTrue(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertTrue(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -412,8 +412,8 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertTrue(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertTrue(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
@@ -446,8 +446,8 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(dataEntity) {
-            assertTrue(it)
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertTrue(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
