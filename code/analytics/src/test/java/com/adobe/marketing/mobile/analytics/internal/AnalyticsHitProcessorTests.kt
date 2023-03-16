@@ -27,8 +27,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.never
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -57,7 +59,6 @@ class AnalyticsHitProcessorTests {
 
         Mockito.reset(mockedExtensionApi)
         Mockito.reset(mockedAnalyticsState)
-        Mockito.`when`(mockedAnalyticsState.lastResetIdentitiesTimestampSec).thenReturn(1234L)
         Mockito.`when`(mockedAnalyticsState.host).thenReturn("test.com")
         Mockito.`when`(mockedAnalyticsState.rsids).thenReturn("rsid")
         Mockito.`when`(mockedAnalyticsState.isAnalyticsConfigured).thenReturn(true)
@@ -384,5 +385,80 @@ class AnalyticsHitProcessorTests {
         assertTrue((event.eventData["hitHost"] as? String)?.startsWith("https://test.com/b/ss/rsid/0") == true)
         assertTrue((event.eventData["hitUrl"] as? String)?.startsWith(payload) == true)
         assertTrue((event.eventData["hitUrl"] as? String)?.endsWith("&p.&debug=true&.p") == true)
+    }
+
+    @Test
+    fun `network success for event processed during resetIdentities should ignore response`() {
+        val countDownLatch = CountDownLatch(2)
+        Mockito.`when`(mockedAnalyticsState.lastResetIdentitiesTimestampSec).thenReturn(TimeUtils.getUnixTimeInSeconds())
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        val payload =
+            "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
+        val timestamp = TimeUtils.getUnixTimeInSeconds()
+        val badDataEntity =
+            AnalyticsHit(payload, timestamp, "id1").toDataEntity()
+        mockedHttpConnecting.responseCode = 200
+        mockedHttpConnecting.responseProperties = mapOf(
+            "ETag" to "eTag",
+            "Server" to "abc.com",
+            "Content-Type" to "xyz"
+        )
+        mockedHttpConnecting.inputStream = ("testAnalyticsResponse").byteInputStream()
+        networkMonitor = { request ->
+            assertTrue(request.url.contains("test.com"))
+            assertTrue(String(request.body).contains(payload))
+            countDownLatch.countDown()
+        }
+
+        assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
+
+        analyticsHitProcessor.processHit(badDataEntity) {
+            assertTrue(it)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
+        verify(mockedExtensionApi, never()).dispatch(any(Event::class.java))
+        assertEquals(timestamp, analyticsHitProcessor.getLastHitTimestamp())
+    }
+
+    @Test
+    fun `network success for event processed after resetIdentities should dispatch response`() {
+        val countDownLatch = CountDownLatch(2)
+        Mockito.`when`(mockedAnalyticsState.lastResetIdentitiesTimestampSec).thenReturn(TimeUtils.getUnixTimeInSeconds() - 10) // simulate previous reset
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        val payload =
+            "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
+        val timestamp = TimeUtils.getUnixTimeInSeconds()
+        val badDataEntity =
+            AnalyticsHit(payload, timestamp, "id1").toDataEntity()
+        mockedHttpConnecting.responseCode = 200
+        mockedHttpConnecting.responseProperties = mapOf(
+            "ETag" to "eTag",
+            "Server" to "abc.com",
+            "Content-Type" to "xyz"
+        )
+        mockedHttpConnecting.inputStream = ("testAnalyticsResponse").byteInputStream()
+        networkMonitor = { request ->
+            assertTrue(request.url.contains("test.com"))
+            assertTrue(String(request.body).contains(payload))
+            countDownLatch.countDown()
+        }
+
+        assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
+
+        analyticsHitProcessor.processHit(badDataEntity) {
+            assertTrue(it)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
+        val eventCaptor = ArgumentCaptor.forClass(
+            Event::class.java
+        )
+        verify(mockedExtensionApi, times(1)).dispatch(eventCaptor.capture())
+        val event = eventCaptor.value
+        assertNotNull(event)
+        assertEquals("AnalyticsResponse", event.name)
+        assertEquals("com.adobe.eventType.analytics", event.type)
+        assertEquals("com.adobe.eventSource.responseContent", event.source)
     }
 }
