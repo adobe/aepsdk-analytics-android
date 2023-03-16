@@ -97,7 +97,7 @@ class AnalyticsHitProcessorTests {
     fun `network failure - recoverable error`() {
         val countDownLatch = CountDownLatch(2)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit("payload1", TimeUtils.getUnixTimeInSeconds(), "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
         // 408, 504, 503, -1
@@ -106,7 +106,7 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
             countDownLatch.countDown()
         }
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertFalse(it)
             countDownLatch.countDown()
         }
@@ -118,7 +118,7 @@ class AnalyticsHitProcessorTests {
     fun `network failure - 404 error`() {
         val countDownLatch = CountDownLatch(2)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit("payload1", TimeUtils.getUnixTimeInSeconds(), "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
         // 408, 504, 503, -1
@@ -127,7 +127,7 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
             countDownLatch.countDown()
         }
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
@@ -142,7 +142,7 @@ class AnalyticsHitProcessorTests {
         val payload =
             "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
         val timestamp = TimeUtils.getUnixTimeInSeconds()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit(payload, timestamp, "id1").toDataEntity()
         mockedHttpConnecting.responseCode = 200
         mockedHttpConnecting.responseProperties = mapOf(
@@ -159,7 +159,7 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
@@ -202,7 +202,7 @@ class AnalyticsHitProcessorTests {
         analyticsHitProcessor.setLastHitTimestamp(
             timestamp + 10
         )
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit(payload, timestamp, "id1").toDataEntity()
         mockedHttpConnecting.responseCode = 200
         mockedHttpConnecting.responseProperties = mapOf(
@@ -219,7 +219,7 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(timestamp + 10, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
@@ -256,14 +256,14 @@ class AnalyticsHitProcessorTests {
         val countDownLatch = CountDownLatch(1)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
         val currentTimestamp = TimeUtils.getUnixTimeInSeconds()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit("payload", currentTimestamp - 65, "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
         networkMonitor = { request ->
             networkRequest = request
         }
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
@@ -281,14 +281,14 @@ class AnalyticsHitProcessorTests {
         val countDownLatch = CountDownLatch(1)
         val analyticsHitProcessor = initAnalyticsHitProcessor()
         val currentTimestamp = TimeUtils.getUnixTimeInSeconds()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit("payload", currentTimestamp - 65, "id1").toDataEntity()
         var networkRequest: NetworkRequest? = null
         networkMonitor = { request ->
             networkRequest = request
         }
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertFalse(it)
             countDownLatch.countDown()
         }
@@ -395,7 +395,7 @@ class AnalyticsHitProcessorTests {
         val payload =
             "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
         val timestamp = TimeUtils.getUnixTimeInSeconds()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit(payload, timestamp, "id1").toDataEntity()
         mockedHttpConnecting.responseCode = 200
         mockedHttpConnecting.responseProperties = mapOf(
@@ -412,7 +412,7 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
@@ -429,7 +429,7 @@ class AnalyticsHitProcessorTests {
         val payload =
             "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
         val timestamp = TimeUtils.getUnixTimeInSeconds()
-        val badDataEntity =
+        val dataEntity =
             AnalyticsHit(payload, timestamp, "id1").toDataEntity()
         mockedHttpConnecting.responseCode = 200
         mockedHttpConnecting.responseProperties = mapOf(
@@ -446,7 +446,7 @@ class AnalyticsHitProcessorTests {
 
         assertEquals(0, analyticsHitProcessor.getLastHitTimestamp())
 
-        analyticsHitProcessor.processHit(badDataEntity) {
+        analyticsHitProcessor.processHit(dataEntity) {
             assertTrue(it)
             countDownLatch.countDown()
         }
