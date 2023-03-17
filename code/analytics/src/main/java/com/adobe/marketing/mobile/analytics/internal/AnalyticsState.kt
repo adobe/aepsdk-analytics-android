@@ -16,7 +16,6 @@ import com.adobe.marketing.mobile.services.Log
 import com.adobe.marketing.mobile.util.DataReader
 import com.adobe.marketing.mobile.util.DataReaderException
 import com.adobe.marketing.mobile.util.StringUtils
-import com.adobe.marketing.mobile.util.TimeUtils
 import java.util.HashMap
 
 /**
@@ -27,7 +26,8 @@ class AnalyticsState {
     internal var host: String? = null
         private set
 
-    internal var lastResetIdentitiesTimestampSec: Long = TimeUtils.getUnixTimeInSeconds()
+    // Store the timestamp for most recent resetIdentities API call
+    internal var lastResetIdentitiesTimestampSec: Long = 0L
 
     // ----------- Configuration properties -----------
     internal var isAnalyticsForwardingEnabled: Boolean =

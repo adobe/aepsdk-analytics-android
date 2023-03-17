@@ -183,7 +183,8 @@ internal class AnalyticsHitProcessor(
                         Log.debug(
                             AnalyticsConstants.LOG_TAG,
                             CLASS_NAME,
-                            "processHit - Dispatching Analytics hit response."
+                            "processHit - Dispatching Analytics hit response for request event id %s.",
+                            eventIdentifier
                         )
                         extensionApi.dispatch(
                             Event.Builder(
@@ -191,6 +192,13 @@ internal class AnalyticsHitProcessor(
                                 EventType.ANALYTICS,
                                 EventSource.RESPONSE_CONTENT
                             ).setEventData(eventData).build()
+                        )
+                    } else {
+                        Log.debug(
+                            AnalyticsConstants.LOG_TAG,
+                            CLASS_NAME,
+                            "processHit - Ignoring response for request event id %s as it was received while processing a resetIdentities event.",
+                            eventIdentifier
                         )
                     }
                     lastHitTimestamp = timestamp
