@@ -457,4 +457,9 @@ class AnalyticsStateTests {
     fun testGetAnalyticsIdVisitorParametersWhenVisitorDataIsAbsent() {
         assertTrue(state.analyticsIdVisitorParameters.isEmpty())
     }
+
+    @Test
+    fun testLastResetIdentitiesTimestampSec_shouldBeZeroByDefault() {
+        assertEquals(0L, state.lastResetIdentitiesTimestampSec)
+    }
 }
