@@ -73,6 +73,7 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
             "lifecyclecontextdata" to mapOf(
                 "osversion" to "mockOSName",
                 "locale" to "en-US",
+                "systemlocale" to "fr-FR",
                 "resolution" to "0x0",
                 "carriername" to "mockMobileCarrier",
                 "devicename" to "mockDeviceBuildId",
@@ -201,6 +202,7 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
             "lifecyclecontextdata" to mapOf(
                 "osversion" to "mockOSName",
                 "locale" to "en-US",
+                "systemlocale" to "fr-FR",
                 "resolution" to "0x0",
                 "carriername" to "mockMobileCarrier",
                 "devicename" to "mockDeviceBuildId",
@@ -269,7 +271,8 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
             "a.OSVersion" to "mockOSName",
             "a.Resolution" to "0x0",
             "a.RunMode" to "Application",
-            "a.locale" to "en-US"
+            "a.locale" to "en-US",
+            "a.systemLocale" to "fr-FR"
         )
         Assert.assertTrue(expectedContextData2 == contextDataMap2)
         Assert.assertEquals(expectedVars2.size, varMap2.size)
@@ -343,6 +346,7 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
             "lifecyclecontextdata" to mapOf(
                 "osversion" to "mockOSName",
                 "locale" to "en-US",
+                "systemlocale" to "fr-FR",
                 "resolution" to "0x0",
                 "carriername" to "mockMobileCarrier",
                 "devicename" to "mockDeviceBuildId",
@@ -413,7 +417,8 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
             "a.OSVersion" to "mockOSName",
             "a.Resolution" to "0x0",
             "a.RunMode" to "Application",
-            "a.locale" to "en-US"
+            "a.locale" to "en-US",
+            "a.systemLocale" to "fr-FR"
         )
         Assert.assertTrue(expectedContextData2 == contextDataMap2)
         Assert.assertEquals(expectedVars2.size, varMap2.size)
@@ -454,6 +459,7 @@ internal class AnalyticsTrackLifecycleTests : AnalyticsFunctionalTestBase() {
                 "lifecyclecontextdata" to mapOf(
                     "osversion" to "mockOSName",
                     "locale" to "en-US",
+                    "systemlocale" to "fr-FR",
                     "resolution" to "0x0",
                     "carriername" to "mockMobileCarrier",
                     "devicename" to "mockDeviceBuildId",
