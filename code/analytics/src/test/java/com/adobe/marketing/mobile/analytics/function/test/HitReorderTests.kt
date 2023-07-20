@@ -464,6 +464,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
             "lifecyclecontextdata" to mapOf(
                 "osversion" to "mockOSName",
                 "locale" to "en-US",
+                "systemlocale" to "fr-FR",
                 "resolution" to "0x0",
                 "carriername" to "mockMobileCarrier",
                 "devicename" to "mockDeviceBuildId",
@@ -529,6 +530,7 @@ internal class HitReorderTests : AnalyticsFunctionalTestBase() {
         )
         val expectedContextData1: Map<String, String> = mapOf(
             "a.locale" to "en-US",
+            "a.systemLocale" to "fr-FR",
             "a.AppID" to "mockAppName",
             "a.CarrierName" to "mockMobileCarrier",
             "a.DeviceName" to "mockDeviceBuildId",
