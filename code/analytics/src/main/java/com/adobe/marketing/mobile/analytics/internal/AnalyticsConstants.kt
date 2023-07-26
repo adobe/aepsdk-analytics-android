@@ -18,7 +18,7 @@ internal object AnalyticsConstants {
 
     const val EXTENSION_NAME = "com.adobe.module.analytics"
     const val FRIENDLY_NAME = "Analytics"
-    const val EXTENSION_VERSION = "2.0.2"
+    const val EXTENSION_VERSION = "2.0.3"
     const val DATASTORE_NAME = "AnalyticsDataStorage"
     const val DATA_QUEUE_NAME = EXTENSION_NAME
     const val REORDER_QUEUE_NAME = "com.adobe.module.analyticsreorderqueue"
@@ -103,6 +103,7 @@ internal object AnalyticsConstants {
         const val DEVICE_RESOLUTION = "a.Resolution"
         const val CARRIER_NAME = "a.CarrierName"
         const val LOCALE = "a.locale"
+        const val SYSTEM_LOCALE = "a.systemLocale"
         const val RUN_MODE = "a.RunMode"
         const val IGNORED_SESSION_LENGTH = "a.ignoredSessionLength"
         const val ACTION_KEY = "a.action"
@@ -198,6 +199,7 @@ internal object AnalyticsConstants {
             const val LIFECYCLE_PAUSE = "pause"
             const val LIFECYCLE_START = "start"
             const val LOCALE = "locale"
+            const val SYSTEM_LOCALE = "systemlocale"
             const val MAX_SESSION_LENGTH = "maxsessionlength"
             const val MONTHLY_ENGAGED_EVENT = "monthlyenguserevent"
             const val OPERATING_SYSTEM = "osversion"
@@ -258,6 +260,7 @@ internal object AnalyticsConstants {
         EventDataKeys.Lifecycle.LAUNCHES to ContextDataKeys.LAUNCHES,
         EventDataKeys.Lifecycle.LAUNCHES_SINCE_UPGRADE to ContextDataKeys.LAUNCHES_SINCE_UPGRADE,
         EventDataKeys.Lifecycle.LOCALE to ContextDataKeys.LOCALE,
+        EventDataKeys.Lifecycle.SYSTEM_LOCALE to ContextDataKeys.SYSTEM_LOCALE,
         EventDataKeys.Lifecycle.MONTHLY_ENGAGED_EVENT to ContextDataKeys.MONTHLY_ENGAGED_EVENT_KEY,
         EventDataKeys.Lifecycle.OPERATING_SYSTEM to ContextDataKeys.OPERATING_SYSTEM,
         EventDataKeys.Lifecycle.PREVIOUS_SESSION_LENGTH to ContextDataKeys.PREVIOUS_SESSION_LENGTH,
