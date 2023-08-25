@@ -20,7 +20,7 @@ android {
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
-    flavorDimensions "target"
+    flavorDimensions = ["target"]
 
     productFlavors {
         phone {
@@ -56,7 +56,7 @@ android {
     }
 
 }
-configurations.all {
+configurations.configureEach {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 dependencies {
@@ -78,7 +78,7 @@ dependencies {
     androidTestUtil 'androidx.test:orchestrator:1.4.2'
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     testLogging {
         showStandardStreams = true
     }
@@ -86,7 +86,8 @@ tasks.withType(Test) {
     jacoco.excludes = ['jdk.internal.*']
 }
 
-task codeCoverageReport(type: JacocoReport, dependsOn: ['testPhoneDebugUnitTest', 'createPhoneDebugCoverageReport']) {
+tasks.register('codeCoverageReport', JacocoReport) {
+    dependsOn['testPhoneDebugUnitTest', 'createPhoneDebugCoverageReport']
     def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
     def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes", excludes: excludeRegex)
 
@@ -105,7 +106,8 @@ task codeCoverageReport(type: JacocoReport, dependsOn: ['testPhoneDebugUnitTest'
     }
 }
 
-task unitTestsCoverageReport(type: JacocoReport, dependsOn: "testPhoneDebugUnitTest") {
+tasks.register('unitTestsCoverageReport', JacocoReport) {
+    dependsOn "testPhoneDebugUnitTest"
     def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
     def javaClasses = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes", excludes: excludeRegex)
     def kotlinClasses = fileTree(dir: "${project.buildDir}/tmp/kotlin-classes/phoneDebug", excludes: excludeRegex)
@@ -125,7 +127,8 @@ task unitTestsCoverageReport(type: JacocoReport, dependsOn: "testPhoneDebugUnitT
     }
 }
 
-task functionalTestsCoverageReport(type: JacocoReport, dependsOn: "createPhoneDebugCoverageReport") {
+tasks.register('functionalTestsCoverageReport', JacocoReport) {
+    dependsOn "createPhoneDebugCoverageReport"
     def excludeRegex = ['**/ADB*.class', '**/BuildConfig.class']
     def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/phoneDebug/classes", excludes: excludeRegex)
 
@@ -156,7 +159,8 @@ def isJitPackBuild() {
 
 def groupIdForPublish = isJitPackBuild()? 'com.github.adobe.aepsdk-analytics-android': 'com.adobe.marketing.mobile'
 
-task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn dokkaJavadoc
     archiveClassifier.set('javadoc')
     from dokkaJavadoc.outputDirectory
 }
