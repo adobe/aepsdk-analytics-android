@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy {
         cacheDynamicVersionsFor 0, 'seconds'
         cacheChangingModulesFor 0, 'seconds'
@@ -9,12 +9,12 @@ configurations.all {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.adobe.analyticstestapp"
-        minSdkVersion 19
-        targetSdkVersion 33
+        minSdk 19
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
