@@ -99,6 +99,50 @@ class AnalyticsIntegrationTests {
         assertTrue(countDownLatch.await(1000, TimeUnit.MILLISECONDS))
     }
 
+    @Test
+    fun testGetQueueSz() {
+        val countDownLatch = CountDownLatch(1)
+        MobileCore.updateConfiguration(
+                mapOf(
+                        "analytics.server" to "test.com",
+                        "analytics.rsids" to "rsid",
+                        "global.privacy" to "optedin",
+                        "experienceCloud.org" to "orgid",
+                        "analytics.batchLimit" to 5,
+                        "analytics.offlineEnabled" to true,
+                        "analytics.backdatePreviousSessionInfo" to true,
+                        "analytics.launchHitDelay" to 1
+                )
+        )
+        val sharedStatesLatch = CountDownLatch(2)
+        configurationAwareness { sharedStatesLatch.countDown() }
+        identityAwareness { sharedStatesLatch.countDown() }
+        sharedStatesLatch.await()
+        MobileCore.trackState(
+                "homePage",
+                mapOf(
+                        "key1" to "value1"
+                )
+        )
+        MobileCore.trackState(
+                "homePage",
+                mapOf(
+                        "key1" to "value1"
+                )
+        )
+        MobileCore.trackState(
+                "homePage",
+                mapOf(
+                        "key1" to "value1"
+                )
+        )
+        Analytics.getQueueSize {
+            assertEquals(3, it)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
+    }
+
     @Test(timeout = 10000)
     fun testTrackAction() {
         val countDownLatch = CountDownLatch(1)
@@ -141,6 +185,7 @@ class AnalyticsIntegrationTests {
             "a.action" to "clickOK"
         )
         assertTrue(expectedContextData == contextDataMap)
+
         assertEquals("1", varMap["ndh"])
         assertEquals("UTF-8", varMap["ce"])
         assertEquals("lnk_o", varMap["pe"])
@@ -198,50 +243,6 @@ class AnalyticsIntegrationTests {
         assertEquals("foreground", varMap["cp"])
         assertNotNull(varMap["mid"])
         assertNotNull(varMap["ts"])
-    }
-
-    @Test
-    fun testGetQueueSize() {
-        val countDownLatch = CountDownLatch(1)
-        MobileCore.updateConfiguration(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 5,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            )
-        )
-        val sharedStatesLatch = CountDownLatch(2)
-        configurationAwareness { sharedStatesLatch.countDown() }
-        identityAwareness { sharedStatesLatch.countDown() }
-        sharedStatesLatch.await()
-        MobileCore.trackState(
-            "homePage",
-            mapOf(
-                "key1" to "value1"
-            )
-        )
-        MobileCore.trackState(
-            "homePage",
-            mapOf(
-                "key1" to "value1"
-            )
-        )
-        MobileCore.trackState(
-            "homePage",
-            mapOf(
-                "key1" to "value1"
-            )
-        )
-        Analytics.getQueueSize {
-            assertEquals(3, it)
-            countDownLatch.countDown()
-        }
-        countDownLatch.await()
     }
 
     @Test
