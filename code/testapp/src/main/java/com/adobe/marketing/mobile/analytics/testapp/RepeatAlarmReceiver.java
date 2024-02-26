@@ -46,7 +46,7 @@ public class RepeatAlarmReceiver extends BroadcastReceiver {
 		Toast.makeText(context, "Initialized RepeatAlarmReceiver", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "Initialized AnalyticsTrackingReceiver to run every 60 seconds");
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(context,
-									  AnalyticsTrackingReceiver.class), 0);
+									  AnalyticsTrackingReceiver.class), PendingIntent.FLAG_IMMUTABLE);
 		AlarmManager manager = (AlarmManager)(context.getSystemService(Context.ALARM_SERVICE));
 
 		// Repeat every minute
