@@ -17,7 +17,6 @@ import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Analytics {
