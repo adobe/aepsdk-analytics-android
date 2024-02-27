@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name="AnalyticsTestApp">
-        <activity android:name="com.adobe.marketing.mobile.analytics.testapp.MainActivity" android:exported="true">
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,9 +24,9 @@
             </intent-filter>
 
         </activity>
-        <activity android:name="com.adobe.marketing.mobile.analytics.testapp.SettingsActivity"/>
+        <activity android:name=".SettingsActivity"/>
         <receiver
-            android:name="com.adobe.marketing.mobile.analytics.testapp.RepeatAlarmReceiver"
+            android:name=".RepeatAlarmReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

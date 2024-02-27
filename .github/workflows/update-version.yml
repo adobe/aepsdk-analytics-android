@@ -18,7 +18,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     
-    - name: Update Analytics Consent
+    - name: Update Analytics
       run: (./scripts/version.sh -u -v ${{ github.event.inputs.version }} -d "Core ${{ github.event.inputs.core-dependency }},")
 
     - name: Create Pull Request

@@ -9,7 +9,6 @@ aepLibrary {
     namespace = "com.adobe.marketing.mobile.analytics"
     enableSpotless = true
     enableCheckStyle = true
-    enableDokkaDoc = true
 
     publishing {
         gitRepoName = "aepsdk-analytics-android"
