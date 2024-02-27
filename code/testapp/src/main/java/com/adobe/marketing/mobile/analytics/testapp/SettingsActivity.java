@@ -10,7 +10,8 @@
  */
 package com.adobe.marketing.mobile.analytics.testapp;
 
-import com.adobe.marketing.mobile.*;
+import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.Assurance;
 
 import android.content.Intent;
 import android.content.SharedPreferences;

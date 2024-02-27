@@ -103,38 +103,38 @@ class AnalyticsIntegrationTests {
     fun testGetQueueSz() {
         val countDownLatch = CountDownLatch(1)
         MobileCore.updateConfiguration(
-                mapOf(
-                        "analytics.server" to "test.com",
-                        "analytics.rsids" to "rsid",
-                        "global.privacy" to "optedin",
-                        "experienceCloud.org" to "orgid",
-                        "analytics.batchLimit" to 5,
-                        "analytics.offlineEnabled" to true,
-                        "analytics.backdatePreviousSessionInfo" to true,
-                        "analytics.launchHitDelay" to 1
-                )
+            mapOf(
+                "analytics.server" to "test.com",
+                "analytics.rsids" to "rsid",
+                "global.privacy" to "optedin",
+                "experienceCloud.org" to "orgid",
+                "analytics.batchLimit" to 5,
+                "analytics.offlineEnabled" to true,
+                "analytics.backdatePreviousSessionInfo" to true,
+                "analytics.launchHitDelay" to 1
+            )
         )
         val sharedStatesLatch = CountDownLatch(2)
         configurationAwareness { sharedStatesLatch.countDown() }
         identityAwareness { sharedStatesLatch.countDown() }
         sharedStatesLatch.await()
         MobileCore.trackState(
-                "homePage",
-                mapOf(
-                        "key1" to "value1"
-                )
+            "homePage",
+            mapOf(
+                "key1" to "value1"
+            )
         )
         MobileCore.trackState(
-                "homePage",
-                mapOf(
-                        "key1" to "value1"
-                )
+            "homePage",
+            mapOf(
+                "key1" to "value1"
+            )
         )
         MobileCore.trackState(
-                "homePage",
-                mapOf(
-                        "key1" to "value1"
-                )
+            "homePage",
+            mapOf(
+                "key1" to "value1"
+            )
         )
         Analytics.getQueueSize {
             assertEquals(3, it)

@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
-import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
@@ -37,7 +36,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class AnalyticsAPITests {
 
     @SuppressWarnings("rawtypes")
-
     @Test
     public void testClearQueue() {
         try (MockedStatic<MobileCore> mobileCoreMockedStatic =

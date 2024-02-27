@@ -23,8 +23,8 @@ import android.widget.Toast;
  * This job can run when the app is in background, so use it cautiously and always cancel the alarm after
  * you finished testing or uninstall the app.
  * Can be initialized or canceled from command line:
- * adb shell am broadcast -a com.adobe.analyticstestapp.alarm.INIT -n com.adobe.analyticstestapp/.RepeatAlarmReceiver
- * adb shell am broadcast -a com.adobe.analyticstestapp.alarm.CANCEL -n com.adobe.analyticstestapp/.RepeatAlarmReceiver
+ * adb shell am broadcast -a com.adobe.marketing.mobile.analytics.testapp.alarm.INIT -n com.adobe.marketing.mobile.analytics.testapp/.RepeatAlarmReceiver
+ * adb shell am broadcast -a com.adobe.marketing.mobile.analytics.testapp.alarm.CANCEL -n com.adobe.marketing.mobile.analytics.testapp/.RepeatAlarmReceiver
  *
  */
 public class RepeatAlarmReceiver extends BroadcastReceiver {

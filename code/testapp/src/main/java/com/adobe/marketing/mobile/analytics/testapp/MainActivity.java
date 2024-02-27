@@ -11,7 +11,10 @@
 package com.adobe.marketing.mobile.analytics.testapp;
 
 import com.adobe.marketing.mobile.Analytics;
-import com.adobe.marketing.mobile.*;
+import com.adobe.marketing.mobile.Identity;
+import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.MobilePrivacyStatus;
+import com.adobe.marketing.mobile.VisitorID;
 
 import android.content.Intent;
 import android.os.Bundle;

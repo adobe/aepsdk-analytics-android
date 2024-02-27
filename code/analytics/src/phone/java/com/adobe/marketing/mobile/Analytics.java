@@ -17,7 +17,6 @@ import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Analytics {
@@ -77,7 +76,7 @@ public class Analytics {
                 new AdobeCallbackWithError<Event>() {
 
                     @Override
-                    public void call(Event event) {
+                    public void call(final Event event) {
                         Map<String, Object> eventData = event.getEventData();
                         callback.call(
                                 eventData != null
@@ -86,7 +85,7 @@ public class Analytics {
                     }
 
                     @Override
-                    public void fail(AdobeError adobeError) {
+                    public void fail(final AdobeError adobeError) {
                         if (adobeCallbackWithError != null) {
                             adobeCallbackWithError.fail(adobeError);
                         }
@@ -128,7 +127,7 @@ public class Analytics {
                 new AdobeCallbackWithError<Event>() {
 
                     @Override
-                    public void call(Event event) {
+                    public void call(final Event event) {
                         Map<String, Object> eventData = event.getEventData();
                         callback.call(
                                 eventData != null
@@ -137,7 +136,7 @@ public class Analytics {
                     }
 
                     @Override
-                    public void fail(AdobeError adobeError) {
+                    public void fail(final AdobeError adobeError) {
                         if (adobeCallbackWithError != null) {
                             adobeCallbackWithError.fail(adobeError);
                         }
@@ -204,7 +203,7 @@ public class Analytics {
                 new AdobeCallbackWithError<Event>() {
 
                     @Override
-                    public void call(Event event) {
+                    public void call(final Event event) {
                         Map<String, Object> eventData = event.getEventData();
                         callback.call(
                                 eventData != null
@@ -213,7 +212,7 @@ public class Analytics {
                     }
 
                     @Override
-                    public void fail(AdobeError adobeError) {
+                    public void fail(final AdobeError adobeError) {
                         if (adobeCallbackWithError != null) {
                             adobeCallbackWithError.fail(adobeError);
                         }
