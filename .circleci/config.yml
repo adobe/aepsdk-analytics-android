@@ -58,6 +58,9 @@ jobs:
       - android/save-build-cache:
           cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
+      - store_artifacts:
+          path: code/<< pipeline.parameters.build-path >>/build/reports  
+          
   build-and-unit-test:
     executor:
       name: android/android-docker
