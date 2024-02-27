@@ -3,6 +3,7 @@ plugins {
 }
 
 val mavenCoreVersion: String by project
+val mavenIdentityVersion: String by project
 
 aepLibrary {
     namespace = "com.adobe.marketing.mobile.analytics"
@@ -26,9 +27,8 @@ dependencies {
 
     // androidTestImplementation dependencies provided by aep-library:
     // JUNIT
-    androidTestImplementation("com.adobe.marketing.mobile:identity:3.0.0-SNAPSHOT")
+    androidTestImplementation("com.adobe.marketing.mobile:identity:$mavenIdentityVersion-SNAPSHOT")
     {
         exclude(group = "com.adobe.marketing.mobile", module = "core")
     }
-    //androidTestUtil("androidx.test:$Versions.ANDROIDX_TEST_ORCHESTRATOR")
 }
