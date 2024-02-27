@@ -1,6 +1,9 @@
 EXTENSION-LIBRARY-FOLDER-NAME = analytics
 TEST-APP-FOLDER-NAME = testapp
 
+init:
+	git config core.hooksPath .githooks
+
 clean:
 	(./code/gradlew -p code clean)
 
