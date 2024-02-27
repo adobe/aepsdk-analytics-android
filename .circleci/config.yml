@@ -76,9 +76,9 @@ jobs:
       - android/restore-build-cache:
           cache-prefix: << pipeline.parameters.build-cache-prefix >> 
 
-      - run:
-          name: Javadoc
-          command: make javadoc
+      # - run:
+      #     name: Javadoc
+      #     command: make javadoc
 
       - store_artifacts:
           path: << pipeline.parameters.build-path >>/docs/javadoc
