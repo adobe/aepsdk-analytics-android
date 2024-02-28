@@ -49,7 +49,7 @@ jobs:
       #     command: make checkformat
 
       # - run:
-      #     name: Check Stype
+      #     name: Check Style
       #     command: make checkstyle
 
       - android/save-gradle-cache:
