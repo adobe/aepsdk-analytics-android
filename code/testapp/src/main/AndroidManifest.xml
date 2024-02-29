@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.adobe.analyticstestapp">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:networkSecurityConfig="@xml/network_security_config"
@@ -11,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name="AnalyticsTestApp">
-        <activity android:name="com.adobe.analyticstestapp.MainActivity" android:exported="true">
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,9 +24,9 @@
             </intent-filter>
 
         </activity>
-        <activity android:name="com.adobe.analyticstestapp.SettingsActivity"/>
+        <activity android:name=".SettingsActivity"/>
         <receiver
-            android:name="com.adobe.analyticstestapp.RepeatAlarmReceiver"
+            android:name=".RepeatAlarmReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

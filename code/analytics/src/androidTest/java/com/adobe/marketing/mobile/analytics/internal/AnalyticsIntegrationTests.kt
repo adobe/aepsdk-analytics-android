@@ -141,6 +141,7 @@ class AnalyticsIntegrationTests {
             "a.action" to "clickOK"
         )
         assertTrue(expectedContextData == contextDataMap)
+
         assertEquals("1", varMap["ndh"])
         assertEquals("UTF-8", varMap["ce"])
         assertEquals("lnk_o", varMap["pe"])
@@ -204,45 +205,49 @@ class AnalyticsIntegrationTests {
     fun testGetQueueSize() {
         val countDownLatch = CountDownLatch(1)
         MobileCore.updateConfiguration(
-            mapOf(
-                "analytics.server" to "test.com",
-                "analytics.rsids" to "rsid",
-                "global.privacy" to "optedin",
-                "experienceCloud.org" to "orgid",
-                "analytics.batchLimit" to 5,
-                "analytics.offlineEnabled" to true,
-                "analytics.backdatePreviousSessionInfo" to true,
-                "analytics.launchHitDelay" to 1
-            )
+                mapOf(
+                        "analytics.server" to "test.com",
+                        "analytics.rsids" to "rsid",
+                        "global.privacy" to "optedin",
+                        "experienceCloud.org" to "orgid",
+                        "analytics.batchLimit" to 5,
+                        "analytics.offlineEnabled" to true,
+                        "analytics.backdatePreviousSessionInfo" to true,
+                        "analytics.launchHitDelay" to 1
+                )
         )
         val sharedStatesLatch = CountDownLatch(2)
         configurationAwareness { sharedStatesLatch.countDown() }
         identityAwareness { sharedStatesLatch.countDown() }
         sharedStatesLatch.await()
         MobileCore.trackState(
-            "homePage",
-            mapOf(
-                "key1" to "value1"
-            )
+                "homePage",
+                mapOf(
+                        "key1" to "value1"
+                )
         )
         MobileCore.trackState(
-            "homePage",
-            mapOf(
-                "key1" to "value1"
-            )
+                "homePage",
+                mapOf(
+                        "key1" to "value1"
+                )
         )
         MobileCore.trackState(
-            "homePage",
-            mapOf(
-                "key1" to "value1"
-            )
+                "homePage",
+                mapOf(
+                        "key1" to "value1"
+                )
         )
         Analytics.getQueueSize {
             assertEquals(3, it)
             countDownLatch.countDown()
         }
         countDownLatch.await()
+
+        // Clear the queue before the next test
+        cleanAnalyticsQueue()
     }
+
 
     @Test
     fun testClearQueue() {
@@ -365,6 +370,18 @@ internal fun extractQueryParamsFrom(url: String): Map<String, String> {
 
 private fun extractContextDataStringFrom(url: String): String? {
     return CONTEXT_DATA_REGEX.find(url)?.value
+}
+
+// Clear the queue to get ready for the next test
+private fun cleanAnalyticsQueue() {
+
+    val clearQueueLatch = CountDownLatch(1)
+    Analytics.clearQueue()
+    // Calling getQueueSize and waiting for the callback to ensure the queue is cleared
+    Analytics.getQueueSize {
+        clearQueueLatch.countDown()
+    }
+    clearQueueLatch.await()
 }
 
 internal fun extractContextDataFrom(url: String): Map<String, String> {

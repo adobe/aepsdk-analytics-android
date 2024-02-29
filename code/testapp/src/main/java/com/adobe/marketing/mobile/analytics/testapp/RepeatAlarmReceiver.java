@@ -8,7 +8,7 @@
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
  */
-package com.adobe.analyticstestapp;
+package com.adobe.marketing.mobile.analytics.testapp;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -46,7 +46,7 @@ public class RepeatAlarmReceiver extends BroadcastReceiver {
 		Toast.makeText(context, "Initialized RepeatAlarmReceiver", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "Initialized AnalyticsTrackingReceiver to run every 60 seconds");
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, new Intent(context,
-									  AnalyticsTrackingReceiver.class), 0);
+									  AnalyticsTrackingReceiver.class), PendingIntent.FLAG_IMMUTABLE);
 		AlarmManager manager = (AlarmManager)(context.getSystemService(Context.ALARM_SERVICE));
 
 		// Repeat every minute

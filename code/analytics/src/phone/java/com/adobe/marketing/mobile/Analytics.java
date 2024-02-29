@@ -17,12 +17,11 @@ import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Analytics {
     private static final String LOG_TAG = "Analytics";
-    private static final String EXTENSION_VERSION = "2.0.3";
+    private static final String EXTENSION_VERSION = "3.0.0";
     // The constants for EventData keys
     private static final String ANALYTICS_ID = "aid";
     private static final String GET_QUEUE_SIZE = "getqueuesize";
@@ -36,29 +35,6 @@ public class Analytics {
     public static final Class<? extends Extension> EXTENSION = AnalyticsExtension.class;
 
     private Analytics() {}
-
-    /**
-     * Registers the extension with the Mobile SDK. This method should be called only once in your
-     * application class.
-     *
-     * @deprecated as of 2.0.0, use {@link MobileCore#registerExtensions(List, AdobeCallback)} with
-     *     {@link Analytics#EXTENSION} instead.
-     */
-    @Deprecated
-    public static void registerExtension() {
-        MobileCore.registerExtension(
-                AnalyticsExtension.class,
-                extensionError -> {
-                    if (extensionError == null) {
-                        return;
-                    }
-                    Log.error(
-                            LOG_TAG,
-                            LOG_TAG,
-                            "There was an error when registering the Analytics extension: %s",
-                            extensionError.getErrorName());
-                });
-    }
 
     /**
      * Returns the version for the Analytics extension
