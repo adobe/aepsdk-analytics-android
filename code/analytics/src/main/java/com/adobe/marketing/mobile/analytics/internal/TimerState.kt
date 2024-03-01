@@ -13,7 +13,8 @@ package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.AdobeCallback
 import com.adobe.marketing.mobile.services.Log
-import java.util.*
+import java.util.Timer
+import java.util.TimerTask
 
 /**
  * Encapsulates a [Timer] object and provides API to start/cancel the timer or check whether the timer is running.

@@ -76,7 +76,7 @@ public class Analytics {
                 new AdobeCallbackWithError<Event>() {
 
                     @Override
-                    public void call(Event event) {
+                    public void call(final Event event) {
                         Map<String, Object> eventData = event.getEventData();
                         callback.call(
                                 eventData != null
@@ -85,7 +85,7 @@ public class Analytics {
                     }
 
                     @Override
-                    public void fail(AdobeError adobeError) {
+                    public void fail(final AdobeError adobeError) {
                         if (adobeCallbackWithError != null) {
                             adobeCallbackWithError.fail(adobeError);
                         }
@@ -127,7 +127,7 @@ public class Analytics {
                 new AdobeCallbackWithError<Event>() {
 
                     @Override
-                    public void call(Event event) {
+                    public void call(final Event event) {
                         Map<String, Object> eventData = event.getEventData();
                         callback.call(
                                 eventData != null
@@ -136,7 +136,7 @@ public class Analytics {
                     }
 
                     @Override
-                    public void fail(AdobeError adobeError) {
+                    public void fail(final AdobeError adobeError) {
                         if (adobeCallbackWithError != null) {
                             adobeCallbackWithError.fail(adobeError);
                         }
@@ -203,7 +203,7 @@ public class Analytics {
                 new AdobeCallbackWithError<Event>() {
 
                     @Override
-                    public void call(Event event) {
+                    public void call(final Event event) {
                         Map<String, Object> eventData = event.getEventData();
                         callback.call(
                                 eventData != null
@@ -212,7 +212,7 @@ public class Analytics {
                     }
 
                     @Override
-                    public void fail(AdobeError adobeError) {
+                    public void fail(final AdobeError adobeError) {
                         if (adobeCallbackWithError != null) {
                             adobeCallbackWithError.fail(adobeError);
                         }

@@ -11,8 +11,6 @@
 
 package com.adobe.marketing.mobile.analytics.internal
 
-import java.util.*
-
 /**
  * Encapsulates a [Timer] object and provides API to start/cancel the timer or check whether the timer is running.
  */
