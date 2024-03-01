@@ -335,7 +335,7 @@ class AnalyticsHitProcessorTests {
     }
 
     @Test
-    fun `hit should be dropped with no retry when URL is malformed`() {
+    fun `hit should be retried when URL is malformed`() {
         // malformed URL
         Mockito.`when`(mockedAnalyticsState.host).thenReturn("adobe.com:_80")
 
@@ -351,7 +351,7 @@ class AnalyticsHitProcessorTests {
             networkRequest = request
         }
         analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
-            assertTrue(processingComplete)
+            assertFalse(processingComplete)
             countDownLatch.countDown()
         }
         countDownLatch.await()
