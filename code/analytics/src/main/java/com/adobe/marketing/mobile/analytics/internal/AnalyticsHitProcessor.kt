@@ -118,7 +118,7 @@ internal class AnalyticsHitProcessor(
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "processHit - Analytics has not been configured properly for RSID or host, retrying Analytics hit."
+                "processHit - The Analytics configuration for RSID or host is incomplete or incorrectly set up, as they appear to be empty or null, retrying Analytics hit."
             )
             processingResult.complete(false)
             return
