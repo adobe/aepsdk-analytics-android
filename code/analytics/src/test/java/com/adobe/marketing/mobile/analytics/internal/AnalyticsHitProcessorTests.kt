@@ -317,6 +317,7 @@ class AnalyticsHitProcessorTests {
             "Server" to "abc.com",
             "Content-Type" to "xyz"
         )
+
         networkMonitor = { request ->
             assertTrue(request.url.contains("test.com"))
             assertTrue(String(request.body).contains(payload))
@@ -330,6 +331,32 @@ class AnalyticsHitProcessorTests {
             countDownLatch.countDown()
         }
         countDownLatch.await()
+        Thread.sleep(50)
+    }
+
+    @Test
+    fun `hit should be dropped with no retry when URL is malformed`() {
+        // malformed URL
+        Mockito.`when`(mockedAnalyticsState.host).thenReturn("adobe.com:_80")
+
+        val countDownLatch = CountDownLatch(1)
+        val analyticsHitProcessor = initAnalyticsHitProcessor()
+        val payload =
+            "ndh=1&ce=UTF-8&c.&a.&action=testAction&.a&k1=v1&k2=v2&.c&t=00%2F00%2F0000%2000%3A00%3A00%200%20420&pe=lnk_o&pev2=AMACTION%3AtestAction&aamb=blob&mid=mid&aamlh=lochint&cp=foreground&ts=1669845066"
+        val timestamp = TimeUtils.getUnixTimeInSeconds()
+        val dataEntity =
+            AnalyticsHit(payload, timestamp, "id1").toDataEntity()
+        var networkRequest: NetworkRequest? = null
+        networkMonitor = { request ->
+            networkRequest = request
+        }
+        analyticsHitProcessor.processHit(dataEntity) { processingComplete ->
+            assertTrue(processingComplete)
+            countDownLatch.countDown()
+        }
+        countDownLatch.await()
+        Thread.sleep(50)
+        assertNull(networkRequest)
     }
 
     @Test

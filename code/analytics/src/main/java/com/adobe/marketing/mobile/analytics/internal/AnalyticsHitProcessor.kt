@@ -113,13 +113,24 @@ internal class AnalyticsHitProcessor(
             payload = replaceTimestampInPayload(payload, timestamp, newTimestamp)
             timestamp = newTimestamp
         }
+
+        if (!analyticsState.isAnalyticsConfigured) {
+            Log.debug(
+                AnalyticsConstants.LOG_TAG,
+                CLASS_NAME,
+                "processHit - Analytics has not been configured properly for RSID or host, retrying Analytics hit."
+            )
+            processingResult.complete(false)
+            return
+        }
+
         val url = getAnalyticsBaseUrl(analyticsState) ?: run {
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "processHit - Retrying Analytics hit, error generating base url."
+                "processHit - Error generating base url due to the url not valid, dropping the hit."
             )
-            processingResult.complete(false)
+            processingResult.complete(true)
             return@processHit
         }
 
@@ -247,9 +258,6 @@ internal class AnalyticsHitProcessor(
      * @return a URL for use in Analytics hits or null if the URL could not be built
      */
     private fun getAnalyticsBaseUrl(state: AnalyticsState): String? {
-        if (!state.isAnalyticsConfigured) {
-            return null
-        }
         val baseUrl =
             "https://${state.host}/b/ss/${state.rsids ?: ""}/${getAnalyticsResponseType(state)}/$version/s${(0..100000000).random()}"
         if (!UrlUtils.isValidUrl(baseUrl)) {
