@@ -252,7 +252,7 @@ internal class AnalyticsHitProcessor(
             Log.debug(
                 AnalyticsConstants.LOG_TAG,
                 CLASS_NAME,
-                "getAnalyticsBaseUrl - The Analytics configuration for RSID or host is not ready, as they appear to be empty or null."
+                "getAnalyticsBaseUrl - The Analytics configuration for RSID or host is not found. RSID and host must not be null or empty."
             )
             return null
         }
