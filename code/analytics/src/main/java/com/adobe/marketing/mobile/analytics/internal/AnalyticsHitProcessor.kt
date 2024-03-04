@@ -141,7 +141,7 @@ internal class AnalyticsHitProcessor(
 
         networkService.connectAsync(networkRequest) { connection ->
             if (connection == null) {
-                Log.warning(
+                Log.debug(
                     AnalyticsConstants.LOG_TAG,
                     CLASS_NAME,
                     "processHit - Retrying Analytics hit, there is currently no network connectivity"
@@ -206,7 +206,7 @@ internal class AnalyticsHitProcessor(
                     doneProcessingResult = true
                 }
                 in arrayOf(408, 504, 503, -1) -> {
-                    Log.warning(
+                    Log.debug(
                         AnalyticsConstants.LOG_TAG,
                         CLASS_NAME,
                         "processHit - Retrying Analytics hit, request with url $url failed with recoverable status code ${connection.responseCode}"
