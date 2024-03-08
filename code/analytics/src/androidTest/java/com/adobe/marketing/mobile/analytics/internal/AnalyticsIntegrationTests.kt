@@ -141,6 +141,7 @@ class AnalyticsIntegrationTests {
             "a.action" to "clickOK"
         )
         assertTrue(expectedContextData == contextDataMap)
+
         assertEquals("1", varMap["ndh"])
         assertEquals("UTF-8", varMap["ce"])
         assertEquals("lnk_o", varMap["pe"])
@@ -242,6 +243,9 @@ class AnalyticsIntegrationTests {
             countDownLatch.countDown()
         }
         countDownLatch.await()
+
+        // Clear the queue before the next test
+        cleanAnalyticsQueue()
     }
 
     @Test
@@ -365,6 +369,18 @@ internal fun extractQueryParamsFrom(url: String): Map<String, String> {
 
 private fun extractContextDataStringFrom(url: String): String? {
     return CONTEXT_DATA_REGEX.find(url)?.value
+}
+
+// Clear the queue to get ready for the next test
+private fun cleanAnalyticsQueue() {
+
+    val clearQueueLatch = CountDownLatch(1)
+    Analytics.clearQueue()
+    // Calling getQueueSize and waiting for the callback to ensure the queue is cleared
+    Analytics.getQueueSize {
+        clearQueueLatch.countDown()
+    }
+    clearQueueLatch.await()
 }
 
 internal fun extractContextDataFrom(url: String): Map<String, String> {
