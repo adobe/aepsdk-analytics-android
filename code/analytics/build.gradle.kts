@@ -39,7 +39,4 @@ dependencies {
     // androidTestImplementation dependencies provided by aep-library:
     // JUNIT
     androidTestImplementation("com.adobe.marketing.mobile:identity:$functionalTestIdentityVersion")
-    {
-        exclude(group = "com.adobe.marketing.mobile", module = "core")
-    }
 }
