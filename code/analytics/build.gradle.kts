@@ -29,7 +29,6 @@ aepLibrary {
 }
 
 dependencies {
-    // Stop using SNAPSHOT after Core release.
     implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion")
 
     // testImplementation dependencies provided by aep-library:
