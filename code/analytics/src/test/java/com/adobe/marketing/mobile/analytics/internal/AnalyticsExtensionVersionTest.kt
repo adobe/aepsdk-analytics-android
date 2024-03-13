@@ -13,29 +13,15 @@ package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.Analytics
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
-import java.io.FileInputStream
-import java.util.Properties
 
 @RunWith(MockitoJUnitRunner.Silent::class)
 class AnalyticsExtensionVersionTest {
-    private val PROPERTY_MODULE_VERSION = "moduleVersion"
 
     @Test
     fun internalExtensionVersion_publicExtensionVersion_asEqual() {
         assertEquals(AnalyticsConstants.EXTENSION_VERSION, Analytics.extensionVersion())
-    }
-    
-    private fun loadGradleProperties(): Properties {
-        val properties = Properties()
-
-        val gradlePropertiesPath = "../gradle.properties"
-        FileInputStream(gradlePropertiesPath).use { properties.load(it) }
-        return properties
     }
 }
