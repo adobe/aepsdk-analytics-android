@@ -30,27 +30,7 @@ class AnalyticsExtensionVersionTest {
     fun internalExtensionVersion_publicExtensionVersion_asEqual() {
         assertEquals(AnalyticsConstants.EXTENSION_VERSION, Analytics.extensionVersion())
     }
-
-    @Test
-    @Ignore
-    fun extensionVersion_verifyModuleVersionInPropertiesFile_asEqual() {
-        val properties: Properties = loadGradleProperties()
-        assertNotNull(Analytics.extensionVersion())
-        assertFalse(Analytics.extensionVersion().isEmpty())
-        val moduleVersion: String = properties.getProperty(PROPERTY_MODULE_VERSION)
-        assertNotNull(moduleVersion)
-        assertFalse(moduleVersion.isEmpty())
-        assertEquals(
-            java.lang.String.format(
-                "Expected version to match in gradle.properties (%s) and extensionVersion API (%s)",
-                moduleVersion,
-                Analytics.extensionVersion()
-            ),
-            moduleVersion,
-            Analytics.extensionVersion()
-        )
-    }
-
+    
     private fun loadGradleProperties(): Properties {
         val properties = Properties()
 
