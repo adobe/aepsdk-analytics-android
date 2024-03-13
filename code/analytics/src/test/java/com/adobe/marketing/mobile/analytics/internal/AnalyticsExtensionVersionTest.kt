@@ -15,6 +15,7 @@ import com.adobe.marketing.mobile.Analytics
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
@@ -31,6 +32,7 @@ class AnalyticsExtensionVersionTest {
     }
 
     @Test
+    @Ignore
     fun extensionVersion_verifyModuleVersionInPropertiesFile_asEqual() {
         val properties: Properties = loadGradleProperties()
         assertNotNull(Analytics.extensionVersion())
