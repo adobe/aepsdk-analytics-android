@@ -22,7 +22,7 @@ The Analytics extension depends on the Core and Identity extensions:
 
 1. Installation via [Maven](https://maven.apache.org/) & [Gradle](https://gradle.org/) is the easiest and recommended way to get the Mobile SDK. Add a dependency on Analytics and Mobile Core to your mobile application. To ensure consistent builds, it is best to explicitly specify the dependency version and update them manually.
 
-    ### Kotlin
+    #### Kotlin
 
     ```kotlin
     implementation(platform("com.adobe.marketing.mobile:sdk-bom:3.+"))
@@ -31,7 +31,7 @@ The Analytics extension depends on the Core and Identity extensions:
     implementation("com.adobe.marketing.mobile:analytics")
     ```
 
-    ### Groovy
+    #### Groovy
     
     ```groovy
     implementation platform('com.adobe.marketing.mobile:sdk-bom:3.+')
@@ -45,7 +45,7 @@ The Analytics extension depends on the Core and Identity extensions:
 
 2. Import MobileCore, Identity and Analytics extensions:
 
-   ### Java
+   #### Java
 
    ```java
    import com.adobe.marketing.mobile.MobileCore;
@@ -53,7 +53,7 @@ The Analytics extension depends on the Core and Identity extensions:
    import com.adobe.marketing.mobile.Analytics;
    ```
 
-   ### Kotlin
+   #### Kotlin
 
    ```kotlin
    import com.adobe.marketing.mobile.MobileCore
@@ -63,7 +63,7 @@ The Analytics extension depends on the Core and Identity extensions:
 
 3. Import the Analytics library into your project and register it with `MobileCore`
 
-   ### Java
+   #### Java
 
    ```java
    public class MainApp extends Application {
@@ -85,7 +85,7 @@ The Analytics extension depends on the Core and Identity extensions:
     }
    ```
 
-   ### Kotlin
+   #### Kotlin
 
    ```kotlin
    class MyApp : Application() {
