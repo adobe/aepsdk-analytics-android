@@ -79,7 +79,7 @@ jobs:
           cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - store_artifacts:
-          path: code/<< pipeline.parameters.build-path >>/reports  
+          path: << pipeline.parameters.build-path >>/reports  
           
   build-and-unit-test:
     executor:
