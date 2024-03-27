@@ -70,5 +70,6 @@ dependencies {
     {
         exclude(group = "com.adobe.marketing.mobile", module = "core")
     }
-    implementation("com.adobe.marketing.mobile:assurance:2.0.0")
+    implementation("com.adobe.marketing.mobile:assurance:3.0.0-SNAPSHOT") {
+        exclude(group = "com.adobe.marketing.mobile", module = "core")}
 }
