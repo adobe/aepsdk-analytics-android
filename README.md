@@ -14,7 +14,7 @@ Refer to the [getting started guide](./Documentation/getting-started.md) for set
 
 **Open the project**
 
-To open and run the project, open the `code/build.gradle` file in Android Studio
+To open and run the project, open the `code/settings.gradle.kts` file in Android Studio
 
 **Run test application**
 
