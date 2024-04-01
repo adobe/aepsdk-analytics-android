@@ -29,8 +29,7 @@ aepLibrary {
 }
 
 dependencies {
-    // Stop using SNAPSHOT after Core release.
-    implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion-SNAPSHOT")
+    implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion")
 
     // testImplementation dependencies provided by aep-library:
     // MOCKITO_CORE, MOCKITO_INLINE, MOCKITO_KOTLIN, JUNIT
@@ -38,8 +37,5 @@ dependencies {
 
     // androidTestImplementation dependencies provided by aep-library:
     // JUNIT
-    androidTestImplementation("com.adobe.marketing.mobile:identity:$functionalTestIdentityVersion-SNAPSHOT")
-    {
-        exclude(group = "com.adobe.marketing.mobile", module = "core")
-    }
+    androidTestImplementation("com.adobe.marketing.mobile:identity:$functionalTestIdentityVersion")
 }
