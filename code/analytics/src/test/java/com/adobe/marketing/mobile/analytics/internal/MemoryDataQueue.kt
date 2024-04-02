@@ -13,7 +13,7 @@ package com.adobe.marketing.mobile.analytics.internal
 
 import com.adobe.marketing.mobile.services.DataEntity
 import com.adobe.marketing.mobile.services.DataQueue
-import java.util.*
+import java.util.LinkedList
 
 class MemoryDataQueue : DataQueue {
     private val queue = LinkedList<DataEntity>()

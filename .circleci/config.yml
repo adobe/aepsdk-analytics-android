@@ -1,104 +1,189 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
-# For a detailed guide to building and testing on Android, read the docs:
-# https://circleci.com/docs/2.0/language-android/ for more details.
-version: 2.1
+#
+# Copyright 2022 Adobe. All rights reserved.
+# This file is licensed to you under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License. You may obtain a copy
+# of the License at http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+# OF ANY KIND, either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+#
 
-# Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
-# See: https://circleci.com/docs/2.0/orb-intro/
+version: 2.1
 orbs:
-  android: circleci/android@2.1.2
+  # Use the circleci android orb version that supports OpenJDK17 required by AGP 8.2+
+  android: circleci/android@2.4.0
+  codecov: codecov/codecov@4.0.1
+
+parameters:
+  gradle-cache-prefix:
+    type: string
+    default: v1
+  build-cache-prefix:
+    type: string
+    default: v1
+  build-path:
+    type: string
+    default: "code/analytics/build"
+
+# Workflows orchestrate a set of jobs to be run;
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - validate-code
+      - build-and-unit-test:
+          requires:
+            - validate-code
+      - functional-test:
+          requires:
+            - validate-code
+      - build-test-app:
+          requires:
+            - validate-code
+          filters:
+            branches:
+              only:
+                - main
+                - staging
 
 jobs:
-  build-project:
+  validate-code:
     executor:
-      name: android/android-machine
-      resource-class: large
-      tag: 2021.10.1
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1
 
     steps:
-      # Checkout the code as the first step.
       - checkout
+
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
       - run:
-          name: Check format
+          name: Check Format
           command: make checkformat
 
       - run:
-          name: build library
-          command: |
-            make assemble-phone
+          name: Check Style
+          command: make checkstyle
 
-      - run:
-          name: publish jitpack build to local repository
-          command: |
-            make publish-maven-local-jitpack
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
 
-      - run:
-          name: build test app
-          command: |
-            make assemble-app
-      - run:
-          name: build java doc
-          command: |
-            make java-doc
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
       - store_artifacts:
-          path: code/analytics/build/libs
-
-  unit-test:
+          path: << pipeline.parameters.build-path >>/reports  
+          
+  build-and-unit-test:
     executor:
-      name: android/android-machine
-      resource-class: large
-      tag: 2021.10.1
-
-    steps:
-      # Checkout the code as the first step.
-      - checkout
-      - android/create-avd:
-          avd-name: myavd
-          install: true
-          system-image: system-images;android-29;default;x86
-      - run:
-          name: unit test
-          command: |
-            make unit-test
-      - run:
-          name: code coverage
-          command: |
-            make unit-test-coverage
-      - run:
-          name: Upload Code Coverage Report
-          command: |
-            curl -s https://codecov.io/bash > codecov;
-            VERSION=$(grep 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-            SHAVERSION=$(shasum -v);
-            echo "Using CodeCov version '$VERSION'"
-            echo "Using shasum '$SHAVERSION'"
-            for i in 1 256 512
-            do
-              shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
-              shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep -w "codecov")
-            done
-            bash ./codecov -v -X s3 -c -D "./code/analytics/build/reports/coverage/test/phone/debug" -F unit-functional-tests
-  integration-test:
-    executor:
-      name: android/android-machine
-      resource-class: large
-      tag: 2022.01.1
-
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1
+ 
     steps:
       - checkout
+
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+       
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >> 
+
+      - run:
+          name: Javadoc
+          command: make javadoc
+
+      - store_artifacts:
+          path: << pipeline.parameters.build-path >>/docs/javadoc
+
+      - run:
+          name: Assemble Phone
+          command: make assemble-phone
+
+      - android/run-tests:
+          test-command: make unit-test-coverage
+
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      - store_artifacts:
+          path: << pipeline.parameters.build-path >>/reports/tests
+
+      - store_test_results:
+          path: << pipeline.parameters.build-path >>/test-results/testPhoneDebugUnitTest
+
+      - codecov/upload:
+          file: << pipeline.parameters.build-path >>/reports/coverage/test/phone/debug/report.xml
+          flags: unit-tests
+
+  functional-test:
+    executor: 
+      name: android/android-machine
+      resource-class: medium
+      tag: 2024.01.1
+
+    steps:
+      - checkout
+
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      - run:
+          name: List available emulator images
+          command: sdkmanager --list
 
       - android/start-emulator-and-run-tests:
+          #   It should match the name seen in the "sdkmanager --list" output
           system-image: system-images;android-29;default;x86
+          #   The command to be run, while waiting for emulator startup
           post-emulator-launch-assemble-command: make assemble-phone
-          test-command: make integration-test
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
-workflows:
-  build-it: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
-    jobs:
-      - build-project
-      - unit-test
-      - integration-test
-      # - functional-test
+          #   The test command
+          test-command: make functional-test-coverage
+          restore-gradle-cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+   
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      - codecov/upload:
+          file: << pipeline.parameters.build-path >>/reports/coverage/androidTest/phone/debug/connected/report.xml
+          flags: functional-tests
+ 
+      - store_artifacts:
+          path: << pipeline.parameters.build-path >>/reports/androidTests
+
+      - store_test_results:
+          path: << pipeline.parameters.build-path >>/outputs/androidTest-results
+    
+  build-test-app:
+
+    executor:
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1
+
+    steps:
+      - checkout
+
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      - run:
+          name: Assemble App
+          command: make assemble-app
+
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>

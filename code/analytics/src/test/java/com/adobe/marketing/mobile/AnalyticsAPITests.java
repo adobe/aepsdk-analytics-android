@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
-import com.adobe.marketing.mobile.analytics.internal.AnalyticsExtension;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
@@ -37,57 +36,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class AnalyticsAPITests {
 
     @SuppressWarnings("rawtypes")
-    @Test
-    public void testRegisterExtension() {
-        try (MockedStatic<MobileCore> mobileCoreMockedStatic =
-                Mockito.mockStatic(MobileCore.class)) {
-            // mock MobileCore.registerExtension()
-            ArgumentCaptor<Class> extensionClassCaptor = ArgumentCaptor.forClass(Class.class);
-            ArgumentCaptor<ExtensionErrorCallback> callbackCaptor =
-                    ArgumentCaptor.forClass(ExtensionErrorCallback.class);
-            mobileCoreMockedStatic
-                    .when(
-                            () ->
-                                    MobileCore.registerExtension(
-                                            extensionClassCaptor.capture(),
-                                            callbackCaptor.capture()))
-                    .thenReturn(true);
-            // call registerExtension() API
-            Analytics.registerExtension();
-            // verify: happy
-            assertNotNull(callbackCaptor.getValue());
-            assertEquals(AnalyticsExtension.class, extensionClassCaptor.getValue());
-            // verify: not exception when error callback was called
-            callbackCaptor.getValue().error(ExtensionError.UNEXPECTED_ERROR);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Test
-    public void testRegisterExtensionWithoutError() {
-        try (MockedStatic<MobileCore> mobileCoreMockedStatic =
-                Mockito.mockStatic(MobileCore.class)) {
-            // mock MobileCore.registerExtension()
-            ArgumentCaptor<Class> extensionClassCaptor = ArgumentCaptor.forClass(Class.class);
-            ArgumentCaptor<ExtensionErrorCallback> callbackCaptor =
-                    ArgumentCaptor.forClass(ExtensionErrorCallback.class);
-            mobileCoreMockedStatic
-                    .when(
-                            () ->
-                                    MobileCore.registerExtension(
-                                            extensionClassCaptor.capture(),
-                                            callbackCaptor.capture()))
-                    .thenReturn(true);
-            // call registerExtension() API
-            Analytics.registerExtension();
-            // verify: happy
-            assertNotNull(callbackCaptor.getValue());
-            assertEquals(AnalyticsExtension.class, extensionClassCaptor.getValue());
-            // verify: not exception when error callback was called
-            callbackCaptor.getValue().error(null);
-        }
-    }
-
     @Test
     public void testClearQueue() {
         try (MockedStatic<MobileCore> mobileCoreMockedStatic =
