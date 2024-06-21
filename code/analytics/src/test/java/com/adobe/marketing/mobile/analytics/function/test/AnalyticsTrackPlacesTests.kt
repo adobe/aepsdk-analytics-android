@@ -139,7 +139,7 @@ internal class AnalyticsTrackPlacesTests : AnalyticsFunctionalTestBase() {
                     "useriswithin" to true,
                     "latitude" to 37.3309257,
                     "libraryid" to "311cbfb0-ac5e-436a-b22d-4a917426880d",
-                    "regionname" to  "Adobe 100",
+                    "regionname" to "Adobe 100",
                     "weight" to 1,
                     "regionmetadata" to mapOf(
                         "country" to "Adobe 100",
