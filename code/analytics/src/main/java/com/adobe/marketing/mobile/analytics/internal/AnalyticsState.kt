@@ -222,17 +222,17 @@ class AnalyticsState {
      */
     private fun extractPlacesInfo(placesInfo: Map<String, Any?>) {
         val placesContextData = DataReader.optTypedMap(
-            String::class.java,
+            Object::class.java,
             placesInfo,
             AnalyticsConstants.EventDataKeys.Places.CURRENT_POI,
             null
         ) ?: return
-        val regionId = placesContextData[AnalyticsConstants.EventDataKeys.Places.REGION_ID]
+        val regionId = placesContextData[AnalyticsConstants.EventDataKeys.Places.REGION_ID] as? String
         if (!StringUtils.isNullOrEmpty(regionId)) {
             defaultData[AnalyticsConstants.ContextDataKeys.REGION_ID] =
                 regionId ?: ""
         }
-        val regionName = placesContextData[AnalyticsConstants.EventDataKeys.Places.REGION_NAME]
+        val regionName = placesContextData[AnalyticsConstants.EventDataKeys.Places.REGION_NAME] as? String
         if (!StringUtils.isNullOrEmpty(regionName)) {
             defaultData[AnalyticsConstants.ContextDataKeys.REGION_NAME] =
                 regionName ?: ""
