@@ -160,6 +160,41 @@ class AnalyticsStateTests {
     }
 
     @Test
+    fun testExtractPlacesInfo_returnsRegionNameAndID_whenStateContainsOtherTypes() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "currentpoi" to mapOf(
+                        "regionid" to "99306680-a0e5-49f1-b0eb-c52c6e05ce01",
+                        "useriswithin" to true,
+                        "latitude" to 37.3309257,
+                        "libraryid" to "311cbfb0-ac5e-436a-b22d-4a917426880d",
+                        "regionname" to "Adobe 100",
+                        "weight" to 1,
+                        "regionmetadata" to mapOf(
+                            "country" to "Adobe 100",
+                            "city" to "Adobe 100",
+                            "street" to "Adobe 100",
+                            "state" to "Adobe 100",
+                            "category" to "Adobe 100"
+                        ),
+                        "radius" to 100,
+                        "longitude" to -121.8939791
+                    )
+                )
+            )
+        )
+        assertEquals(
+            "99306680-a0e5-49f1-b0eb-c52c6e05ce01",
+            state.defaultData[AnalyticsConstants.ContextDataKeys.REGION_ID]
+        )
+        assertEquals(
+            "Adobe 100",
+            state.defaultData[AnalyticsConstants.ContextDataKeys.REGION_NAME]
+        )
+    }
+
+    @Test
     fun testExtractPlacesInfo_returnsDefaultValues_when_empty() {
         state.update(
             mapOf(
@@ -181,6 +216,48 @@ class AnalyticsStateTests {
             )
         )
         assertTrue(state.defaultData.isEmpty())
+    }
+
+    @Test
+    fun testExtractPlacesInfo_returnsDefaultValuesAndDoesNotCrash_when_regionname_invalidType() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "currentpoi" to mapOf(
+                        "regionid" to "sampleRegionId",
+                        "regionname" to true
+                    )
+                )
+            )
+        )
+        assertEquals(
+            "sampleRegionId",
+            state.defaultData[AnalyticsConstants.ContextDataKeys.REGION_ID]
+        )
+        assertNull(
+            state.defaultData[AnalyticsConstants.ContextDataKeys.REGION_NAME]
+        )
+    }
+
+    @Test
+    fun testExtractPlacesInfo_returnsDefaultValuesAndDoesNotCrash_when_regionid_invalidType() {
+        state.update(
+            mapOf(
+                PLACES_SHARED_STATE to mapOf(
+                    "currentpoi" to mapOf(
+                        "regionid" to 123,
+                        "regionname" to "sampleRegionName"
+                    )
+                )
+            )
+        )
+        assertEquals(
+            "sampleRegionName",
+            state.defaultData[AnalyticsConstants.ContextDataKeys.REGION_NAME]
+        )
+        assertNull(
+            state.defaultData[AnalyticsConstants.ContextDataKeys.REGION_ID]
+        )
     }
 
     @Test
