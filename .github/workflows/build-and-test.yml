@@ -25,5 +25,5 @@ jobs:
       run-test-functional: true
       run-build-app: true
       enable-codecov: true
-      javadoc-build-path: code/analytics/build/docs/javadoc
+      javadoc-build-path: code/analytics/build/dokka/javadoc
     secrets: inherit
