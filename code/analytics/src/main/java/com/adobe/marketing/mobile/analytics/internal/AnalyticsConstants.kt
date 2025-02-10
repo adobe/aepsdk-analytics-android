@@ -18,7 +18,7 @@ internal object AnalyticsConstants {
 
     const val EXTENSION_NAME = "com.adobe.module.analytics"
     const val FRIENDLY_NAME = "Analytics"
-    const val EXTENSION_VERSION = "3.0.1"
+    const val EXTENSION_VERSION = "3.0.2"
     const val DATASTORE_NAME = "AnalyticsDataStorage"
     const val DATA_QUEUE_NAME = EXTENSION_NAME
     const val REORDER_QUEUE_NAME = "com.adobe.module.analyticsreorderqueue"
