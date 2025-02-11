@@ -83,7 +83,7 @@ internal class AnalyticsExtension : Extension {
     }
 
     override fun getVersion(): String {
-        return AnalyticsConstants.EXTENSION_VERSION
+        return AnalyticsConstants.VERSION
     }
 
     /**
