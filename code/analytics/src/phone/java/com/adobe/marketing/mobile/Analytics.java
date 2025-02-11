@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class Analytics {
     private static final String LOG_TAG = "Analytics";
-    private static final String EXTENSION_VERSION = "3.0.1";
+    private static final String EXTENSION_VERSION = "3.0.2";
     // The constants for EventData keys
     private static final String ANALYTICS_ID = "aid";
     private static final String GET_QUEUE_SIZE = "getqueuesize";
