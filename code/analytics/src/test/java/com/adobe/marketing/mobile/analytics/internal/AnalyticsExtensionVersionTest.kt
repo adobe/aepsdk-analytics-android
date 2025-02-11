@@ -27,7 +27,7 @@ class AnalyticsExtensionVersionTest {
 
     @Test
     fun internalExtensionVersion_publicExtensionVersion_asEqual() {
-        assertEquals(AnalyticsConstants.EXTENSION_VERSION, Analytics.extensionVersion())
+        assertEquals(AnalyticsConstants.VERSION, Analytics.extensionVersion())
     }
 
     @Test
